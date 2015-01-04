@@ -1,3 +1,5 @@
+admin/
+
 # Non-latex ignores
 *.svg
 *.pyc

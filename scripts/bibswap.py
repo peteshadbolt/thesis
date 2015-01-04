@@ -53,8 +53,8 @@ def extract_cites(filename):
 
 
 def load_database():
-    home=os.environ['HOME']
-    database_filename=os.path.join(home, '.bibswap/bibswap.db')
+    root=os.path.split(__file__)[0]
+    database_filename=os.path.join(root, 'bibswap.db')
     return anydbm.open(database_filename, 'c')
 
 if __name__=='__main__':
