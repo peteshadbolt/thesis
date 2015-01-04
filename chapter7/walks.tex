@@ -1,0 +1,415 @@
+\section{Multiphoton quantum interference} 
+\label{sec:quantum-walks}
+
+All experimental work in this thesis has so far been performed in a qubit encoding. Although we have studied two photons in up to 6 modes --- a system with 21 unique configurations --- we have only been interested the four two-qubit states $\ket{00} \ldots \ket{11}$, and we have postselected on detection events which fall in that subspace.  
+%Here we are motivated by the fact that most quantum-computing blueprints are written in terms of qubits, in the circuit model. 
+This has allowed us to directly exploit the majority of the established language and theory of quantum computation, much of which is written in terms of qubits \emph{i.e.} in the circuit model. 
+In particular, we have made use of proofs of universality and scaling such as those of \gls{klm} (\ref{sec:klm}) to guide our experimental design.
+The fact that the literature should be so focussed on qubits is not surprising --- as with a classical computer, any finite $d$-dimensional \emph{qudit} encoding can be efficiently and exactly represented in terms of two-level systems, which often have advantages in terms of simplicity of analysis and hardware efficiency\footnote{In a circuit model architecture, replacing qubits with $d$-level systems has been shown to give a modest multiplicative $\log_2d$ advantage in the number of gate operations \cite{Muthukrishnan2000} and facilitate controlled-$\unitary$ operations \cite{Zhou2010}.}. 
+
+At present, the major bottlenecks for the development of universal \gls{loqc} are the lack of deterministic, scalable sources of indistinguishable photons, and the difficulty of optical-frequency adaptive measurements. Although work is under way to develop deterministic sources in a variety of architectures (see section \ref{sec:sources}), current technology is very much ``pre-threshold'', and experiments which go beyond four photons remain challenging.  On the other hand, with the advent of integrated quantum photonics, \emph{modes} are comparatively cheap --- reconfigurable silicon photonic devices with hundreds of waveguides are readily available \cite{Sun2013}. 
+
+Perhaps we can obtain a greater computational return per photon, at least in the short term, by dispensing with the circuit model and making direct use of a larger number of optical modes?  Taking a simple example, if our basic resource is 5 photons, then using the $2p$ modes that are minimally required to encode $p$ independent qubits, we generate a Hilbert space on qubits of dimension $2^5 = 32$. If on the other hand we inject the same $5$ photons into a device with $25$ modes, we generate a Hilbert space with dimension 118,775. Na\"ively, we might expect that it is in general hard to classically compute the effects of quantum interference in such scenarios. Moreover, it is not obvious that this computational advantage should depend on adaptive measurements, and the associated problem of GHz feed-forward, required for universal \gls{loqc}.  The price we pay for this experimental convenience is the guarantee of universality provided by \gls{klm} and others --- see section \ref{sec:reck-scheme} --- but it is nonetheless conceivable that we might retain an exponential quantum speedup for specific tasks.
+
+As well as an alternative approach to photonic quantum computation, this section also introduces a new attitude towards quantum interference.  Even when studying fundamental physical phenomena such as entanglement and nonlocality (for example in chapters \ref{chap:random-chsh} and \ref{chap:quantum-chemistry}), we have so far treated photonic quantum interference as a \emph{resource} which powers the \acrshort{cnotp} gate, rather than a basic physical phenomenon of interest. In this section we will demonstrate complex multiphoton quantum interference effects which have not previously been observed and are of basic scientific interest in their own right, irrespective of potential practical applications.
+
+Large-scale experiments of this form can currently only be implemented in a controlled way using the technology previously described: first, the ability to build intrinsically stable multi-path interferometers on a monolithic chip, and second, a detection system capable of efficiently acquiring a detailed picture of the full output state. The theoretical framework described in section \ref{sec:permanents} will also be indispensable for the numerical simulation and verification of experimental results.
+
+The variety of possible linear optical networks which can be constructed from beamsplitters and phase-shifters is infinite. Here we will consider two extrema: the \emph{most structured} and \emph{least unstructured} nontrivial interferometers. In the first case, we construct linear, symmetric arrays of uniformly coupled waveguides. Using these devices, we implement \emph{quantum walks} of up to five photons, which continuously tunnel back and forth between neighbouring waveguides in the array. In the unstructured case, we use \emph{Haar random} circuits, chosen uniformly at random from the space of all possible interferometers. A recent result by Aaronson and Arkhipov \cite{Aaronson2010} has shown that multiphoton experiments using randomized interferometers of this type are very likely to be classically intractable, even without feed-forward. We experimentally test various aspects of this scheme, referred to as \bosonsampling, using up to 3 photons. Finally we discuss the problem of verification and validation of $\bosonsampling$ machines, and experimentally demonstrate the potential utility of quantum walks in this context.
+
+\subsection{Quantum random walks}
+\label{sec:quantum-random-walks}
+
+% BEGIN WALKS FIGURE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[t!]
+\centering
+\includegraphics[width=.9\linewidth]{chapter7/fig/walks/intro.pdf}
+\caption[Classical and quantum random walks]{
+    Classical and quantum random walks. (a) A ball takes a classical random walk through the pins of a Galton board. The probability that the ball lands at a given lattice site is binomially distributed. (b) The state space of a walker can be represented as a graph, whose vertices and edges correspond to lattice sites and allowed trajectories of the walker, respectively. (c) A single quantum walker injected into a discrete array of continuously-coupled lattice sites undergoes a quantum walk, continuously tunnelling to neighbouring sites. The wavefunction spreads ballistically, and interferes with itself to create wavelike patterns in the probability distribution. This numerical simulation also shows reflection of the wavefunction at the edge of the lattice. (d) The dynamics of a single walker can be reproduced classically, for instance using water waves. However, if two indistinguishable walkers are simultaneously injected into adjacent modes we obtain quantum interference, leading to generalized bosonic bunching which has no classical analog. Photon pairs are more likely to be detected at nearby sites, i.e. on the main diagonal of the correlation matrix. (e) Injecting three photons into adjacent sites, we observe the higher-order equivalent of (d), where photons are again clustered on the main diagonal. In general, the correlation matrix of $p$ photons can be represented as a $p$-dimensional hypercube. }
+\label{fig:walks-intro}
+\end{figure}
+% END WALKS FIGURE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Galton's board}
+\label{sec:galtons-board}
+% Galton's board
+A \emph{Galton board} is constructed by hammering nails into a board so as to form a regular lattice, as shown in figure \ref{fig:walks-intro}. The board is mounted vertically, and a ball is dropped from above. Upon striking each pin the ball bounces at random, either to the left or the right. 
+Each row of the lattice corresponds to a discrete timestep, and we are usually only interested in the ball's lattice site $k$ on the current row, rather than its exact position in space. 
+The ball is said to take a \emph{random walk} through the lattice, and is referred to as a \emph{walker}. Random-walk dynamics appear throughout nature, from Brownian motion and neuroscience to the hunting tactics of sharks \cite{Viswanathan1999} and humans \cite{Raichlen2013}. Moreover, random walks form the basis for a number of randomized classical algorithms, including graph connectivity \cite{Motwani1995a} and machine learning\footnote{In fact, a classical random walk was used as part of a machine learning algorithm to optimize the performance of the \acrshort{cnotmz} chip \cite{Li2013}.}.  Interestingly, the best-known approximate polynomial-time algorithm for the permanent (see section \ref{sec:permanents}) of a nonnegative real matrix, due to Jerrum, Sinclair and Vigoda \cite{Jerrum2004a}, makes use of a random walk.
+ A random walk is a \emph{Markov chain}, as the instantaneous stochastic dynamics of the walker do not depend on the past trajectory or history\footnote{Note that the momentum of the ball in the Galton board gives the system some memory of past states, and the system is therefore only approximately Markovian.}.
+
+The time evolution of the ball in a Galton board is discretized. At a given timestep, corresponding to one row of the board, the walker bounces to a neighbouring lattice site --- either to the left or the right, with equal probability. After $n_t$ timesteps, there are $\binom{n_t}{k}$ possible routes that the walker might have taken to arrive at a site $k$. The probability that the walker arrives at the $k^{th}$ site is therefore binomially distributed, 
+\begin{equation}
+   P(k) = \frac{1}{2^n} \binom{n_t}{k} 
+\end{equation}
+where the centre of the distribution corresponds to the starting site $k_0$. This behaviour is shown in figure \ref{fig:walks-intro}(a).
+
+\subsubsection{Quantum walks}
+\label{sec:continuous-time-quantum-walks-of-photons}
+At any given time, a classical random walker occupies a single site $k$ in the lattice. What happens if we instead use a quantum walker, able to occupy a coherent superposition state $\thestate = \sum_{k=1}^m d_k \ket{k}$ over many lattice sites $k$? There are many ways to construct such quantum-mechanical analogues of Galton's board, all of which fall under the banner of \emph{quantum walks}. All quantum walks have in common the fact that the walker is a quantum particle, and that the stochastic evolution is described by a lossless (unitary) process. Most quantum walks are characterised by a time-independent or periodic Hamiltonian with a regular, local, graph-like structure.
+%Since the evolution is unitary, in contrast with classical random walks, quantum walks do not converge to a steady state \cite{Nayak2000}.
+
+A number of basic phenomena distinguish quantum walks of a single particle from classical random walks. 
+First,  the probability distribution over sites, an example of which is shown in figure \ref{fig:walks-intro}(c), is qualitatively more complex than that of classical particles, owing to interference of the wavefunction with itself. This interference pattern often features two prominent \emph{ballistic lobes} of high probability, whose distance from the origin is a linear function of the evolution time.  A quantum walker thus traverses the lattice faster than a classical particle, in the sense that after fixed amount of time we are more likely to detect the quantum particle at a greater distance from the origin. 
+
+Quantum walks provide a generic, simple model of quantum dynamics, and as such have found a broad range of practical applications. Quantum walks have been used to model natural quantum phenomena including photosynthesis \cite{Mohseni2008i} and exciton dynamics \cite{Klafter1980}, and form the basis of a variety of quantum algorithms for problems including search \cite{Childs2004, Shenvi2003, Childs2003a}, verification of matrix products \cite{Buhrman2004}, evaluation of balanced binary game trees \cite{Farhi2007}, and computation of a broad class of general formulas \cite{Reichardt2007}. Moreover, quantum walks have been shown to provide a basic primitive for universal quantum computation \cite{Childs2009, Childs2013a} --- an idea which can be traced back to Feynman, who describes a computer with a time-independent Hamiltonian in \emph{Simulating physics with computers} \cite{Feynman1982d}.
+
+\subsubsection{Continuous-time quantum walks of photons}
+All quantum walks can be categorized as being either \emph{continuous time} or \emph{discrete-time}. 
+The discrete-time quantum walk \cite{Aharonov2000, Nayak2000, Watrous1998} is perhaps the closest quantum ancestor of a Galton board. The system evolves in discrete timesteps, during which the evolution of the state of the walker is described by a fixed unitary operator $\hat{W}$. By analogy with Galton's nail, $\hat{W}$ places the walker into a coherent superposition of leftward and rightward motion, resulting in a superposition (usually balanced) over lattice sites at the next timestep. The time evolution of a discrete quantum walk is then generated by repeated application of $\hat{W}$, with $\thestate_\lout=\hat{W}^{n_t}\thestate_\lin$ after $n_t$ timesteps.  
+
+% Set up the continuous time quantum walk
+In this work we are instead concerned with \emph{continuous-time} quantum walks \cite{Childs2001a, Farhi1998a}, which do not share such a strong analogy with Galton's board. Discrete and continuous-time quantum walks have been shown to be equivalent in the limit of an infinitely small timestep \cite{Childs2010}. 
+Rather than using instantaneous splitting operations, a continuous-time walk creates a constant opportunity for a walker at a particular site to leak or tunnel into some subset of other sites in the lattice. This opportunity, or \emph{coupling}, has an associated strength which is related to the rate at which probability amplitude moves between a particular pair of connected sites.  
+
+More formally: the state of a single walker in a lattice with $m$ sites $k=\{1,2\ldots m\}$ can always be written in a basis $\{ \ket{1}, \ket{2} \ldots \ket{m}\}$
+\begin{equation}
+    \thestate(t) = \sum_{k=1}^m b_k \ket{k} = \sum_{k=1}^m b_k \creation_k \vacuum
+    \label{eqn:walk-superposition-state}
+\end{equation}
+where $\ket{k}$ is the state of a walker in the $k^{th}$ site, with a corresponding creation operator $\creation_k$. 
+Following Childs et al. \cite{Childs2001a}, the connectivity of the lattice can be represented as a graph $G$, whose vertices and edges correspond to lattice sites and site-to-site couplings respectively. 
+For the simple example of the Galton board, $G$ is a 1-D linear graph with nearest-neighbour couplings, as shown in figure \ref{fig:walks-intro}(b).
+Any $G$ --- and therefore any lattice --- can be written as an $m \times m$ \emph{generator} matrix $M$,  
+where an element $M_{ij}$ corresponds to the coupling strength between sites $i$ and $j$ of the lattice.
+
+To see the physical meaning of these couplings, we first examine a classical continuous-time random walk. Let $P_i(t)$ be the probability of finding the walker at site $i$ and time $t$. If two sites $i$, $j$, are coupled with a strength $M_{ij}$, then it is reasonable to think that the rate of change of probability at a site should be proportional to both the coupling strength and the probability distribution over all adjacent sites:
+\begin{equation}
+   \frac{d P_i(t)}{dt} = \sum_{j=1}^m M_{ij} P_j(t).
+   \label{eqn:classical-continuous-random-walk}
+\end{equation}
+To a first approximation, this reproduces the results of Galton's board --- in particular, since $P_i$ are positive real numbers, no interference effects are seen.  
+
+For quantum states, time evolution is governed by the Heisenberg equation (\ref{eqn:heisenberg-equation}), and a quantum walker prepared at site $i$ evolves according to
+\begin{equation}
+   i\frac{d\creation_i(t)}{dt} = \left[ \creation_i(t), \hamiltonian \right].
+\end{equation}
+We can then model analogous dynamics to (\ref{eqn:classical-continuous-random-walk}) for a single quantum walker by choosing a Hamiltonian in the interaction picture
+\begin{equation}
+   \hamiltonian = \sum_{i,j=1}^m M_{ij} \creation_i \annihilation_j.
+\end{equation}
+where we have set $\hbar$=1, leading to
+\begin{equation}
+   i \frac{d \creation_i(t)}{dt} = - \sum_{j=1}^m M_{ij}\creation_j(t).
+\end{equation}
+Terms on the diagonal of $M$ can be interpreted as coupling a site to itself, encouraging the walker to stay at a particular site.
+
+Integrated photonics provides a particularly simple route to the implementation of continuous-time quantum walks. Arrays of straight, parallel, evanescently coupled waveguides can be lithographically fabricated in a variety of material systems, providing a compact, interferometrically stable lattice upon which a walker, in the form of coherent laser light or single photons, can move. Each waveguide then represents a site in the lattice, and the time parameter corresponds to longitudinal distance $z$ in the array, with $t=z/(n c)$ where $n$ is the refractive index of the material. The $M_{i\ne j}$ correspond to the strength of evanescent coupling between adjacent pairs of waveguides, which can be precisely controlled as described in section \ref{sec:directional-coupler}. Since the evanescent field of a single mode waveguide falls off exponentially with distance (section \ref{sec:guided-modes}), the coupling strength between next nearest-neighbour waveguides is exponentially weaker than that of nearest-neighbours, and can usually be neglected.  
+
+A number of experiments report the use of laser-written waveguides in 3-D architectures to implement walks on highly-connected graphs \cite{Rechtsman2013, Meinecke2013a}. 
+Moreover, the Reck-Zeilinger scheme described in section \ref{sec:reck-scheme} of this thesis allows graphs with any connectivity to be experimentally implemented in a 2-D waveguide structure.
+However the majority of implementations, including those reported in this thesis, use a 2-D nearest-neighbour array, leading to a 1-D lattice such as that shown in figure \ref{fig:walks-intro}(b). Each site is then coupled to at most two nearest neighbours, giving a simple tridiagonal form for the generator:
+\begin{equation}
+  M_{ij}=\begin{cases}
+    \gamma_{ij}, & \text{if $|i-j| = 1$ },\\
+    \beta_{i},   & \text{if $i=j$},\\
+    0, & \text{otherwise}.
+  \end{cases}
+  \rightarrow
+  \begin{bmatrix}
+  \beta_1 & \gamma_{12} & 0 & 0 & 0  & 0 & 0\\
+  \gamma_{12} & \beta_2 & \gamma_{23} & 0  & 0 & 0 & 0\\
+  0 & \gamma_{23} & \beta_3 & \gamma_{34} & 0 & 0  & 0\\
+  & & & \ldots & & & \\
+  0 & 0 & 0 & 0 &  0 & \gamma_{m-1, m} & \beta_m 
+  \end{bmatrix},
+\end{equation}   
+where $\gamma_{ij}$ are evanescent couplings with $\gamma_{ij}=\gamma_{ji}$ and $\beta_i$ are waveguide propagation constants. The Hamiltonian for a single particle on a 1-D lattice is then
+\begin{equation}
+   \hamiltonian   = \sum_{j=1}^N \beta_j \creation_j \annihilation_j 
+                  + \gamma_{(j, j-1)} \creation_{j-1}\annihilation_{j} 
+                  + \gamma_{(j, j+1)} \creation_{j+1}\annihilation_{j_1}.
+                  \label{eqn:quantum-walk-hamiltonian}
+\end{equation}
+A waveguide array with a fixed length $z$ is then described by an $m \times m$ unitary operator $\unitary$, which acts on the single-particle Hilbert space $\hilspace_{m}^1$ and is equivalent to the transfer matrix $\transfer$
+\begin{equation}
+    \transfer \leftrightarrow \unitary = e^{-i \hamiltonian z/nc}~; \quad \thestate_\lout= \unitary \thestate_\lin
+    \label{eqn:quantum-walk-unitary}
+\end{equation}
+which under the assumption of zero loss completely characterises the device.
+
+Quantum walks of a single particle have now been reported in a variety of physical systems including cold atoms \cite{Karski2009a}, ions \cite{Schmitz2009, Zahringer2010a}, and nuclear magnetic resonance \cite{Du2003},  as well as a large number of optical implementations \cite{Bouwmeester1999, Schreiber2010a, Schreiber2011}.  Single-photon quantum walks have been used to simulate the band structure of strained graphene \cite{Rechtsman2013} and the relationship between decoherence and the quantum/classical boundary \cite{Broome2010b}.
+
+In optical single-particle quantum walks, the walker is either implemented using a single photon or a single beam of coherent laser light. In the absence of two-photon quantum interference, the dynamics are thus described by a classical wave theory (see section \ref{sec:light}) and both classical and quantum light sources give identical detection probabilities. In other words, the interference pattern in figure \ref{fig:walks-intro}(c) can be exactly reproduced using water waves. This implies that these experiments and associated algorithms can be simulated on a digital computer with an overhead at most polynomial in the system size \cite{Knight2003}. Thus no quantum algorithm based on a single-particle quantum walk provides any more than a polynomial (likely quadratic \cite{Aharonov2000}) speedup over a classical computer, and all such algorithms can be simulated with a constant $O(1)$ scaling using classical wave computers. The only exceptions to this rule are oracle-based algorithms, for example the result of \cite{Childs2003}.
+
+In order to see quantum walk behaviour which is not explained by a classical wave model, we must introduce multiple contiguous walkers to the lattice \cite{Omar2006}.   The first experimental demonstration \cite{Peruzzo2010}  used photon pairs generated by \gls{spdc} together with an array of 21 uniformly coupled $\text{SiO}_x\text{N}_y$ waveguides. This work has since been extended, using entangled photons to simulate fermionic statistics \cite{Matthews2013}, as well as observation of two-photon time evolution \cite{Meinecke2013a}.
+A number of recent demonstrations have used laser-written waveguides to implement discrete-time walks of two to three indistinguishable photons \cite{Sansoni2012, Crespi2013a, Crespi2013b}, including walks in 3-D structures \cite{Poulios2013a}.  Quantum walks of two interacting magnons have also recently been observed, using cold atoms trapped in a linear lattice~\cite{Fukuhara2013a}.
+
+Let's consider a 1-D array of uniformly coupled waveguides, such as that used by Peruzzo et al. \cite{Peruzzo2010}. Measuring the twofold coincidence count-rate between single-photon detectors at output ports $i$ and $j$, we can plot a correlation matrix (figure \ref{fig:walks-intro}(d)), showing the probability of coincidental detection of photons in any given pair of waveguides ($i$,$j$).  
+We find that indistinguishable photons are very likely to be detected either at the same site, or at adjacent waveguides.  Specifically, we observe two clouds of probability density, centred about the main diagonal ($i=j$) of the correlation matrix, corresponding to events in which both photons are detected in the same half of the array.
+Events in which the photon pair is split across the array (off-diagonal terms in the correlation matrix) are suppressed. 
+
+This effect is a generalized form of two-photon quantum interference (section \ref{sec:hong-ou-mandel}),  and has no classical analogue. For the case of $m=p=2$, for example, we recover exactly the situation of Hong, Ou and Mandel. Intuitively, this effect can be thought of as a consequence of the known tendency of photons to bunch together. It should be noted that in a two-photon quantum walk, in contrast with \gls{hom} interference at a 50:50 \gls{bs}, it is not always the case that both photons are detected at exactly the same site. The observed increase in probability of coincidental detection at \emph{nearby but not identical} sites will be referred to here as \emph{clouding}, to distinguish from \gls{hbt}-style \emph{bunching} --- it is not clear that the two are equivalent.
+
+In order to calculate states and probabilities in multi-particle walks, we make direct use of the method outlined in section \ref{sec:permanents}. To re-iterate, any $p$-photon amplitude or probability can be expressed as the permanent of a $p\times p$ submatrix of the $m \times m$ transfer matrix $\transfer$. As we have already seen, $\transfer$ is equivalent to the single-particle unitary time evolution operator $\unitary$ (\ref{eqn:quantum-walk-unitary}), which is a direct function of the single-particle Hamiltonian (\ref{eqn:quantum-walk-hamiltonian}). This is the origin of the nomenclature of $M$ as a generator, since it is a relatively small $m \times m$ matrix operating on $\hilspace_m^1$ which is used to \emph{generate} $\hamiltonian$ and $\unitary$ on the much larger multi-particle Hilbert space $\hilspacep$, which has dimension $\binom{m+p-1}{p}$.
+
+How hard is it to simulate such highly-ordered quantum walks of many indistinguishable photons? Looking at figures such as those shown in \ref{fig:walks-intro}, we might expect that by exploiting the apparent structure of the probability distribution we should be able to efficiently predict the outcome of such experiments using a classical algorithm. Indeed, there have been tentative theoretical efforts to approximately model such distributions in terms of Bessel functions \cite{Bessen2006}. However, our best known exact methods depend on the calculating the permanent, which in general is exponentially hard. Detailed discussion of these issues, in a slightly different context, is given in the next section.
+
+\subsection{\bosonsampling}
+\label{sec:bosonsampling}
+\newcommand{\bsdist}{\mathcal{B}}
+\newcommand{\usdist}{\mathcal{F}}
+\newcommand{\csdist}{\mathcal{C}}
+%The extended Church-Turing thesis says this
+Imagine a computer which can be built in the real world. The \gls{ect} says that any such apparatus can be efficiently simulated by a probabilistic Turing machine ---  ``Time on all reasonable machine models is related by a polynomial.'' \cite{Parberry}.
+While the standard Church-Turing thesis (section \ref{sec:cnot-mz-intro}) has been all but proven for practical purposes \cite{Dershowitz2008}, the \gls{ect} has been significantly weakened by the prospect of quantum computing. The idea that some machines might be fundamentally classically intractable is uncomfortable, and the veracity of the \gls{ect} remains the subject of intense debate \cite{Dershowitz2011}. It is reasonable that this debate should be serious: before making any large financial investment in quantum computing research, we should first ensure that the problems of interest cannot be efficiently solved using classical computers\footnote{The \gls{ect} is not sufficiently well-posed to ever be formally disproved, only weakened.}. 
+
+Shor's algorithm constitutes the best-known challenge to the \gls{ect}. A machine running Shor's algorithm could not currently be simulated in polynomial time. However, Shor's algorithm does not yet render the \gls{ect} untenable, as it has not been proven that factoring is classically intractable, i.e. outside $\P$. Moreover, \emph{even if}  \textsc{Factoring} $\not\subset \P$, it may still be the case that undiscovered new physics or decoherence phenomena render the construction of a scalable quantum factoring machine fundamentally (as opposed to practically) impossible (see, for example \cite{Kalai2011}).
+
+Can we find \emph{experimental} evidence against the \gls{ect}? It would arguably be very convincing if we could build a universal, fault-tolerant quantum computer capable of significantly out-performing a classical computer at problems such as prime factoring. Although great progress has been made, the largest number factored so far using a quantum computer is 21  \cite{Martin-Lopez2012}\footnote{or 143, depending on how you define ``quantum computer'' \cite{Xu2012}.}. In contrast, the current recommended \gls{rsa} key length (i.e. the size in bits of a composite number whose prime factorization is considered classically intractable in the near-term) is $L=2048$. To run Shor's algorithm on this key would require $O(L^2)$ logical qubits, which after error-correction would likely correspond to billions of coherent components \cite{Devitt2012}. Even if we \emph{could} build such a machine\footnote{A \gls{cpu} containing in excess of a billion nanoscale transistors can be bought for less than \pounds 10.}, we would \emph{also} need to prove that factoring is hard in order to strike a blow against the \gls{ect}.  
+
+As discussed in chapter \ref{chap:quantum-chemistry}, exact simulation of quantum chemistry and superconducting materials is currently classically intractable. Non-universal quantum simulation, which is likely to be technologically less demanding than universal quantum computing \cite{Aspuru-Guzik2012}, is believed to provide an exponential quantum speedup in some instances and would represent a challenge to the \gls{ect}. However, this approach suffers from the same burden of proof as Shor's algorithm: it is even harder to formally \emph{prove} that such problems are classically intractable.
+
+\newcommand{\gpe}{GPE_\times}
+\bosonsampling, proposed in 2010 by Scott Aaronson and Alex Arkhipov \cite{Aaronson2010}, attempts to solve the problems of theoretical proof and experimental difficulty outlined above. 
+Although \bosonsampling holds for any noninteracting boson, for simplicity we will only consider photons. We can then define the problem:
+%This is the hypothesis of bosonsampling
+\begin{quote}
+Build an $m$-mode interferometer $A$, whose transfer matrix  $\transfer$ is chosen uniformly at random from the space of all possible interferometers (i.e. by the Haar measure, section \ref{sec:quantum-mechanics-states}).  Place a detector at the output of each mode, and inject $p\lesssim \sqrt{m}$ indistinguishable photons to different input ports of the circuit. \bosonsampling is the problem of generating a single detection event, sampled from the probability distribution $\bsdist$ over all possible $p$-fold detection events.
+\end{quote}
+%Alternatively: Sample from the probability distribution over $p$-fold collision-free detection events generated by $p$ indistinguishable noninteracting bosons (photons) in $m \gtrsim p^2$ modes of a Haar-random linear (-optical) unitary network.
+The device, consisting of an interferometer together with $p$ photons and $m$ detectors, is referred to as a \emph{boson computer}. We have already shown in section \ref{sec:permanents} of this thesis that each element of the probability distribution $\bsdist$ can be computed as a permanent of a $p\times p$ submatrix of $\transfer$.
+The core result of \cite{Aaronson2010} is to show that, given certain very reasonable conjectures, fast approximate classical algorithms for \bosonsampling would have very dramatic and unlikely consequences for existing models of computation:
+\begin{quote}
+Suppose there exists a classical algorithm which takes as input a description of a boson computer $A$ and an error bound $\varepsilon$, and samples from an approximate distribution $\bsdist'$ such that $||\bsdist - \bsdist'|| \le \varepsilon$, in $\poly(|\transfer|, 1/\varepsilon)$ time. Then 
+$\gpe$, which is a $\#\P$-hard problem, is solvable in $\BPP^{\NP}$.  \cite{Aaronson2010}
+\end{quote}
+Here $\gpe$ is the problem of estimating the permanent of a matrix of complex Gaussian random numbers $X\sim \mathcal{N}_\mathbb{C}^{p\times p}$ to multiplicative $\pm \varepsilon \cdot p!$ error, with high probability. In 1979 it was proven by Valiant \cite{Valiant1979a} that calculation of the permanent is $\#\P$-complete, and an exact fast algorithm would imply $\P=\NP$. Here, $\#\P$ is the class of problems which \emph{count} the solutions of decision problems in $\NP$. Polynomial-time approximate randomized algorithms for the permanent of certain classes of matrix exist --- for example those due to Jerrum, Sinclair, and Vigoda \cite{Jerrum2004a} (real, positive matrices) and Gurvitz \cite{Gurvits2005} (complex matrices with atypically large permanents), but no known algorithm achieves the generality, precision and success probability demanded by \bosonsampling. Much of the work of \cite{Aaronson2010} is to provide evidence that $\gpe$ --- i.e. approximate estimation of the permanent of a random complex matrix --- is $\#\P$-hard,
+%(the \emph{Permanent of Gaussians} conjecture)
+and to prove that if so, a fast classical  \bosonsampling machine would imply $\P^{\#\P} = \BPP^{\NP}$, collapsing the polynomial hierarchy ($\P$, $\NP$, $\coNP$ etc.) to an extent that would have far-reaching implications, not least rendering postselected\footnote{Allowing postselection on exponentially unlikely outcomes for both quantum and classical machines.} classical computers as powerful as postselected quantum computers ($\BPPpath = \PostBQP$). 
+
+Arguably, \bosonsampling provides even stronger evidence against the \gls{ect} than Shor's algorithm. If \textsc{Factoring} turns out to be in $\P$, although existing public-key cryptography would be broken, we would not have to modify our existing models of computation. If on the other hand \bosonsampling has an efficient classical algorithm, then a generic, foundational assumption of basic computation complexity theory would fall.
+
+At the same time, in practical terms \bosonsampling is a \emph{weaker} than Shor's result. Factoring is a problem with known real-world applications, while \bosonsampling does not have any such known use. 
+It is important to emphasize that a \bosonsampling machine does not allow one to compute the permanent, only to \emph{sample} from $\bsdist$. A necessary condition for the proof is that $m \gtrsim p^2$, in which case each element of $\bsdist$ is exponentially small in $p$. We therefore cannot simply run the machine many times in order to well-estimate a particular entry in $\bsdist$.
+
+From an experimental point of view, the most compelling feature of \bosonsampling is the relative ease with which an advantage over existing classical machines can be achieved. 
+Rapid scaling in $p$, together with a number of experimentally convenient properties, renders \bosonsampling a leading candidate for the first experimental quantum speedup over classical computers.
+Specifically:
+\begin{itemize}
+    \item The exponential difficulty of classical \bosonsampling scales \emph{particularly fast}. In numerical simulations, using an optimized implementation of the fastest known exact algorithm\footnote{Benchmarks and optimized Cython code for the permanent are given in appendix \ref{app:qy}.} for the permanent \cite{Ryser1963}, we find that for $p>6$ (with $m=p^2$) full calculation of $\bsdist$ becomes practically impossible on a single GHz \gls{cpu}.  It is reasonable to think that experiments with $\gtrsim$~20 indistinguishable photons in $\gtrsim$ 400 modes will begin to challenge even for existing supercomputers. 8-photon experiments have been reported using photons generated by \gls{spdc}~\cite{Yao2012}. 
+\item \bosonsampling depends on high-visibility quantum interference, but, in contrast with gls{klm}, does not require adaptive measurement or feed-forward --- techniques which, at optical frequencies, remain experimentally very challenging. %It is perhaps remarkable that an exponential speedup can apparently be achieved without any nonlinear coupling between photons.
+\item Given the fidelity with which linear-optical networks and single-photon detectors can be constructed, it is not necessarily the case that \bosonsampling machines require error correction (section \ref{sec:errors-in-quantum-computers}), although this remains an open question (see, for example, ref \cite{Leverrier2013}).
+\end{itemize}
+
+Let's assume that we have a \bosonsampling machine with $p>20$. How can we verify that the machine is truly implementing \bosonsampling, and that experimental imperfection has not caused it to output a classically tractable distribution?  The success or failure of Shor's algorithm can be easily checked in polynomial time by simply multiplying the prime factors. All problems in $\NP$ have this promise, however, the output of problems in $P^\#\P$ cannot necessarily be checked in polynomial time. Indeed, the original proposal of \bosonsampling suggests that efficient verification might be \emph{fundamentally} impossible. 
+
+An intuitive argument was recently given by Gogolin et al. \cite{Gogolin2013},  who consider the problem of distinguishing a \bosonsampling machine, which samples from $\bsdist$, from a fake, classical uniform-sampler, which samples $p$-fold clicks from the flat distribution $\usdist: P_i = 1/d ~\forall~ i$.  Since $\transfer$ is Haar-random, $\bsdist$ is roughly uniform. Moreover, when $m\gtrsim p^2$, $\bsdist$ is spread roughly uniformly over exponentially many possible detection patterns. It might therefore appear that $\bsdist$ should be well-approximated by $\usdist$.  Indeed, the authors show that without knowledge of $\transfer$, the experimentalist would need to obtain an exponential number of samples from a machine under test before they could distinguish $\bsdist$ ---  generated by a ``real'' \bosonsampling machine --- from $\usdist$.  If the purpose of \bosonsampling is to provide experimental evidence against the \gls{ect}, this is a serious problem.
+
+Previous experimental implementations of \bosonsampling have used up to four indistinguishable photons, together with randomized interferometers constructed using optical fibre \cite{Broome2013}, lithographically fabricated waveguide chips \cite{Spring2013} and laser-written waveguides \cite{Crespi2013, Tillmann2013}. These early demonstrations have largely focussed on verification of the relationship between measured statistics and permanents of $\transfer$.  In our experimental work we have instead attempted to address the more recent questions of verification and validation of \bosonsampling, including the potential role of quantum walks in this problem.
+
+\subsection{Experiment} 
+\begin{figure}[t!]
+\includegraphics[width=1\linewidth]{chapter7/fig/walks/setup.pdf}
+\caption[Experimental setup]{Experimental setup to generate (a), interfere (b,c) and detect (d) single photons. (a) \SI{780}{nm} laser light from a 140fs pulsed Titanium:Sapphire laser was attenuated with a \gls{hwp} and a \gls{pbs}, before frequency doubling with a type-I \gls{bbo} nonlinear crystal.  The subsequent \SI{390}{nm} light was reflected from four \glspl{dm} and focused onto a type-I \gls{bibo} nonlinear crystal to generate double pairs of photons through spontaneous parametric down conversion.  After passing through an \gls{if}, photons are reflected off a prism (PR) and collected into polarisation maintaining fibres which are butt-coupled, via a V-groove fibre array, to either (b) the \gls{qw} chip, or (c) the \gls{ru} chip. Outgoing photons are coupled from the chip using a second fibre array, either directly to 16 \gls{apd} detectors (d), or via a network of fibre splitters. Detection events are time-correlated and counted using a 16-channel \gls{tcspc}.
+}
+\label{fig:setup}
+\end{figure}
+
+We have performed three and four-photon experiments, using photonic chips to implement both quantum walks (\acrshort{qw}) and Haar-random \bosonsampling unitaries (\acrshort{ru}). Throughout our experimental work, we have focussed on characterisation of the bosonic clouding effects described in section \ref{sec:quantum-walks}, the problems of \bosonsampling verification outlined in section \ref{sec:bosonsampling}, and the potential relationship between the two.
+
+A full schematic of the experimental setup is shown in figure \ref{fig:setup}. A multi-photon type-I \gls{spdc} source (section \ref{sec:four-photon-source}) is coupled into \gls{pmf} fibre. These fibres are butt-coupled to the input ports of either the \gls{qw} (section \ref{sec:quantum-walk-chip}) or \gls{ru} (section \ref{sec:bosonsampling-chip}) chip. Photons are then coupled out of the chip and detected/correlated using the counting system previously described, together with an array of fibre splitters for pseudo-number resolving detection (section \ref{sec:detection-scheme}).
+
+\subsubsection{Multiphoton source} 
+\label{sec:four-photon-source}
+The photon source used in this experiment, illustrated in figures \ref{fig:setup} and \ref{fig:four-photon-source}(a), is based on type-I down-conversion (section \ref{sec:spontaneous-parametric-downconversion}) in the pulsed regime.
+% Sheer tech list
+A Ti:Sapphire pulsed laser (Coherent \emph{Chameleon Ultra II}) generates \SI{144}{fs} \gls{fwhm} pulses at \SI{780}{nm}, with a repetition rate of \SI{80}{MHz}. The average output power is $\sim$ \SI{3.7}{W}, with peak power in excess of \SI{300}{kW}. This light is attenuated using a zero-order \gls{hwp} together with a Glan Taylor high-power \gls{pbs}, and is upconverted to \SI{390}{nm} using a \SI{2}{mm}-thick \gls{bbo}, phase-matched for colinear \gls{shg}. This pump beam is cleaned of \SI{780}{nm} light using four \glspl{dm} and is then focussed to a waist of $\sim$~\SI{40}{\micro \metre} on a \SI{2}{mm}-thick \gls{bibo} crystal phase-matched for type-I downconversion, generating photon pairs at 780nm on a cone with 3$\degs$ opening angle. The pump is then removed using a \gls{dm} together with a band-pass \gls{if} (Semrock \emph{MaxLine}, $\lambda_0$ = \SI{780}{nm}, $\Delta \lambda = \SI{3}{nm}$, transmission $\sim 95\%$).  Four prisms, together with precision alignment stages and aspheric lenses, are used to couple downconverted light from the four compass points of the downconversion cone ($0 \degs$ N, $90 \degs E$, $180 \degs$ S, $270 \degs$ W) into \gls{pmf}.
+
+Our goal is to use this source to generate states of three and four photons where no two photons share the same mode --- i.e. the Fock states $\ket{111}$ and $\ket{1111}$.
+This is motivated by the fact that, for quantum walks, the observed dynamics are more diverse when photons are injected into separate modes, as photons injected at the same mode tend to stick together. Similarly, for \bosonsampling, detection probabilities due to state components with more than one photon per mode (either at the input or output of the device) have repeated rows and columns in the corresponding submatrix of $\transfer$, making classical estimation of the permanent less computationally demanding. 
+
+This source simultaneously generates the \gls{spdc} state (\ref{eqn:spdc-state}) at both the N/S and E/W compass points of the cone.  This can be modelled as two independent downconversion processes, and is more easily visualized as simultaneous \gls{spdc} at two independent crystals as shown in figure \ref{fig:four-photon-source}(b).  Assuming the filters, collection optics, and geometry are symmetric across all four modes, we can write the output state as 
+\begin{align}
+   \ket{\Psi} &= \ket{\psi}_{SPDC}^{ns} \otimes \ket{\psi}_{SPDC}^{ew}\\
+              &= 
+              \left[ \ket{0_n0_s} + 
+              e^{i(\phi_n+\phi_s)}\gamma \ket{1_n1_s} + 
+              e^{2i(\phi_n+\phi_s)}\gamma^2 \ket{2_n2_s} \right] \notag \\
+              & \otimes 
+              \left[ \ket{0_n0_s} + 
+              e^{i(\phi_e+\phi_w)}\gamma \ket{1_e1_w} + 
+              e^{2i(\phi_e+\phi_w)}\gamma^2 \ket{2_e2_w} \right] 
+              + \text{h.c.}
+              \label{eqn:full-spdc-four}
+\end{align}
+where the phases $\vec{\phi}$ arise due to differences in path length between the each collection stage and the \gls{bibo} crystal. These free-space optical paths are not phase-stabilized,  and therefore fluctuate randomly with temperature and acoustic noise in the lab.
+In this work we are principally concerned with the four-photon subspace of (\ref{eqn:full-spdc-four}),
+\begin{align}
+    \ket{\Psi (\vec{\phi})}_4 &= 
+    \frac{1}{\sqrt{3}}\bigl[
+    e^{i(\phi_n+\phi_s+\phi_e+\phi_w)} \ket{1_n1_s1_e1_w} \notag \\
+    &+ e^{2i(\phi_e+\phi_w)} \ket{0_n0_s2_e2_w}
+    + e^{2i(\phi_n+\phi_s)} \ket{2_n2_s0_e0_w}
+    \bigl].
+\end{align}
+With high pump power there is a chance that one photon will be detected in each of the four modes, in which case the state is projected onto $\ket{1111}$ term only, and the global phase can be ignored. However, if the modes are mixed by an interferometer prior to measurement, we can no longer be sure that a given fourfold detection event did not arise from one of the $\ket{2200}$ or $\ket{0022}$ terms. Since the phases $\vec{\phi}$ fluctuate in time, the average state will in general be partially mixed, and will not produce high-visibility quantum interference.
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=.8\linewidth]{chapter7/fig/walks/4photon.pdf}
+\caption[Four-photon \acrshort{spdc} source]{
+    (a) By coupling to the four compass points of the \gls{spdc} cone (N,S,E,W) we can well-approximate states of three degenerate photons in three modes, heralded on detection of a fourth photon.  (b) This approach can be modelled as two independent \gls{spdc} processes at different crystals.
+}
+\label{fig:four-photon-source}
+\end{figure}
+
+
+We take a number of measures to overcome these problems. First, we can easily perform three-photon experiments in which modes $N,S,E$ are sent into the interferometer, while mode $W$ is connected directly to a heralding single-photon detector. Postselection on detection of three photons at the output of the interferometer together with detection at the herald then isolates an effective input state of three degenerate single photons in three modes, $\ket{111}$.
+
+In order to study four-photon statistics arising from the $\ket{1111}$ term, we must currently take a less satisfactory approach. Connecting all four modes to the interferometer, we first acquire fourfold coincidence countrates $c_i^m$ using the full four-mode four-photon \gls{spdc} state (\ref{eqn:full-spdc-four}). During this measurement, we continuously rotate the polarization of one arm of the source using an arrangement of waveplates (figure \ref{fig:four-photon-source}), forcing the average state into a maximal mixture\footnote{By introducing a strong, controlled, uniform source of noise, we ``override'' any effects from the uncontrolled, non-uniform thermal/acoustic phase fluctuation. In this sense, the method described here shares some similarity with the techniques for precise characterization under environmental noise described in section \ref{sec:noisy-entanglement-witness}.}
+\begin{align}
+\dema_4 
+&= \int  \left(\hat{R}(t)_n \otimes I_s \otimes I_e \otimes I_w \right) \ket{\Psi (t)}_4 
+\bra{\Psi (t)}_4 dt \notag\\
+&= \ket{1111}\bra{1111} + \ket{2200}\bra{2200} +\ket{0022}\bra{0022}.
+\label{eqn:spdc-mixed-state}
+\end{align}
+We would then like to treat detection events due to the $\ket{2200}$ and $\ket{0022}$ terms as noise. Fortunately, these countrates can be experimentally measured: making two further measurements with modes $E/W$ and $N/S$ disconnected from the interferometer respectively, we obtain two new sets of experimental countrates ($c_i^{ns}$, $c_i^{ew}$). Subtracting these countrates from the mixed state data $c_i^m$, we recover statistics which model the behaviour of the desired $\ket{1111}$ state. This approach is problematic, quantum interference is to a certain extent artificially constructed using measurements on a maximally mixed state. As a result, this is not a scalable route to high photon-number experiments. However, short of post-selecting from higher-photon number terms in the state with exponentially low probability, or waiting for a scalable single-photon source, it nonetheless provides an immediate route to experimental tests of the $\ket{1111}$ state.
+
+\newcommand{\sion}{SiO$_x$N$_y$\xspace}
+\subsubsection{Quantum walk chip} 
+\label{sec:quantum-walk-chip}
+All of the quantum walk data presented in this section was measured using a 2-D waveguide array (figure \ref{fig:setup}), fabricated in silicon oxynitride (\sion). The coupled region of the array, which  is \SI{700}{\micro\metre} long, consists of 21 waveguides with a cross-section of \SI{2.2}{\micro\metre}  $\times$ \SI{0.85}{\micro\metre},  and a uniform pitch of \SI{1.3}{\micro\metre}. Curved fan-in and fan-out waveguides connect each mode to input and output ports at the chip facets, which are butt-coupled to \gls{pmf} V-groove arrays with a pitch of \SI{127}{\micro\metre}. The waveguides are tapered to a width of \SI{0.7}{\micro\metre} to improve coupling to the fibre mode. An oil-based index-matching fluid was used to further improve coupling efficiency. The lumped fibre-to-fibre coupling was typically \SI{\sim30}{\percent}.
+
+\sion is a ceramic material, whose refractive index can be tuned between $\sim$~1.45 and $\sim$~2 by controlling the nitrogen/oxygen ratio ($x/y$). Compared to silica-on-silicon waveguides (section \ref{sec:silica-on-silicon}), SiO$_x$N$_y$ can achieve a much higher refractive index contrast of $\Delta = (n_2^2-n_1^2)/2n_1^2 =$ 4.4\% between the waveguide core ($n_2$) and cladding ($n_1$), allowing a significantly smaller bend radius (section \ref{sec:guided-modes}) and more compact fan-in/fan-out regions. 
+
+\subsubsection{\bosonsampling chip} 
+\newcommand{\sini}{Si$_2$N$_3$\xspace}
+\label{sec:bosonsampling-chip}
+Following the prescription of Aaronson and Arkhipov \cite{Aaronson2010}, the \bosonsampling device used here implements a random unitary operation on 9 modes, chosen by the Haar measure (section \ref{sec:quantum-mechanics-states}) on $U(9)$. In order to implement this operator in linear optics, we make use of the Reck-Zeilinger scheme described in section \ref{sec:reck-scheme} of this thesis.  The layout of directional couplers is shown in figure \ref{fig:setup}.  
+
+The chip is fabricated in silicon nitride (\sini), with a refractive index contrast of \SI{27}{\percent}. The device consists of a total of 36 directional couplers. The high index-contrast afforded by \sini was essential in order to achieve a compact circuit and suppress losses. Each waveguide has a cross-sectional width of \SI{1.5}{\micro\metre}, and the pitch between parallel waveguides was designed to match that of the fibre arrays (\SI{127}{\micro\metre}). At each directional coupler, the separation between waveguides is \SI{2.5}{\micro\metre}, with an interaction length, depending on the desired coupling ratio, of \SI{\sim400}{\micro\metre}. This device is not reconfigurable --- each coupling ratio and internal phaseshift was written directly into the device, based on a single randomly chosen $\unitary$.
+Although this device provides a much higher refractive index contrast than \sion, the lumped fibre-to-fibre coupling efficiency was typically much lower --- on the order of \SI{\sim 5}{\percent}. We attribute much of this loss to poor mode-matching between fibre and waveguide, rather than propagation loss, and expect that this can be considerably improved.
+
+\subsubsection{Pseudo-number-resolving detection} 
+\label{sec:detection-scheme}
+\bosonsampling only requires that measurements are performed in the \emph{collision-free subspace} where no two photons occupy the same mode. It is therefore sufficient to use non-number resolving detectors, such as the silicon \glspl{apd} used throughout this thesis.  For quantum walks, however, the most interesting features occur when photons bunch together \emph{i.e.} on the main diagonal of the correlation matrix ($i\approx j \approx k \ldots$). In order to observe these effects, we must be able to count up to four photons in single mode. While number-resolving detectors have recently been reported both at room temperature and using superconducting nanowires (see section \ref{sec:detectors}), they are currently not widely available. 
+
+In order to examine the collision subspace of probability distributions generated by the quantum walk chip, we instead multiplex silicon \glspl{apd} using fibre splitters, thus approximating non-deterministic number-resolving detectors. Using $d$ unit-efficiency detectors, together with a balanced 1-to-$d$ fibre splitter, we ideally detect $p$ photons in a single mode with probability 
+\begin{equation}
+    P(p,d) = {\binom{d}{p}}/\left[\binom{d+p-1}{p} p^p\right].
+\end{equation} 
+$P(d,p)$ is polynomial in $p$ if $d\ge p^2$, and this scheme is in principle scalable.
+Numerical simulations of realistic detection efficiencies, taking into account various experimental imperfections, are shown in figure \ref{fig:detector-multiplexing}.
+
+%%%%%%%%%%%%%%%% DETECTION EFFICIENCY PIC %%%%%%%%%%%%%%%%
+\begin{figure}[t!]
+\centering
+\includegraphics[width=1\linewidth]{chapter7/fig/walks/detector_efficiency.pdf}
+\caption[Detection efficiency of multiplexed pseudo-number-resolving detectors]{
+(a) Numerical simulation of pseudo-number-resolving detection efficiency using fibre splitters and multiplexed non-number-resolving detectors. The simulation assumes an average single-detector quantum efficiency of $60\pm 10\%$, and a variance in splitting ratio of \SI{\sim10}{\percent} --- realistic experimental values. Inset: an example with $p=3$, $d=4$. (b) Eight detection schemes used to image three-photon data in a quantum walk.} 
+\label{fig:detector-multiplexing}
+\end{figure}
+%%%%%%%%%%%%%%%% DETECTION EFFICIENCY PIC %%%%%%%%%%%%%%%%
+
+
+\subsection{Characterization and numerical simulation} 
+In order to compare our experimental results with theory, we implemented detailed numerical simulations of each setup, incorporating various measured experimental parameters. 
+
+The visibility of quantum interference of the photon source was characterized by measurement of Hong-Ou-Mandel dips. Fitting curves to measured count rates as described in section \ref{sec:cnot-mz-dip}, we estimated the \gls{hom} dip visibility between photons generated in separate downconversion events (``off-pair'' photons) to be \SI{\sim88}{\percent}. The visibility of off-pair quantum interference is reduced with respect to an on-pair dip by the possibility that two photons are generated at different times within a single pulse, leading to temporal distinguishability. Our laser was therefore optimized for generation of short pulses.
+
+Fabrication of both \gls{qw} and \gls{ru} chips is subject to imperfection in coupling ratios and phase shifts, and the unitary $\unitary_d$ describing each device will differ slightly from the $\unitary$ originally designed. Owing to the ordered structure of the \gls{qw} chip, we were able to characterize $\unitary_{QW}$ by means of single photon measurements only, using bright laser light injected at the centre of the array. Assuming that deviation from the original design is most prominent in the nearest-neighbour coupling ratios $\gamma_{ij}$ (which depend exponentially on distance) and time parameter $t$, a nonlinear optimization algorithm was used to find values of these (20+1) free parameters which best reproduce the experimentally measured single-photon distribution. We found a standard deviation in the reconstructed coupling ratio of $\sigma_\beta$ \SI{\sim5}{\percent}.
+
+For the \gls{ru} chip, since fabrication error could potentially lead to \emph{any} $m$-mode unitary, we use the more rigorous approach of Laing \cite{Laing2012a}, which allows full reconstruction of the device unitary by means of a single-photon and two-photon measurements only. This method, which does not require interferometric stability between the chip and probes, is scalable: since $\unitary_d$ is described by a number of parameters polynomial in $m$, it can be completely reconstructed using a polynomial number of measurements.
+
+Our numerical simulations also make use of a full audit of individual detector efficiencies, fibre splitter coupling ratios, and losses, together with a model of each pseudo-number-resolving detection scheme.
+
+\subsection{Experimental results} 
+\begin{figure}[t!]
+\centering
+\includegraphics[width=1\linewidth]{chapter7/fig/walks/cubes.pdf}
+\caption[Clouding of 3 photons in 9-mode and 21-mode interferometers]{Absence and emergence of correlated bosonic clouds. Three-photon data for a nine mode random unitary (\acrshort{ru},a,b,e,f) and a 21 mode quantum walk (\acrshort{qw},c,d,g,h).  The radii of spheres centred at coordinates ($i,j,k$) are proportional to the probability of detecting three photons in output modes $i$, $j$ and $k$ respectively.  We tune between indistinguishable (blue) and distinguishable (red) photons by introducing a large path-length difference at the source.  (a) Experimental \gls{ru} with indistinguishable and (b) distinguishable photons.  (c,d) Bosonic clouds from experimental \gls{qw} using indistinguishable and distinguishable photons respectively. (e,f)  Simulated \gls{ru} with indistinguishable and distinguishable photons respectively.  (g,h) Theoretical bosonic clouds from \gls{qw} with indistinguishable and distinguishable photons respectively.
+Experimental data has been corrected for measured detection efficiency. Numerics have been filtered to show only those detection patterns which were experimentally measured --- this is the main reason for the apparent asymmetry between boson clouds.  }
+\label{fig:multiphoton-cubes}
+\end{figure}
+
+\subsubsection{Bunching and clouding in quantum walks}
+In our first experiment, we injected the three-photon state $\ket{111}$ into the central waveguides ($k$=10,11,12) of the \gls{qw} chip, using the fourth output mode of the source as a herald as previously described. Using 1-to-2 and 1-to-3 fibre splitters in a total of eight configurations (figure \ref{fig:detector-multiplexing}), we measured 524 of the 1771 possible three-photon detection events over 21 modes, obtaining a total of 3870 three-fold events. Delaying the arrival time of photons from modes $E$ and $S$ of the source on the order of the photon coherence time (\SI{\sim1}{\pico\second}), we repeated this measurement with mutually distinguishable photons, obtaining 5588 threefold events.
+
+
+\newcommand{\prbth}{P_i^\text{th}}
+\newcommand{\prbex}{P_i^\text{exp}}
+We found a statistical fidelity between normalized theoretical $\prbth$ and experimental $\prbex$ probability distributions of $F_Q = 0.930 \pm 0.003$ and $F_C = 0.961 \pm 0.002$ for indistinguishable and distinguishable input states respectively. Error bars are calculated using a Monte-Carlo technique, assuming Poissonian statistics. We attribute the observed discrepancy between experiment and theory to imperfect characterization of the \gls{qw} device, non-uniform facet/coupling loss, limited visibility of quantum interference due to photon distinguishability introduced by propagation through device itself, and higher-order terms in the \gls{spdc} state.
+
+Experimental \gls{qw} data is compared with numerical simulations in figure \ref{fig:multiphoton-cubes} (c, d, g \& h). Using indistinguishable photons, bosonic bunching is immediately apparent along the main diagonal of the correlation cube, with three-photon detection events strongly suppressed in off-diagonal regions.  Two ``clouds'' are clearly visible, centred on waveguides 6 and 16. If one photon is detected at waveguide 16 (for example), it is much more likely that the remaining two photons will also be detected in the vicinity of that waveguide. 
+In contrast, using distinguishable photons we are equally likely to detect photons at opposite sides of the array as to find them grouped together, and the clouds are seen to dissipate.  
+
+We can compare this behaviour with three-photon data obtained from the unstructured \gls{ru} chip, shown together with numerical simulations in figure \ref{fig:multiphoton-cubes} (a, b, e \& f). For the \gls{qw} chip, it is meaningful for two waveguides to be nearest neighbours, while for the \gls{ru} chip this is not the case. No clouding behaviour is observed, and the distinction between distinguishable and indistinguishable photons is qualitatively not as strong. 
+
+In order to quantify this bosonic clouding effect, we construct a simple metric. For a general experiment of $p$ photons in $m$ modes, the correlation matrix forms a $p$-dimensional hypercube with $2^p$ quadrants\footnote{Higher-dimensional quadrants of hypercubes are referred to as \emph{octants} or \emph{hyper-octants}.}. We define the \emph{clouding parameter} $C$ to be the fraction of events which occupy the two principal quadrants, i.e. those which intersect the main diagonal $i=j=k=l \ldots$. We obtained experimental values of $C_Q^\text{exp} = 0.288 \pm 0.015$ and $C_C^\text{exp} = 0.20 \pm 0.01$ for indistinguishable and distinguishable photons respectively, compared to theoretical values of $C_Q^\text{th}=0.332 \pm 0.007$ and $C_C^\text{th}=0.202\pm0.005$, indicating significantly stronger clouding under the influence of quantum interference.
+
+Isolating the $\ket{1111}$ term from $\spdc$ as previously described, we measured four-photon correlations at the output of the \gls{qw} device, with modes $N$, $S$, $E$ and $W$ of the source connected to waveguides ($k$=9,10,11,12) respectively. Using 1-by-4 splitters in two different configurations, we measured coincidence countrates for 1016 out of a possible 10626 four-fold patterns, collecting $\sim 50,000$ events over the course of $\sim$ 1 week. Experimental data is plotted together with numerical simulations in figure \ref{fig:unitary_specific}(a, b). We found statistical fidelities between normalized experimental and theoretical distributions of $F_Q = 0.971 \pm 0.001$ and $F_C = 0.978 \pm 0.004$ respectively. Experimental and theoretical clouding parameters were measured to be $C_Q^\text{ex}=0.175\pm0.007$ and $C_Q^\text{th}=0.144\pm0.002$ respectively. In contrast, we measured significantly smaller values of $C$ when all four photons were made distinguishable, finding experimental and theoretical values of $C_C^{ex}= 0.09\pm 0.003$ and $C_C^{th} = 0.078 \pm 0.001$ respectively. These values are compared graphically in figure \ref{fig:unitary_specific}(d).
+
+While acquiring this four-photon data, the counting system also recorded 217 five-fold detection events. These events arise from extremely low-probability six-photon terms in $\spdc$, where one photon is lost. The Hilbert space dimension of 5 photons in 21 modes --- the number of possible detection patterns --- is 53,130. As a result, with so few detection events registered in total, no unique detection pattern appears more than twice in our data. In this regime it is no longer helpful to to plot individual countrates in a bar chart, or compute statistical fidelities. However, the clouding metric, which boils the full dataset down to a single global property of the probability distribution, appears to detect evidence of bosonic clouding, and therefore quantum interference, in our experimental data. We measured values of $C_Q = 0.079\pm0.019$ and $C_C = 0.058 \pm 0.016$ for indistinguishable and distinguishable photons respectively. These values are compared graphically in figure \ref{fig:unitary_specific}(e).
+
+\subsubsection{Quantum verification in large Hilbert spaces}
+\label{sec:bs-verification}
+Full quantum state tomography (section \ref{sec:state-tomography}) of the three-photon, 21-mode state shown in figure \ref{fig:multiphoton-cubes} would require $O(1\times10^6)$ measurements to reconstruct the $d^2-1$ free parameters of the density matrix $\dema$. Without exploiting known structure in the state, full reconstruction of the 5-photon state measured in figure \ref{fig:unitary_specific}(e) would require $O(1\times10^9)$ linearly independent measurement settings. Even estimating the expectation value of a single measurement setting is likely to be prohibitively time-consuming, as the probability of any given event is so small.
+
+We can compare this situation to that of Shor's algorithm, which is designed in such a way that, for a sufficiently large problem size, the experimentalist \emph{cannot accurately measure the probability of detecting any given $n$-qubit state} in polynomial time. Specifically, when factoring an $L$-bit number $N$, Shor's algorithm  generates a periodic probability distribution characterized by $O(N) \propto O(2^L)$ equally spaced peaks.
+Although it is exponentially more likely that the machine will output a result corresponding to a peak than a trough, since each \emph{peak} is exponentially small, the probability of registering the \emph{same} outcome twice is negligible. Despite this, the \emph{period} --- a global property of the probability distribution, which is a function of its highly structured nature --- can be extracted (using the inverse \gls{qft}) after only polynomially many trials, yielding the prime factors and thus a simple means of verifying the output. 
+
+As experiments in quantum computation and quantum information continue to scale in complexity and Hilbert space dimension, the available experimental data will necessarily be increasingly sparse, to the extent that standard methods of comparison with theory will break down. Moreover, we are already approaching the point at which both full numerical simulation of the experimental setup, as well as full characterization by quantum state tomography, become classically intractable. Our results begin to encroach on this regime of extremely sparse data and challenging classical simulation. However, as we have shown, using global measures which exploit known structure in the probability distribution or experimental setup, we are nonetheless able to verify that the machine operates as desired. 
+
+This global, structured approach is possible for the \gls{qw} chip, as the device is specifically designed to generate highly structured probability distributions. How can we confirm successful operation of the \gls{ru} chip, which is nominally completely unstructured? 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% QUANTUM WALKS : MULTIPHOTON FIGURE %%%%%%%%%%%%
+\begin{figure}[t!]
+\includegraphics[width=\linewidth]{chapter7/fig/walks/multiphoton.pdf}
+\caption[Quantum-walk-specific verification]{Quantum-walk-specific verification. (a) Experimental data (black points) for four indistinguishable photons in a 21 mode quantum walk, over 1820 four-fold detection patterns, ordered by descending theoretical probability (red points). Number-resolved data is highlighted with blue circles.
+Error bars assume Poissonian statistics. (b) Reconstructed pure-state four-photon data, after subtraction of experimentally-measured contributions due to $\ket{2200}$ and $\ket{0022}$ terms.
+In (c-e) we perform a quantum-walk-specific test for $p= 3,4,5 $ photons, measuring the fraction of events $C$ in the principal quadrants (see inset). We plot experimental results for indistinguishable (blue) and distinguishable (red) photons, along with a corresponding theoretical distribution with the same number of samples drawn. In all cases, we see a statistically significant increase in $C$ for indistinguishable photons. In (f) we perform the same test for three photons in a 9-mode random unitary, where our quantum-walk-specific test does not reveal statistically significant quantum-classical separation, as expected.
+}
+\label{fig:unitary_specific}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END QUANTUM WALKS : MULTIPHOTON FIGURE %%%%%%%%%%%%
+
+
+\subsubsection{Experimental verification of \bosonsampling}
+\label{sec:bosonsampling-verification}
+Injecting three photons into the first three modes of the \gls{ru} chip, we measured 434 three-fold coincidences, distributed over all 84 detection patterns in the collision-free subspace. Experimental results from both indistinguishable and distinguishable photons are compared with numerical simulations (based on the reconstructed experimental device unitary $\unitary_d$) in figures \ref{fig:multiphoton-cubes} (a,b) and (e,f) respectively. Statistical fidelities between the experimental data and numerical model were $F_Q = 0.939\pm0.010$ and $F_C = 0.970 \pm 0.007$, for indistinguishable and distinguishable photons respectively.
+
+The principal claim of ref. \cite{Gogolin2013} is that without knowledge of $\unitary_d$, the experimentalist cannot discriminate between an untrusted \bosonsampling machine and a classical uniform-sampler  $\usdist$,  without first measuring an exponential number of samples.  In our first approach to verification of the \gls{ru} device, we assert that in the context of realistic experiments it seems unreasonable to enforce the condition that $\unitary_d$ should be unavailable to the experimentalist: as we have already described, it can always be efficiently measured \cite{Laing2012a}. Indeed, Aaronson and Arkhipov have shown \cite{Aaronson2013} that given $\unitary_d$, a \bosonsampling machine \emph{can} be distinguished from a uniform-sampling machine in polynomial time using the so-called \emph{row-norm} or $R^*$ discriminator, prompting experimental interest \cite{Spagnolo2013a}.
+
+Sending $p$ photons into modes $z^a_i$ of a device with a known transfer matrix $\transfer \leftrightarrow \unitary_d$, we sample a single detection event, registering a coincidence-click at output modes $z^b_j$. We isolate the $p \times p$ submatrix $M$ of $\transfer$, choosing columns and rows according to $z^a_i$ and $z^b_j$ respectively, and then compute the normalized product $R^*$ of row-norms of $M$,
+\begin{equation}
+R^*= \frac{1}{p^p}\prod_{i=1}^p \left( \sum_{j=1}^p |M_{ij}|^2 \right).
+\end{equation}
+Note that this quantity can be computed in classical polynomial time. While $R^*$ does not give a good approximation to $|\perm(M)|^2$, it is nonetheless sufficiently \emph{correlated} with $\bsdist$ --- which \emph{does} depend on $|\perm(M)|^2$ --- to discriminate between \bosonsampling devices and uniform-samplers. 
+
+In order to confirm that $\bsdist$ as generated by our experiment can rapidly be distinguished from $\usdist$, we use Bayesian inference to update our knowledge in real time, based on the data shown in figure \ref{fig:multiphoton-cubes}. Bayes' theorem gives the probability that we are sampling from $\bsdist$, given our experimental values of $R^*$
+\begin{equation}
+   P(\bsdist | R^*) = \frac{P(R^*|\bsdist) P(\bsdist)}{P(R^*)}.
+\end{equation}
+In order to obtain $P(R^*|\bsdist)$, we numerically estimate the probability that $R^*$ is above a threshold value of 1, finding $P((R^*>1)|\bsdist)=0.631$, $P((R^*<1)|\bsdist)=0.369$.
+Starting from an unbiased prior, $P(\bsdist) = P(\usdist) = 1/2$, after only 12 detection events we obtain a confidence level greater than \SI{90}{\percent} that the experimental data was drawn from $\bsdist$. Using all 434 detection events, this rises to $P(\bsdist|R^*) = 1-10^{-35}$.
+
+In $\usdist$, Goglin et al. consider a somewhat artificial failure mode of a \bosonsampling device --- in reality, the experimentalist is likely to know \emph{a priori} that the device in the lab is not a uniform sampler. A more realistic possibility is that photons sent into the device are partially or completely mutually distinguishable, a legitimate experimental concern. In this case no quantum interference is observed in the output probability distribution $\csdist$, and the behaviour of the device can be classically predicted in polynomial time.  Here, the $R^*$ test fails to distinguish $\bsdist$ from a classical machine generating $\csdist$. As we have already seen, the clouding metric $C$ also fails to detect a signature of quantum interference in \bosonsampling data, owing to the lack of structure in $\bsdist$. 
+
+An alternative test, which succeeds in this task, measures the \emph{net probability} that a $p$-fold click is detected in the collision-free subspace, when $p$ photons are sent into the device. Intuitively, since indistinguishable photons tend to bunch together, this probability should increase when input photons are made distinguishable. The fraction of trials $N$ to $p$-fold detection events $P$ was estimated to be $P_Q^{ex}(p-\text{fold}) = 0.450\pm0.028$ and $P_C^{ex}(p-\text{fold}) = 0.680\pm0.002$ for indistinguishable and distinguishable photons respectively, compared to theoretical values of $P_Q^{th}=0.509$ and $P_C^{th} = 0.691$. Here we used the method of \cite{Spagnolo2013a} to estimate $N$.
+
+\subsection{Postselected multiphoton quantum walks}
+\label{sec:postselected-multiphoton-quantum-walks}
+\begin{figure}[t!]
+\centering
+\includegraphics[width=.9\linewidth]{chapter7/fig/walks/postselected.pdf}
+\caption[Asymmetry in postselected quantum walks]{
+Asymmetry in postselected on quantum walks. (a-f) Numerical simulation of quantum walk time evolution under postselection. Beginning with a four-photon quantum walk, we postselect on detection of one photon in a specific waveguide. Figures (a-f) show successive steps in the time evolution of the resulting three photon state as correlation cubes. Each axis of the cube denotes the position of a photon in the array, where the hue and radius of each sphere are proportional to the probability of detecting three photons, after postselection, at waveguides $i,j,k$. (f) A two-photon quantum walk, postselected from three-photon data. The radius of each red circle corresponds to the experimental count rate in waveguides $i, j$, after postselection and correction for measured detection efficiencies. Black circles show a numerical simulation. The asymmetry seen in the numerics (a-f) is clearly reproduced. (h) Experimental data using distinguishable photons. The apparent asymmetry is an artefact of our measurement setup. }
+\label{fig:postselected-walks}
+\end{figure}
+
+One of the most powerful features of \bosonsampling is that it demands neither postselection nor adaptive measurement. It is remarkable that \bosonsampling provides a quantum speedup in the absence of any nonlinear coupling between photons, either in the sense of nonlinear optics (section \ref{sec:nonlinear-optics}) or the measurement-induced nonlinearity of KLM (section \ref{sec:klm}). It is nonetheless interesting to ask whether anything might be accomplished by minimal postselection and/or feed-forward on quantum walks or \bosonsampling machines.
+
+The probability distribution generated by a quantum walk of a single photon in a linear, uniformly coupled array is symmetric about the input waveguide (figure \ref{fig:walks-intro}). For multiphoton walks, if the choice of input waveguides is symmetric, the multi-photon distribution will also be symmetric, as seen in our three-photon experimental data (figure \ref{fig:multiphoton-cubes}). However, by \emph{postselecting} on detection of one photon in a particular waveguide, we find that interesting asymmetric effects can be seen in the resulting ($p-1$)-photon statistics.
+
+Figures \ref{fig:postselected-walks}(a-f) show numerical simulations of the time evolution of a four-photon quantum walk, after postselection on detection of one photon in a particular off-centre mode. The resulting three-photon statistics show an asymmetric distribution, with a single ballistic lobe propagating on the main diagonal. We expect that this effect would be difficult to achieve without postselection, assuming a uniform, planar waveguide array\footnote{Careful control of the phase of input photons, following the classical approach of beam steering using a phased array, might conceivably reproduce this effect.}. We used the \gls{qw} chip to test this behaviour, sending three indistinguishable photons into the device as before and postselecting on detection at waveguide 15. Experimental two-photon correlations are shown in figure \ref{fig:postselected-walks}(g), where a single asymmetric lobe can be clearly seen. Using distinguishable photons, we do not see the same effect (figure \ref{fig:postselected-walks}(h)).
+
+\newcommand{\mudist}{\mathcal{M}}
+\subsection{Discussion}
+The experimental progress described in this section is characterized by an increase in complexity. Each optical chip has more than twice as many spatial modes as those previously described in this thesis, and the \gls{ru} device has 36 directional couplers, compared to 13 for the \acrshort{cnotmz}. We have described a four-photon source which, although not entirely novel, has been used in a previously unexplored capacity. To our knowledge, ours is the first demonstration of correlated coincidence counting using 16 single photon detectors where all possible detection events are registered\footnote{16 detectors are used in ref  \cite{Yao2012}, but only a subset of possible detection events are recorded.}. This system has allowed us to take detailed images of the complex three-photon interference effects shown in figure \ref{fig:multiphoton-cubes}, which have not previously been observed.
+
+In \cite{Aaronson2013}, Aaronson and Arkhipov describe an efficient classical algorithm due to Fernando Brandao, based on work of Trevisan et al. \cite{Trevisan2009}, which generates a ``mock-up'' probability distribution $\mudist$ which provably cannot be distinguished from $\bsdist$ by circuits of any fixed polynomial size. This distribution is carefully designed , and it is not currently known whether any machine --- classical or quantum --- could distinguish $\mudist$ from $\bsdist$ in polynomial time. Although it is hard to say at this stage, it would not be surprising if the \emph{deliberate} lack of structure in $\bsdist$ renders \bosonsampling machines fundamentally indistinguishable from certain adversarial classical ``fakes''.  Nonetheless, we have shown that a specific small class of experimentally relevant \bosonsampling failure modes can be efficiently detected in experiments. We expect that the scope of such methods will grow, to encompass the majority of realistic errors that might render \bosonsampling machines classically tractable.
+
+Moreover, we have found circumstantial evidence to suggest that by deliberately imposing \emph{structure} on the interferometer and resulting probability distribution, the difficulty of experimental verification can be significantly reduced. To this end, we have shown that by exploiting known qualitative properties of the probability distribution generated by a quantum walk, we are able to detect a signature of quantum interference even in extremely large and non-separable Hilbert spaces, where it is no longer practical to measure probabilities. We do not expect that the scheme used in section \ref{sec:bosonsampling-verification}, as described, will always return a definitive answer after a polynomial number of events\footnote{Doubts might be raised by the fact that the number of hypercube orthants which intersect with the main diagonal of the correlation matrix falls off exponentially with $p$.}. However, we expect that future scalable techniques will follow our basic method, and that probability distributions with tailored structure will be essential to light the way, as we drive out into the darkness of classical computational intractability.
+

@@ -1,0 +1,82 @@
+\section{Time-correlated Single Photon Counting} 
+\label{sec:counting}
+% Coincidence counting
+In multiphoton experiments we are frequently presented with the problem of measuring correlation functions in space or time, based on detection events over $d$ detectors. Very often, this problem reduces to the counting of \emph{coincidences}. By postselecting on events in which $p$ detectors fired within some small coincidence time-window $\Delta t$, we record only those events in which all $p$ photons were generated in the same downconversion event or femtosecond pulse, preserving temporal indistinguishability and thus high-visibility quantum interference. 
+
+%Clearly there is a small but finite probability that photons generated in separate down-conversion events, which are distinguishable in time, give rise to detection events within $\Delta t$ --- so-called accidental coincidences. The rate of accidental coincidences, which effectively act as noise and reduce the visibility of quantum interference, depends primarily on the pair generation rate of the source and the width of the coincidence window. The window $\Delta t$ cannot be made arbitrarily small due to timing noise --- electronic jitter --- in the detection and timing electronics. In all of the experiments described here, a coincidence window of $\Delta t \sim 5$ ns provides a good trade-off between detection efficiency and rate of accidental coincidences.
+
+% G2 curves, cross correlation etc
+Certain experiments require more precise timing information. For example, the pulse envelope of a laser or the delay introduced by a coaxial cable can be measured using the closely related techniques of temporal \emph{autocorrelation} and \emph{cross-correlation}. Here, the exact time of each detection event is measured and recorded with very high (fs) precision by a fast clock. The recorded arrival time of a single detection event is referred to as a \emph{time-tag}.
+The autocorrelation function $G(\tau)$ of continuous time-varying signal $I(t)$  
+\begin{equation}
+    G(\tau) = \lim_{T\to \infty} \frac{1}{2T} \int_{-T}^{T} I(t) \cdot I(t+\tau) dt
+\end{equation}
+provides information about similarity of the signal with a delayed version of itself, while the cross-correlation function between two signals $I_{1,2}(t)$ 
+\begin{equation}
+    G_{12}(\tau) = \lim_{T\to \infty} \frac{1}{2T} \int_{-T}^{T} I_1(t) \cdot I_2(t+\tau) dt
+    \label{eqn:cross-correlation}
+\end{equation}
+measures the similarity between these signals as a function of the delay between them. When counting discrete photon detection events with finite timing resolution, the signal is no longer analog and we instead compute the discretized quantities
+\begin{equation}
+    G(t) = \sum_t N(t) \cdot N(t+\tau)~;\quad G_{12}(\tau) = \sum_t N_1(t) \cdot N_2(t+\tau)
+    \label{eqn:cross-correlation-discrete}
+\end{equation}
+where $N_i(t)$ is the number of photons detected in channel $i$ and timebin $t$. These functions can be easily computed from measured timetags.
+
+\subsection{TCSPC Hardware} 
+In all of the multi-photon experiments described here, silicon-based avalanche photodiode single photon detectors (APDs) have been used for detection. A number of alternative single photon detector technologies are described in detail in section \ref{sec:detectors} of this thesis. Upon absorbing a single photon within the frequency band to which the APD is sensitive ($\sim$ 500 to $\sim$ 900 nm), a 3.3V trigger/timing logic (TTL) voltage pulse is generated with finite probability --- typically $\sim60\%$ for the Perkin-Elmer APDs used here. 
+
+The task of TCSPC is then to count and correlate these TTL pulses in time.  The rate of single-photon detection is typically on the order of MHz, and many standard data acquisition systems do not have sufficient bandwidth, channel count, or timing resolution to capture and correlate events at this rate. As a result, TCPSC largely depends on dedicated high-speed electronics falling into one of two categories. pure coincidence-counting systems, often based on nuclear instrumentation module (NIM) logic or field programmable gate arrays (FPGAs), and time-to-digital converters, which convert incoming TTL pulses into high-resolution digital timetags to be processed downstream.
+
+The counting systems used in chapters \ref{chap:cnot-mz}, \ref{chap:delayed-choice}, \ref{chap:random-chsh} and \ref{chap:quantum-chemistry} of this thesis are custom-built around Xilinx Virtex 5 or Spartan 6 FPGAs. These devices provide a lithographically-fabricated array of $\sim 10^5$ logic units (gates), which can be reconfigured to implement dedicated coincidence counting logic with much greater bandwidth and timing stability than can be achieved using general-purpose ICs. These systems are built to count instances of $O(10)$ possible coincidence patterns over $\le8$ independent channels, with a fixed coincidence window of \SI{5}{\nano\second}, and do not provide high-resolution timing information --- instead simply reporting the number of events for each pattern over a fixed integration time of \SI{1}{\second}.
+
+\subsection{DPC-230} 
+The DPC-230 is a 16-channel photon correlator, produced by Becker and Hickl GmbH. It is principally designed for multiphoton fluorescence spectroscopy and biological imaging, however we have adapted it for applications in quantum photonics. The principal functionality of interest is the capability of the DPC-230 to time-tag incoming TTL pulses on 16 independent channels simultaneously with $\sim 80$ ps resolution, allowing coincidence counting using an array of 16 Si APDs. The instrument, which is packaged as a PCI card for installation in a standard PC, uses 16 CMOS time-to-digital converters (TDCs) to record the absolute arrival time of TTL pulses.  
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=\textwidth]{chapter7/fig/counting/schematic.pdf}
+\caption[DPC-230 coincidence-counting setup]{
+Two groups of eight Perkin-Elmer Si APDs send TTL pulses via MCX coaxial cable to the DPC-230 TCSPC (time-tagging) board. The DPC-230 uses two 8-channel TDC chips, which time-tag the rising edge of incoming pulses with ps resolution. These timetags are stored in one of two FIFO buffers, each of which can store 2 million photons at a time. Coincidence counting and control is managed by three processes running in parallel on a quad-core desktop computer.  The first, highest-priority process sequences time-tagging and  periodically reads timetags from the PCI bus into one of two RAMDisks, operating in a double-buffered arrangement. This process also communicates via RS-232 with other high-priority hardware such as the Ti:Sapphire laser and SMC100 motor controllers. While this process is acquiring timetags, coincidence counting is performed on older data in a parallel process. Optimized C code merges data from TDC1 and TDC2 and then counts/stores all $2^{16}$ possible $N$-fold coincidence events, up to $N=16$, with a variable top-hat coincidence window (typically 5ns). This stage also implements 16 arbitrary software-defined delays, allowing path length differences and APD idiosyncrasies to be accounted for. Finally the count rates are filtered and summed according to the users request, and plotted in a real-time GUI.
+}
+\label{fig:counting-schematic}
+\end{figure}
+
+The design and interface of the DPC-230 are focussed on multiphoton spectroscopy and biological imaging, and the device is largely configured for off-line analysis of small samples --- a few seconds of photon time-tag data. It is not intended for real-time use, and does not provide coincidence counting as built-in functionality. For instance, all time-tag data must be written to a hard disk and post-processed before it can be used, and all of the documentation and bundled software are written with this mode of operation in mind. However, in the context of quantum photonics the experimentalist needs both real-time operation, providing immediate feedback when working in the lab, as well as the ability to integrate for days or weeks at a time in multiphoton experiments where the $n$-fold detection rate is extremely low.  We therefore built a custom hardware/software stack which addresses these issues, providing coincidence counting functionality and allowing the DPC-230 to be operated in realtime, accumulating up to ten million photon time-tags per second, for months at a time. 
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=\textwidth]{chapter7/fig/counting/dips.pdf}
+\caption[Representative data from the DPC-230]{
+ The sheer amount of information generated by the DPC-230 demands new approaches to data processing and analysis. (a) An array of 16 Perkin-Elmer Si APDs. (b) 36 cross-correlation curves, acquired in a single 2-second measurement. The red curve shows a typical cross-correlation function. The time between peaks corresponds to the repetition rate of the Ti:Saph, i.e. $\sim$ 12.5 ns. Detector jitter is the predominant source of broadening of the peaks, giving a FWHM of $\sim$ 1 ns. (c) 105 Hong-Ou-Mandel dips measured in parallel over a single actuator scan, using a type-II pulsed SPDC source and the DPC-230.
+}
+\label{fig:counting-representative-data}
+\end{figure}
+The internal architecture of the DPC-230, together with the custom PC \linebreak hardware/software stack, is shown in figure \ref{fig:counting-schematic}. Two TDC chips, each having 8 independent TDC channels, are synchronized by a stable clock. These convert TTL pulses generated by single photon detectors into 24-bit timetags, encoding the channel number and absolute time of arrival of each pulse, down to a bin width of 82.3 ps. These timetags are temporarily stored in first-in-first-out (FIFO) buffers, each of which is capable of storing $\sim 2\times10^6$ photons. This data is read into RAM in the host PC over a standard PCI bus.  
+
+At high photon count rates (up to $1\times 10^7$ photons/second), around 30MB of timetag data is acquired per second. Since for multiphoton experiments we must often continuously integrate for a number of days, it is essential that this data is processed in real-time so that unmanageably large volumes of timetags do not accumulate. In order to achieve maximum throughput we use two high-priority processes, written in optimized C and running on separate cores of a Pentium Core i7 CPU to implement data acquisition and post-processing/coincidence counting in parallel. Timetags are acquired to the DPC-230's internal FIFOs for one second, and are then read into one of two RAMDisk buffers by the data-acquisition process. This data is passed to the post-processing thread, which merges data from the two TDC chips and then counts and stores instances of all possible $p$-fold coincidences up to $p=16$, with a user-specified coincidence window. Above a net detection rate of $\sim1\times 10^6$ photons per second, this process takes slightly longer than one second to process one-second's worth of timetag data. The data acquisition thread must therefore wait for the post-processing thread to ``catch up'', resulting in a reduced duty cycle and a linear decrease in the effective $n$-fold detection efficiency. The system is routinely used at a throughput of $\sim 5\times 10^6$ photons/s.
+
+In order to avoid storing integrated count-rates for all $2^{16}$ possible events, we exploit the sparsity of the data --- 5-fold events and above are very rate --- and write only nonzero countrates to disk.  Despite the significant saving in disk space provided by this sparse format, it was necessary to further optimize the representation of post-processed data by means of a custom binary file format, which stores coincidence data together with information pertaining to the motor controllers, laser, and other metadata. This file format is described in detail in Appendix \ref{app:qy}.
+Finally, this data is sent to a graphical user interface, running in a third process, where it can be graphed, filtered and analysed by the experimentalist.
+
+\subsubsection{User interface}
+\begin{figure}[t!]
+\centering
+\includegraphics[width=\textwidth]{chapter7/fig/counting/gui.pdf}
+\caption[Coincidence counting GUI]{
+(a) Realtime interface, showing motor controller and laser status, and coincidence count-rates. Inset - delay control. (b) Delay solver. The left-hand panel shows 16 cross-correlation curves, measured in parallel across 16 detectors. The peak at the center of each curve corresponds to two-fold coincidences due to photon pairs generated by the source. The right-hand panel visualizes the relationship between these cross-correlation curves and solves for the optimal delay configuration.
+}
+\label{fig:counting-gui}
+\end{figure}
+
+A bad craftsman blames her tools, but correlation is not causation --- we may not infer that a person who blames their tools is unskilled. With the rapid increase in the complexity of experimental apparatus and the volume of data generated by tools such as the DPC-230, we must take greater care over the interface between the human being and their experimental setup. When actively developing and optimizing apparatus in the lab, the importance of responsive control and immediate, intuitive feedback cannot be understated.
+
+We have built a graphical user interface (GUI), shown in figure \ref{fig:counting-gui}(a), which enables experimental control, real-time analysis, post-processing, and management of coincidence data from the DPC-230.  This GUI also interfaces with SMC100 motor controllers and the Coherent \emph{Chameleon} Ti:Sapphire laser. The user can choose an arbitrary subset of detection events of interest, including number-resolved patterns under a variety of pseudo-number-resolving schemes, to be displayed and graphed in real-time. This interface also controls the integration time, coincidence window and software delays, and allows arbitrary sequences of measurement and automation to be scripted.
+
+\subsubsection{Delays}
+Synchronization of delays is an important consideration when coincidence-counting with large numbers of detectors. For example, digital pulse-conditioning logic inside the Perkin-Elmer APD assembly, together with variation in cable and free-space path lengths, can introduce up to $\sim$20ns of delay between detection of a photon and arrival of the corresponding TTL pulse at the TDC.  We must therefore introduce artificial delays into ``early'' channels, ensuring that timetags due to photons generated within the same downconversion event or laser pulse fall within the coincidence window of the counting logic. Traditionally, this has been accomplished using rack-mounted delay boxes, which simply switch between fixed lengths of coaxial cable.  The optimization of these delays has typically been performed by a process of trial and error on behalf of the experimentalist.  With many more detectors to deal with, this optimization process becomes very time consuming.
+
+These issues can be mitigated by making direct use of timing information provided by the DPC-230. First, physical electronic delay boxes are no longer required, since all delays can be implemented in software --- simply by shifting timetags from each channel by some user-specified time $\Delta t$. Secondly, the task of finding optimal delay configurations has been almost entirely automated. Switching out of coincidence-counting mode, we acquire timetags for $\sim 10$ s  and then compute cross-correlation functions (\ref{eqn:cross-correlation}) between all possible pairwise combinations of channels. These $G_{12}$ curves are analyzed by a physically-inspired optimization process which automatically finds the optimal delay configuration with minimal input from the user --- see figure \ref{fig:counting-gui}(b). This capability has been essential for the multiphoton experiments described in section \ref{sec:quantum-walks}, where frequent changes in the detection setup required regular re-calibration of delays.
+
+
+

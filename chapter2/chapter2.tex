@@ -1,0 +1,1852 @@
+%\titlespacing*{\chapter}{0pt}{150pt}{40pt}
+
+\begin{savequote}[140mm] 
+Krazy: ``Why is Lenguage, Ignatz?''\\
+Ignatz: ``Language is that we may understand one another.''\\
+Krazy:  ``Can you unda-stend a Finn, or a Leplender, or a Oshkosher, huh?''\\
+Ignatz: ``No,''\\
+Krazy: ``Can a Finn, or a Leplender, or a Oshkosher unda-stend you?''\\
+Ignatz: ``No,''\\
+Krazy: ``Then I would say lenguage is that that we may mis-unda-stend each udda.''
+\qauthor{George Herriman, \emph{Krazy Kat}} 
+%The very foundation of interhuman discourse is misunderstanding.  
+%\qauthor{Lacan} 
+\end{savequote}
+
+
+\chapter{Background}
+\label{chap:background}
+
+\section{Quantum mechanics}
+\label{sec:triangles}
+Classical physics provides a description of the world which can be pictured in the mind's eye. The behaviour of classical objects, fields, fluids, and machines can be explained either in terms of effects which we as human beings experience and observe, or by direct and satisfactory analogy to our experience. 
+
+Over the course of the 20th century, it became increasingly evident that classical physics does not provide a complete picture of the world. In particular, two macroscopic physical effects --- black body radiation and the photoelectric effect --- cannot be adequately explained by a classical model.  Throughout more than 100 years of discovery, Planck, Bohr, Einstein, de Broglie, Schr\"odinger, Dirac, and many others developed the theory of quantum mechanics, which accommodates these phenomena and predicts a great deal more. Quantum mechanics remains the most complete and accurate model of physics ever developed.
+
+In order to construct this theory, it has been necessary to accept the existence of phenomena which resist any meaningful analogy with everyday human experience. In particular, quantum mechanics dispenses with the idea that the attributes of physical systems are well-defined prior to the act of measurement, as well as the notion that physics is at heart governed by deterministic processes. Quantum mechanics predicts new phenomena, such as entanglement and nonlocality, which are extreme in their departure from a common-sense understanding of the world.  These effects have since been widely observed in experiments, where they are most regularly seen in nanoscale systems such as single atoms, electrons, and photons.
+
+Very early on in the development of quantum theory, it was recognised that the surprising new effects it predicts might be used to build machines which would not be feasible in a classical model. Perhaps the most dramatic example of this was the immediate application of the new theory to the development of the atomic bomb, leading to the deaths of more than ten thousand people at Hiroshima. Quantum theory was also instrumental in the development of field-effect transistors, atomic clocks, hard disk drives, and the laser, which led to a revolution in information processing, communication, and measurement.
+Later on, it was suggested --- by Feynman, Lloyd, Deutsch, Kitaev, and others --- that coherent quantum machines, directly manipulating pure quantum states at the lowest level, might possess a fundamental advantage over their classical or semi-classical counterparts for certain tasks, including secure communication, measurement, computation, and simulation of quantum systems themselves. In contrast with the transistor, whose functionality can be reproduced by a solenoid, the capability offered by these quantum technologies would be fundamentally inaccessible to classical machines.  
+These applications are discussed throughout this thesis.
+
+In this section I draw on notes from Michael Nielsen, Isaac Chuang, John Preskill, Paul Dirac, Keith Hannabuss, and Scott Aaronson.
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=\textwidth]{chapter2/fig/triangles.pdf}
+\caption[Models of physics.]{ 
+Models of physics. (a) A square-based model elegantly captures the properties of many things:  skyscrapers, chess boards, salt crystals. (b) However, we need only find one example --- which might only be seen in a challenging or contrived experiment --- to detect the incompleteness of the model. (c) $\square$-physics does not elegantly account for the existence of triangles. (d) The new theory of $\bigtriangleup$-physics is radical and unfamiliar, but it accommodates the new phenomenon well. It is arguably \emph{more} elegant than the old model, and provides a more complete understanding of the world.  Importantly, this new model is largely compatible with the previous understanding.  
+(e)  $\bigtriangleup$-physics allows the construction of \emph{machines} which are difficult to build in a $\square$-based model.
+}
+\label{fig:triangles}
+\end{figure}
+
+\subsection{States}
+\label{sec:quantum-mechanics-states}
+Classically, an event with $n$ possible outcomes is described by a probability distribution $\mathcal{P}$, corresponding to a vector of $n$ real scalars
+\begin{equation}
+   \mathcal{P} = \left( p_1, p_2 \ldots p_n \right)~;\quad p_i \in \mathbb{R}~;\quad 0\le p_i \le 1~~\forall~i.
+\end{equation}
+Since we always obtain \emph{some} outcome, these numbers sum to $1$, i.e. the 1-norm is conserved, 
+\begin{equation}
+\sum_i|p_i|  = 1.
+\end{equation}
+Quantum mechanics is the theory which naturally emerges if one attempts to replace these probabilities by complex \emph{amplitudes}, with the condition that the 2-norm, rather than the 1-norm, is conserved
+\begin{equation}
+   \ket{\psi} = \left( a_1 , a_2, \ldots a_n \right) ~; \quad a_i \in \mathbb{C} ~; \quad ||\psi||^2 = \sum_i |a_i|^2 = 1.
+   \label{eqn:state-normalization}
+\end{equation}
+The state of the system is completely encoded in the state vector $\ket{\psi}$, which is defined on the complex \emph{Hilbert space}, $\hilspace$. Any ray in $\hilspace$ corresponds to a physical state, and two vectors represent the same state iff one is a multiple of the other. This allows construction of superposition states
+\begin{equation}
+    \ket{\psi} = a_1\ket{\psi_1} + a_2 \ket{\psi_2} ~;\quad |a_1|^2 + |a_2|^2 = 1.
+\end{equation}
+The Hilbert space has an inner product $\overlap{\varphi}{\psi}$, which associates each pair of vectors $\ket{\varphi}$, $\ket{\psi}$ with a complex number, and is positive, linear, and skew symmetric
+\begin{equation}
+   \overlap{\varphi}{\psi} \ge 0 ~; \quad 
+   \bra{\varphi}\left(a \ket{\psi_1} + b \ket{\psi_1}\right) 
+   = a \overlap{\varphi}{\psi_1} + b \overlap{\varphi}{\psi_2}  ~; \quad 
+   \overlap{\varphi}{\psi} = \overlap{\psi}{\varphi}^*.
+\end{equation}
+% FUTURE: Improve The Haar measure
+Normalization (\ref{eqn:state-normalization}) can then be re-expressed as $\overlap{\varphi}{\psi}=1$.
+Volume in Hilbert space is measured by the \emph{Haar measure} $\mathrm{d} \ket{\psi}$, which defines a notion of uniform sampling or integration over $\hilspace$. 
+In order to describe a composite system of two or more objects, Hilbert spaces are joined by means of the tensor product
+\begin{equation}
+    \hilspace_{AB}  = \hilspace_A \otimes \hilspace_B ~; \quad \ket{\Psi_{AB}} = \ket{\psi_A} \otimes \ket{\psi_B}
+\end{equation}
+We will often make reference to the Hilbert space \emph{dimension} $d$ pertaining to some physical system of interest. By this, we will usually mean the dimension of the \emph{smallest} Hilbert space required to capture the full dynamics of the system, all things being equal. For example, we might say that a quantum coin has a two-dimensional Hilbert space ($H$, $T$), even though the position of the coin in space is a continuous variable demanding an infinite-dimensional $\hilspace$.
+
+\subsection{Measurements}
+\label{sec:quantum-measurement}
+\newcommand{\obs}{\hat{A}}
+\newcommand{\projector}{\hat{\Pi}}
+An \emph{observable} is a property of a physical system which can in principle be measured.
+Observables in quantum mechanics are described by Hermitian operators $\obs$ defined on $\hilspace$, which map states to states:
+\begin{equation}
+   \obs : \thestate \rightarrow \obs \thestate ~; \quad \obs = \obs^\dagger.
+\end{equation}
+Any observable has a spectral decomposition
+\begin{equation}
+   \obs = \sum_i \lambda_i \projector_{\lambda_i},
+\end{equation}
+with eigenvalues $\lambda_i$. 
+Here, $\projector_{\lambda_i}$ are orthonormal \emph{projectors} on $\hilspace$, with 
+\begin{equation}
+\projector_i \projector_j = \delta_{ij} ~ ; \quad \projector_i= \projector_i^\dagger.
+\end{equation}
+If $\lambda_i$ is nondegenerate, then 
+$\projector_i = \ket{\lambda_i}\bra{\lambda_i}$, with $\overlap{\lambda_i}{\lambda_j} = \delta_{ij}$, and $\{\ket{\lambda_i}\}$ form an orthonormal basis for $\hilspace$.
+
+When the observable $\obs$ is experimentally measured, the outcome is always an eigenvalue of $\obs$. The outcome of any given measurement is in general probabilistic, returning $\lambda_i$ with probability
+\begin{equation}
+   p(\lambda_i) = \bra{\psi}\projector_i\ket{\psi} 
+\end{equation}
+At the time of measurement, the system is projected into an eigenstate of $\obs$ corresponding to the measured eigenvalue $\lambda_i$. 
+\begin{equation}
+    \thestate \xrightarrow{\text{Detect}~\lambda_i} \frac{\projector_i\thestate}{(\bra{\psi}\projector_i\ket{\psi})^{1/2}} = \ket{\lambda_i}~.
+\end{equation}
+This is the ``collapse'' of the wavefunction, whose interpretation remains contentious. It implies that repeated further measurements of the same operator on the same system will always yield the same eigenvalue.
+The expectation value of $\obs$ for a state $\thestate$ is given by
+\begin{equation}
+\expect{A} = \sum_i p(\lambda_i) \lambda_i = \bra{\psi} \obs \ket{\psi}
+\end{equation}
+The \emph{Born rule} connects amplitudes to probabilities. It gives the probability that a system prepared in a state $\ket{\psi}$ will be detected in state $\ket{\varphi}$, as
+\begin{equation}
+    p(\varphi | \psi) = |\overlap{\varphi}{\psi}|^2.
+\end{equation}
+%FUTURE: superluminal communication in double slit?
+
+\subsection{Time evolution}
+\label{sec:time-evolution}
+Time-evolution of a classical probability distribution can be described in terms of a stochastic matrix --- a matrix of real numbers whose columns each add up to one, preserving the 1-norm.
+Time evolution of a quantum state must preserve the 2-norm (\ref{eqn:state-normalization}). The most general class of operators which always conserve the 2-norm of a vector on $\hilspace$ are the \emph{unitary} matrices $\unitary$, 
+\begin{equation}
+    \unitary \unitary^\dagger = \identity~;\quad
+    \sum_i |\unitary_{ij}|^2 = 1
+    .
+\end{equation}
+Time-evolution of a closed quantum system can always be described by a unitary matrix.
+%FUTURE synch with tomography
+In the \emph{Schr\"odinger picture} of quantum mechanics, we say that $\unitary$ evolves an input state $\thestate_\lin$ to an output state $\thestate_\lout$, as
+\begin{equation}
+    \thestate_\lout  = \ket{\psi(t)} = \unitary \thestate_\lin = \unitary \ket{\psi(0)},
+\end{equation}
+and observables $\obs$ do not change as a function of time. 
+
+How is the unitary operator $\unitary$ connected to the physical properties of the system at hand?
+In general, $\unitary$ is generated by a Hamiltonian $\hamiltonian$, according to the time-dependent Schr\"odinger equation
+\begin{equation}
+   i \hbar \frac{\partial}{\partial t} \thestate = \hamiltonian \thestate,
+   \label{eqn:schrodinger-equation}
+\end{equation}
+where $\hbar$ is Planck's constant. $\hamiltonian$ is defined on the Hilbert space $\hilspace$, and has a spectral decomposition in terms of energy eigenstates and eigenvalues, $\hamiltonian = \sum_i E_i \ket{E_i}\bra{E_i}$. The Schr\"odinger equation has solutions of the form
+\begin{equation}
+    \thestate_\lout = \ket{\psi(t)} = 
+    \mathrm{exp} \left[ \frac{-i \hamiltonian (t_2-t_1) }{\hbar} \right]
+    \ket{\psi(0)}
+    = \unitary(t_2, t_1) \thestate_\lin.
+    \label{eqn:eiht}
+\end{equation}
+When the Hamiltonian is fixed in time, the time-independent component of solutions of (\ref{eqn:schrodinger-equation}) satisfy the \emph{time-independent Schr\"odinger equation}
+$\hamiltonian \thestate  = E \thestate$,
+where $E$ is the energy of the state $\thestate$. 
+The Hamiltonian $\hamiltonian$ thus completely determines the continuous-time dynamics of the system, and can be related to the discrete-time unitary description of evolution  by (\ref{eqn:eiht}).
+
+As well as the Schr\"odinger picture of quantum mechanics, we can equivalently adopt the \emph{Heisenberg picture}, in which the state is thought of as remaining fixed, with observables evolving under $\unitary$,
+\begin{equation}
+\hat{A}_{out} = \unitaryd \hat{A}_{in} \unitary.
+\end{equation}
+This picture can sometimes provide a simpler analysis, especially for systems of few particles in many modes. The correspondence between these pictures can be seen as
+\begin{equation}
+    \thestate_{out} = \hat{V_t}^\dagger \unitary \thestate_{in} ~; \quad \hat{A}_{out} = \hat{V}_t^\dagger \hat{A}_{in} \hat{V}_t
+\end{equation}
+where $\hat{V}_t = \identity$ and $\hat{V}_t = \unitary$ yield the Schr\"odinger and Heisenberg pictures respectively.
+In the Heisenberg picture, unitary evolution of the observable is related to $\hamiltonian$ by the Heisenberg equation,
+\begin{equation}
+   i\frac{d\hat{A}}{dt} = \left[ \hat{A}, \hamiltonian \right].
+   \label{eqn:heisenberg-equation}
+\end{equation}
+%Any unitary operator on states or observables has a corresponding class of Hamiltonian operators, and vice-versa.
+
+\subsection{No-cloning and Heisenberg uncertainty}
+\label{sec:no-cloning}
+There exist a number of operations which are trivial to perform for classical systems, but which are not allowed for quantum states.
+For example, perfect duplication of an arbitrary unknown quantum state is impossible. To see this, consider a cloning machine $\unitary$ which copies an unknown state $\thestate$ onto an ancilla system, initially prepared in $\ket{a}$: 
+\begin{equation}
+   \unitary \thestate \otimes \ket{a} = \thestate \otimes \thestate.
+\end{equation}
+If we use the machine to copy two particular quantum states, $\thestate$ and $\ket{\varphi}$, we have
+\begin{equation}
+   \unitary \thestate \otimes \ket{a} = \thestate \otimes \thestate~; \quad
+   \unitary \ket{\varphi} \otimes \ket{a} = \ket{\varphi} \otimes \ket{\varphi}.
+\end{equation}
+Taking the inner product of these two equations, we have $\overlap{\psi}{\varphi} = \left(\overlap{\psi}{\varphi}\right)^2$, immediately implying that such a cloning machine cannot be universal. Note that this does not preclude the preparation of an ensemble of identical states by repeated application of a trusted state preparation procedure.
+
+Quantum mechanics also places fundamental limits on the extent to which the properties of a given ensemble of quantum states can be measured and known. Heisenberg's \emph{uncertainty principle} states that: given as a resource an ensemble of identical unknown states $\thestate$, the standard deviation $\Delta (\hat{C})$, $\Delta (\hat{D})$ in measurements of two observables $\hat{C}$, $\hat{D}$ is bounded below by
+\begin{equation}
+    \Delta(\hat{C}) \Delta(\hat{D}) 
+    \ge 
+    |\bra{\psi} \left[ \hat{C}, \hat{D} \right]\ket{\psi}| / 2 .
+\end{equation}
+That is, when $\hat{C}$ and $\hat{D}$ do not commute, the better our knowledge of $C$, the less information we have on $D$.  The related (but distinct) principle of \emph{complementarity} further limits our ability to measure noncommuting observables of quantum states, and is described in section \ref{sec:complementarity}.
+
+\subsection{Qubits}
+\label{sec:qubits}
+%%%%%%%%%%%% Bloch sphere figure
+\begin{figure}[t!]
+\centering
+\includegraphics[width=.4\textwidth]{chapter2/fig/bloch_sphere.pdf}
+\caption[Bloch sphere]{
+The Bloch sphere provides a geometrical representation of the state space of a two-level quantum system --- a qubit. Points on the surface of the sphere are pure ($\thestate = \alpha \ket{0} + \beta \ket{1}$, $\alpha^2+\beta^2=1$), and include the quadrant points $\ket{0}$, $\ket{1}$, $\ket{+}$, $\ket{-}$, $\ket{+i}$, $\ket{-i}$. These points are eigenstates of the Pauli matrices $\pauli_x$, $\pauli_y$, $\pauli_z$, and the axes are labelled correspondingly. The point at the centre of the sphere is the maximally mixed state, $\identity$.
+}
+\label{fig:bloch-sphere}
+\end{figure}
+%%%%%%%%%%%% END Bloch sphere figure
+
+The basic unit of classical information is the \emph{bit}, $b \in \{ 0, 1\}$. The quantum analogue is the \emph{qubit}, a two-level quantum system with Hilbert space dimension $d=2$. By analogy with classical bits, the states $\ket{0}$, $\ket{1}$ form a basis for $\hilspace$, and a single qubit can occupy any normalized superposition state
+\begin{equation}
+   \ket{\psi} = \alpha \ket{0} + \beta \ket{1} ~ ; \quad |\alpha|^2+ |\beta|^2=1.
+\end{equation}
+Neglecting a global phase, this can be re-written as 
+\begin{equation}
+   \ket{\psi}= \cos \frac{\theta}{2}\ket{0} + e^{i \varphi} \sin \frac{\theta}{2} \ket{1} ,
+\end{equation}
+leading to a natural geometrical representation of the state space $\hilspace$ of the qubit as the surface of a unit sphere, often referred to as the \emph{Bloch sphere} (figure \ref{fig:bloch-sphere}). Throughout this thesis we will make use of the quadrant points of the Bloch sphere
+\begin{eqnarray}
+    \ket{0} \equiv 
+    \begin{bmatrix}
+        1\\
+        0
+    \end{bmatrix}, ~~
+    &\ket{+}\equiv\tfrac{1}{\sqrt{2}}\left(\ket{0}+\ket{1}\right),
+    &\ket{+i}\equiv\tfrac{1}{\sqrt{2}}\left(\ket{0}+i\ket{1}\right)\\
+    \ket{1} \equiv
+    \begin{bmatrix}
+        0\\
+        1
+    \end{bmatrix}, ~~
+    &\ket{-}\equiv\tfrac{1}{\sqrt{2}}\left(\ket{0}-\ket{1}\right),
+    &\ket{-i}\equiv\tfrac{1}{\sqrt{2}}\left(\ket{0}-i\ket{1}\right),
+\end{eqnarray}
+which are eigenstates of the Pauli matrices $\pauli_z$, $\pauli_x$, $\pauli_y$ respectively.
+
+Almost any two-level quantum system can be used to encode a qubit. Specific conditions for a qubit to be useful for quantum computation are given in section \ref{sec:divincenzo-criteria}. Qubit encodings for linear optics are discussed in sections \ref{sec:photons-as-qubits} and \ref{sec:cnotmz-state-preparation}.
+
+\subsection{Mixture}
+\label{sec:background-mixture}
+So far we have only been concerned with closed quantum systems, where there is no uncontrolled outside influence, and all components of the system are accounted for. In practice, we often encounter situations in which some part of the quantum system is inaccessible to the experimentalist, often due to coupling to the environment. Under such circumstances, many of the assumptions of the previous discussion do not hold: namely, time evolution is no longer necessarily unitary, measurements are not guaranteed by orthogonal projectors, and it is no longer satisfactory to represent states as rays in $\hilspace$.
+
+In order to represent the state of a quantum system subject to unknown external influence, we can consider a black-box device. We send into this device a quantum state, for example $\ket{0}$. Inside the box, a demon flips a fair coin. Depending on the outcome of the coin flip, the demon then outputs either the state $\ket{0}$, or the state $\ket{1}$. Now, we should not write the state of the ensemble generated by this box as a coherent superposition $\ket{+} = \frac{1}{\sqrt{2}}\left(\ket{0}+\ket{1}\right)$, as the two states are chosen according to a classical probabilistic process. We instead describe the state using a \emph{density matrix} $\dema$, defined as
+\begin{equation}
+    \dema \equiv \sum_i p_i \ket{\psi_i} \bra{\psi_i}.
+\end{equation}
+For the simple example cited here, the output of the box can be written as 
+\begin{equation}
+    \dema = \frac{1}{2} \ket{0}\bra{0} + \frac{1}{2} \ket{1}\bra{1} =
+    \frac{1}{2}
+    \begin{bmatrix}
+       1 & 0 \\
+       0 & 1 
+    \end{bmatrix} = \identity/2,
+\end{equation}
+which is in contrast with the density matrix of the superposition state $\ket{+}$
+\begin{equation}
+    \dema_+ = \ket{+} \bra{+} = \frac{1}{2} 
+    \begin{bmatrix}
+       1 & 1 \\
+       1 & 1 
+    \end{bmatrix} .
+\end{equation}
+All physical density matrices are semidefinite positive ($\dema \ge 0$), Hermitian ($\dema = \dema^\dagger$), and have trace one ($\mathrm{Tr}(\dema) = 1$):
+Time evolution of a density matrix $\dema$ by a unitary process $\unitary$ proceeds as
+\begin{equation}
+   \dema = \sum_i p_i \ket{\psi_i}\bra{\psi_i} \xrightarrow{\unitary}  
+   \dema = \sum_i p_i \unitary \ket{\psi_i}\bra{\psi_i} \unitary^\dagger
+   = \unitary \dema \unitary^\dagger,
+\end{equation}
+and the expectation value of an observable $\obs$ given a state $\dema$ is given by
+$\expect{\obs} = \mathrm{Tr} ( \obs \dema )$.
+Density matrices provide the most general description of quantum states. In the limit of zero coherence, the language of density operators reproduces classical probability theory. 
+A standard approach for the description and characterization of open quantum processes is given in section \ref{sec:cnot-process-tomography}, and a method for the generation of mixed states from entangled two-qubit states is discussed in section \ref{sec:cnotmz-mixture}.
+
+\subsubsection{Purity}
+Uncertainty in a discrete classical random variable $X$ is captured by the Shannon entropy, 
+\begin{equation}
+H(X) \equiv - \sum_i p(x_i) \log p(x_i).
+\end{equation}
+$H(X) = 1$ when $X$ is the output of a single toss of a fair coin, and $H(X) = 0$ when, for example, $X \in {x_0, x_1}$ and $p(x_0)=1$, $p(x_1)=0$.
+
+Mixed states can be thought of as possessing greater uncertainty than pure states, since for a maximally mixed state there exists no measurement basis $\{ \ket{\tau} \}$ in which measurement outcomes are deterministic.
+In order to quantify uncertainty for a quantum \emph{state} we might try to apply the Shannon entropy to measurement outcomes --- however, this does not give the desired behaviour.  If $\dema$ is a pure state $\ket{\psi}\bra{\psi}$, then there is a conjugate measurement basis $\{\ket{\psi}^*, \ket{\psi_\perp}^* \}$ in which the measurement outcome \emph{is} deterministic. If we assign eigenvalues $\pm1$ to each basis state respectively we will \emph{always} register $+1$, giving a Shannon entropy over measurement outcomes of $H(X)=0$.  However, we could equally choose to measure in a diagonal basis, giving uniformly distributed random measurement outcomes and thus $H(X)=1$. 
+%FUTURE: basically get rid of a lot of this crap
+
+So, we cannot use the Shannon entropy to quantify uncertainty for a particular state, as a good measure of states should be independent of any measurement basis.  
+The \emph{von Neumann entropy} is an entropic measure which solves this problem. The von Neumann entropy of a state $\dema$ with a spectral decomposition $\{\lambda_i\}, \{\ket{\lambda_i} \}$ is defined as
+\begin{equation}
+S(\dema) \equiv -Tr\left(\dema \log \left( \dema \right) \right) = -\sum(i) \lambda_i \log \left( \lambda_i \right) = -\langle \log \dema \rangle
+\end{equation}
+which evaluates to 0 for all pure states, is maximal and equal to $\log d$ for all maximally mixed states (where $d$ is the dimension of the Hilbert space)
+%FUTURE: normalize notation here
+, and increases monotonically with all sensible measures of mixture.  Further useful measures of the degree of mixture of a quantum state are given by two related quantities, the \emph{purity} 
+\begin{equation}
+\gamma(\dema) \equiv Tr(\dema^2)
+\label{eqn:purity}
+\end{equation}
+and the \emph{linear entropy} $S_L(\dema) \equiv 1-\gamma(\dema^2)$. The purity of a pure state $\ket{\psi}$ is $Tr(\ket{\psi}\bra{\psi}\ket{\psi}\bra{\psi}) = 1$, and for a maximally mixed state $\gamma \left( \identity \right) = 1/d$.
+
+\subsection{Entanglement}
+\label{sec:entanglement}
+Superposition states of a single particle, permitted by quantum mechanics as previously described, have powerful and counterintuitive implications.  Single-particle experiments such as Young's double slit (section \ref{sec:young-double-slit})  show qualitative differences in physical behaviour with respect to classical mechanics, 
+and quantum algorithms such as Grover search (section \ref{sec:quantum-computing}) can provide a polynomial speedup for certain computational tasks.  
+
+However, in order to fully appreciate the extent to which quantum mechanics is profoundly distinct from classical physics, it is important to consider multi-particle experiments involving the related phenomena of \emph{entanglement} and \emph{nonlocality}. Using these phenomena we can construct games which can provably only be be won by quantum players, and experimentally falsify the extremely natural and widely-held notion of a local-realistic universe.  Entanglement is the \emph{resource} which drives most quantum technologies, including quantum computing, metrology, simulation, and some schemes for quantum communication.  Throughout this thesis, we make use of entangled quantum states both as a resource for computation (sections \ref{chap:quantum-chemistry} and \ref{sec:bosonsampling}) and as a basic physical phenomenon of fundamental interest (sections \ref{chap:delayed-choice}, \ref{chap:random-chsh}, and \ref{sec:quantum-walks}).
+
+%Albert Einstein was particularly uncomfortable with the radical implications of entanglement and nonlocality.
+Einstein, whose celebrated theory of relativity restored locality to macroscopic physics, was intimately involved in the discovery \cite{Einstein1935}, along with Podolsky, Rosen, Schr\"odinger, and von Neumann, that quantum mechanics permits multipartite systems to exist in states which cannot be written as a product of their subsytems, \emph{i.e.}
+\begin{equation}
+\dema_{A,B,C\ldots} \ne \sum_i p_i \dema_A \otimes \dema_B \otimes \dema_C \ldots
+\label{eqn:separable-state}
+\end{equation}
+% Would be nice to get some sort of \gls{locc} constraint in here
+%More precisely, we can define entanglement that which cannot be increased by \emph{local operations and classical communication} (\gls{locc}) alone --- that is, two parties in separate labs, 
+Quantum states which cannot be written in this form are said to be \emph{entangled}. For such states, full knowledge of the individual subsystems does not imply full knowledge of the true, holistic state, and vice-versa. To see the physical effect of this phenomenon, we can consider the example of a bipartite entangled state of two qubits, shared between distant parties, Alice and Bob:
+\begin{equation}
+\ket{\Phi^+} = \frac{1}{\sqrt{2}} \left( \ket{0_A 0_B} + \ket{1_A 1_B} \right).
+\end{equation}
+ This state cannot be written as the product of two separate objects, as in (\ref{eqn:separable-state}). When both parties measure their system in the $\{ \ket{0}, \ket{1} \}$ (logical) basis, we see that Alice and Bob each have 50\% probability of detecting 0 or 1, and their measurement outcomes are also strongly \emph{correlated} --- Alice's outcome is always the same as Bob's.
+\begin{equation}
+P_{00} = |\bra{00} \ket{\Phi^+}|^2 = \frac{1}{2}; ~~~
+P_{11} = |\bra{11} \ket{\Phi^+}|^2 = \frac{1}{2}; ~~~
+P_{01}=P_{10} = 0
+\end{equation}
+Correlated, probabilistic behaviour indistinguishable from that generated by this state \emph{when measuring in the logical basis} can easily be simulated classically. Flip a coin, and if it outputs heads, give to Alice and Bob the state $\ket{00}$, otherwise provide $\ket{11}$, \emph{i.e.} generate the mixed state $\left(\ket{00}\bra{00} +\ket{11}\bra{11} \right)/2 = \identity$. The troubling observation that led Einstein, Podolsky and Rosen (EPR) to conclude that quantum mechanics was ``incomplete'' becomes apparent when Alice measures in an arbitrary basis $\{ \ket{\lambda_0}, \ket{\lambda_1} \}$.  
+
+Depending on Alice's measurement outcome, she will remotely project Bob's state onto one of the conjugate basis states $\{ \ket{\lambda_0}^*, \ket{\lambda_1}^*\}$, leaving the entire system in $\ket{\lambda_{0_A} \lambda_{0_B}}^*$ or $\ket{\lambda_{1_A} \lambda_{1_B}}^*$ (see section \ref{sec:quantum-measurement}). The implication of this effect, named \emph{steering} by Schr\"odinger, is that either (i) the physical state of Bob's particle was somehow remotely and instantaneously modified by Alice's choice, or (ii) Bob's state was never well-defined in the first place. Put another way, either the universe is \emph{nonlocal} --- meaning that the relationship between two separate objects cannot be completely accounted for by a set of factors that previously acted on those objects --- or it is not \emph{realistic} --- the physical properties of objects do not have real, pre-existing values, until a measurement is made --- or both. 
+%Further discussion of local realism and nonlocal correlations is given in section \ref{sec:local-realism}.
+
+Entanglement can be measured in myriad different ways, and a full discussion of the diverse variety of entanglement measures and associated partitionings of Hilbert space is beyond the scope of this thesis. 
+A comprehensive review was given by Plenio \cite{Plenio2006}. 
+We provide here a minimal set of examples, as reference points which will be used throughout this thesis.
+
+We can assert some simple and reasonable conditions for a measure of entanglement: 
+\begin{itemize}
+\item Separable states of the form (\ref{eqn:separable-state}) contain no entanglement.
+\item Entanglement cannot be increased through \gls{locc} alone. Experimentalists in separate labs, connected only by classical channels and each having access to one subsystem of a larger quantum state, cannot increase the extent to which they are entangled\footnote{Experimentalists \emph{can} use \gls{locc} operations to selectively \emph{throw away} states coming from some partially entangled source, thus producing a postselected state with greater entanglement than the source itself. However, the entanglement of the system as a whole, including those systems that were thrown away, does not increase under \gls{locc} operations.}. 
+This implies that \emph{entanglement is invariant under local unitaries}.  A state $\dema$ can be said to be at least as entangled than another $\dema'$ if $\dema$ can be converted to $\dema'$ through \gls{locc} operations alone.
+\item Maximally entangled states exist. The \emph{Bell states}
+\begin{equation}
+\ket{\Psi^{\pm}} \equiv \frac{1}{\sqrt{2}} \left( \ket{01} \pm \ket{10} \right)~;~~~~~
+\ket{\Phi^{\pm}} \equiv \frac{1}{\sqrt{2}} \left( \ket{00} \pm \ket{11} \right) 
+\label{eqn:bell-states}
+\end{equation}
+form an orthonormal basis set for two-qubit states, and are the canonical example of two-qubit maximally entangled states.
+Any pure or mixed state of two qubits can be prepared from a Bell state using only \gls{locc} operations, and one can easily convert between Bell states using only local unitary operations $\hat{U}_A \otimes \hat{U}_B$.
+For multipartite systems, a satisfactory definition of maximally entangled states has proved elusive --- see, for example, results by Greenberger, Horne and Zeilinger \cite{Greenberger1990}.
+\end{itemize}
+
+Two entanglement measures of particular relevance to experimental quantum optics are the  \emph{entropy of entanglement} and the \emph{concurrence}. 
+As we have already seen, individual subsystems of an entangled state are strongly dependent on one another.
+If Alice and Bob share the separable pure state $\dema_{AB} = \ket{0_A0_B}\bra{0_A0_B}$, the reduced density matrix of Alice, tracing over Bob's state, is $\dema_{A} = Tr_B \dema_{AB} = \ket{0}\bra{0}$ --- that is, her state is pure and independent of Bob's system.
+However, when Alice and Bob share a maximally entangled state (for example $\ket{\Phi^+}\bra{\Phi^+}$), although the state of the whole system is pure,  Alice's reduced density matrix is maximally mixed, $\dema_{A} = \frac{1}{2}\left(\ket{0}\bra{0} + \ket{1}\bra{1}\right) = \identity$. 
+We can use this behaviour to devise an entanglement measure for pure states based on the generalized quantum uncertainty of the state of one subsystem, tracing over the other, where uncertainty is characterized by the von Neumann entropy. 
+
+The \emph{entropy of entanglement} is defined \cite{Bennett1996} as 
+\begin{equation}
+E(\dema_{AB}) = S(\dema_B) = S(\dema_A) = S\left[Tr_B \left( \dema_{AB} \right) \right].
+\label{eqn:entropy-of-entanglement}
+\end{equation}
+In this example of two qubits, it is natural to choose a base 2 logarithm, in which case $E$ ranges from zero, when $\dema_{AB}$ is separable, to $\log_2 d = 1$ for a maximally entangled two-qubit state.  A nice property of $E(\dema_{AB})$ is that for two qubits, in the asymptotic limit of many experiments, $E$ is equal to the ratio $m/n$, where $m$ is the number of perfect, maximally entangled singlet states that can be reversibly generated by \gls{locc} operations from a source producing $n$ copies of $\dema_{AB}$.
+
+The entropy of entanglement is defined only for pure states. A useful entanglement measure which also works for mixed states is the \emph{concurrence}, defined for a mixed state of two qubits $\dema$ as
+\begin{equation}
+\mathcal{C}(\dema) \equiv \max(0, \lambda_1, \lambda_2, \lambda_3, \lambda_4)
+\label{eqn:concurrence}
+\end{equation}
+where $\{\lambda_i\}$ are eigenvalues of the matrix $R=\sqrt{\sqrt{\dema} \tilde{\rho} \sqrt{\dema}}$ and $\tilde{\dema} = (\pauli_y \otimes \pauli_y) \dema (\pauli_y \otimes \pauli_y)$. $\mathcal{C}$ ranges from 0 for a separable state and 1 for a maximally entangled state, and is monotonically related to $E$. We make use of the concurrence in sections \ref{sec:noisy-entanglement-witness} and \ref{chap:quantum-chemistry} of this thesis.
+
+\subsection{Bell nonlocality}
+\label{sec:nonlocality}
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=.8\textwidth]{chapter2/fig/bell-chsh.pdf}
+\caption[A Bell-CHSH test]{ 
+    A Bell-CHSH test. Alice and Bob receive devices from a common source or factory. Each device has a binary input (heads, $H$ or tails, $T$) and a binary output (0, 1). The internal machinery of the devices, as well as the pre-arranged strategy of Alice and Bob, are left unspecified --- the only condition is that the devices are separated in space and cannot communicate. Having received their devices, Alice and Bob each flip a coin, obtaining $H$ or $T$.  Their task is then to satisfy the rules illustrated in the central schematic. Namely, if one or more coins shows heads, the output of Alice and Bob's devices should \emph{agree}, yielding $0_a0_b$ or $1_a1_b$. Only when both parties flip tails should they disagree, outputting $0_a1_b$ or $1_a0_b$. It is easily confirmed that all local strategies are limited to a probability of success of $3/4$. However, when Alice and Bob share an entangled state, this bound can be violated.
+}
+\label{fig:bell-chsh-test}
+\end{figure}
+
+
+In our discussion so far, it has been necessary to use the formalism of state vectors, operators, measurements and so on in order to provide an intuitive picture of the character and effects of entanglement. Although we will see later on that machines which use entanglement as a resource have the potential to dramatically affect the real classical world, it is hard to give a good picture of the \emph{fundamental properties} of entanglement without appealing to the quantum mechanical formalism. However, it turns out that we can construct experiments which reveal --- without \emph{fully} characterising entanglement itself --- the sharp separation between allowed behaviour of entangled \emph{vs} separable states, without the need to first choose an in-depth physical model of the world, and which rely only on simple statements about space and probability.
+
+%re-write this in terms of the game
+Classical physics is local. Consider two parties, Alice and Bob, who are separated in space by many light-years. They each possess a single object. Their objects may have originated from a common source. Alice and Bob now independently and freely choose to measure their respective objects in some way. We do not need to use the quantum mechanical description of measurement --- we simply imagine switches allowing Alice to measure in $a \in \{a_0, a_1 \ldots \}$ and Bob in $b \in \{b_0, b_1 \ldots \}$, yielding measurement outcomes $A$ and $B$ respectively. When this experiment is repeated many times, these measurement outcomes are governed by a probability distribution $p(AB|ab)$.
+
+Alice and Bob's systems may have met in space at some point in their history, and may have been prepared or choreographed in a particular way, giving rise to correlations or dependencies in $p$. We denote this prior knowledge by a \emph{local (hidden) variable} $\lambda$, which accounts for any local information or ``hidden pre-programming'' which these objects might possess. Having done so, we define a \emph{local theory} as one in which we can factorize the probability distribution \cite{Brunner2013} over measurement outcomes as 
+\begin{equation}
+p(AB|ab) = \int_\Lambda d\lambda ~q(\lambda) p(A|a, \lambda) p(B|b, \lambda),
+\label{eqn:locality}
+\end{equation}
+where $q$ is a random variable over all possible $\lambda \in \Lambda$, which takes into account the possibility that $\lambda$ may change between measurement runs.
+The outcome of Alice's measurement thus does not depend on Bob's choice of measurement operator, and is fully described by local effects. Note that we arrive at this definition without any particular choice of physical model.
+
+In 1964, John Bell proved \cite{Bell1964c} that the predictions of quantum theory are incompatible with the notion of locality captured in (\ref{eqn:locality}). Since 1964, many variations on Bell's proof have been developed, some of which are simpler to derive, or experimentally test, than others. Here we consider a Bell test due to Clauser, Horne, Shimony and Holt \cite{Clauser1969}, in which we assume only two measurement settings $a \in \{a_0, a_1\}$, $b \in \{b_0, b_1\}$,  and two measurement outcomes $A, B \in \{-1, +1\}$ per party. 
+
+Consider the quantity
+\begin{equation}
+S = \expect{A_0B_0} + \expect{A_0B_1} + \expect{A_1B_0} - \expect{A_1B_1}
+\label{eqn:chsh-abstract}
+\end{equation}
+where $\expect{A_a B_b} = \sum_{A,B} AB p(AB|ab)$ is the expectation value of the product $A\cdot B$, given measurement settings $a, b$. Assuming a local model, we re-write these expectation values using (\ref{eqn:locality}),
+\begin{equation}
+\expect{A_a B_b} = \int d \lambda q(\lambda) \expect{A_a}_\lambda \expect{B_b}_\lambda
+\end{equation}
+where $\expect{A_a}_\lambda = \sum_A A p (A | a, \lambda) \in \left[ -1, 1 \right]$ is Alice's local expectation value and $\expect{B_b}_\lambda = \sum_B B p (B | b, \lambda) \in \left[ -1, 1 \right]$ is Bob's. Now, (\ref{eqn:chsh-abstract}) becomes
+\begin{equation}
+S=\int d\lambda S_\lambda = \int d\lambda 
+\expect{A_0}_\lambda \expect{B_0}_\lambda + \expect{A_0}_\lambda \expect{B_1}_\lambda + \expect{A_1}_\lambda \expect{B_0}_\lambda - \expect{A_1}_\lambda \expect{B_1}_\lambda.
+\end{equation}
+Since $\expect{A}, \expect{B} \in \left[-1, 1\right]$, we see that $|S| \le | \expect{B_0}_\lambda + \expect{B_1}_\lambda + \expect{B_0}_\lambda - \expect{B_1}_\lambda |$  and therefore 
+\begin{equation}
+|S| \le 2.
+\label{eqn:chsh-inequality}
+\end{equation}
+This is the Bell-CHSH inequality, which holds for all local realistic models.  Now consider a scenario in which Alice and Bob share the Bell state $\ket{\psi_{AB}} = \ket{\Psi^-}$. Their local measurement settings are now described by qubit measurement operators, $\hat{A}_i$, $\hat{B}_i$. It is helpful to express each measurement operator as a \emph{Bloch vector}, which maps a single-qubit measurement operator to $\mathbb{R}^3$ per the Bloch sphere (figure \ref{fig:bloch-sphere}),
+\begin{align}
+    &\hat{A_i} = a_{i_1} \pauli_x + a_{i_2} \pauli_y + a_{i_3} \pauli_z = \vec{a}_i \cdot \vec{\sigma},\\
+    &\hat{B_i} = b_{i_1} \pauli_x + b_{i_2} \pauli_y + b_{i_3} \pauli_z = \vec{b}_i \cdot \vec{\sigma}.
+    \label{eqn:bloch-vectors}
+\end{align}
+Setting $q(\lambda)=1$, it is then easy to show that the expectation value of $AB$ is simply related to the overlap of $\vec{a}$ and $\vec{b}$,
+\begin{equation}
+    \expect{\hat{A}_i \hat{B}_i}_{\psi} = \int d \lambda q(\lambda) \bra{\psi} \hat{A}_i \otimes \hat{B}_i  \ket{\psi} = - \vec{a}_i \cdot \vec{b}_i = -\cos(\theta),
+\end{equation}
+where $\theta$ is the angle between $\vec{a}_i$ and $\vec{b}_i$.
+If they choose the following measurement operators
+\begin{equation}
+\hat{A}_0 = \pauli_z ~ ; ~~~
+\hat{A}_1 = \pauli_x ~ ; ~~~
+\hat{B}_0 = -\frac{\pauli_z+\pauli_x}{\sqrt{2}} ~ ; ~~~
+\hat{B}_1 = \frac{\pauli_z-\pauli_x}{\sqrt{2}}
+\end{equation}
+it is easy to show that $S=2\sqrt{2} > 2$, violating \ref{eqn:chsh-inequality}. The maximum value of $S$ which can be obtained, using any quantum state, is $2\sqrt{2}$. Moreover, this value is only obtained for maximally entangled states. Considerable insight into the fundamental nature of quantum mechanics has been gained \cite{Popescu1994, Tsirelson1993, Brunner2013} through the construction of unphysical models or objects which violate \gls{chsh} \emph{beyond} $2\sqrt{2}$.
+
+Since the discovery of Bell's theorem and its later development by CHSH, this inequality has been experimentally violated many times. 
+Arguably the first robust experimental demonstration was made in 1982 by Aspect et al. \cite{Aspect1982c}, using entangled photon pairs from a calcium cascade source. 
+More recent experimental implementations have focussed either on closing the \emph{loopholes} which leave such experiments open to local-realistic interpretation \cite{Giustina2013, Scheidl2010}, or on the potential communication applications of nonlocal correlations, in the form of \emph{device independent quantum key distribution} (see section \ref{sec:qkd}). 
+
+\subsubsection{Obtaining nonlocality}
+Not all entangled states exhibit nonlocal statistics. Pure states with any nonzero value of the entropy of entanglement (\ref{eqn:entropy-of-entanglement}), for instance states of the form
+\begin{equation}
+     \sqrt{1-p} \ket{\Psi^-} + \sqrt(p) \ket{00} 
+\end{equation}
+violate Bell-CHSH (although not maximally) for all $p>0$. In contrast, Werner \cite{Werner1989} described mixed, entangled two-qubit states, showing EPR correlations and which cannot be written as \ref{eqn:separable-state}, which do \emph{not} exhibit nonlocal correlations. The \emph{Werner state} with visibility $V$
+\begin{equation}
+    \dema_V \equiv V\ket{\Psi^-} \bra{\Psi^-} + \left(1-V\right) \frac{\identity}{4}
+    \label{eqn:werner-state}
+\end{equation}
+cannot violate Bell-CHSH for $V<1/\sqrt{2}$. 
+
+Even if Alice and Bob share a maximally entangled state, nonlocal statistics are not always revealed --- for instance, if they choose their measurements from a single orthogonal basis set. 
+Therefore in order for Alice and Bob to guarantee that they will see nonlocal correlations, they must somehow co-ordinate their choice of measurement settings. This point is discussed in detail in chapter \ref{chap:random-chsh} of this thesis.
+
+
+%\subsubsection{Locality, no-signalling, and realism}
+%\label{sec:local-realism}
+%Einstein in particular was troubled by the nonlocal correlations produced by entangled states, as they suggest superluminal action at a distance --- which appears to conflict with special relativity. 
+%Interestingly, one can prove that entanglement does not allow faster-than-light communication, which is equivalent to what many would consider instantaneous \emph{classical} action at a distance.
+
+%, that is, the amount of classical information which can be transmitted from Alice to Bob through manipulation and measurement of a shared entangled state alone is always exactly zero.
+%Without resorting to a full proof,
+%This point can be intuitively understood by noticing that although Alice has free choice of the \emph{basis}  $\{ \ket{\lambda_{0,1}} \}$
+%she cannot force Bob's system to collapse into a \emph{particular eigenstate} --- from Bob's point of view, this collapse is random.
+%Therefore, when Bob makes a measurement on his system, 
+%Bob's measurement outcomes will therefore be indistinguishable from noise and do not communicate any information. In order to detect nonlocal correlations, he must compare measurement outcomes with Alice via classical, sub-luminal communication. 
+%The question of whether it can be said that Alice's choice has a \emph{real} instantaneous effect on Bob's state remains contentious, and is outside the scope of this thesis. 
+%This is known as the principle of \emph{no-signalling} and 
+%FUTURE: no-signalling
+
+
+
+%For a maximally mixed state, there is no such basis --- measurement outcomes will be uniformly distributed and indistinguishable from noise regardless of the choice of basis.  
+% challenge: get through this bit without talking about qubits
+
+
+\section{Quantum technologies} 
+\label{sec:quantum-technologies}
+\begin{quote}
+``Information is physical.''
+\qauthor{Rolf Landauer}
+\end{quote}
+Information must necessarily be encoded in the state a physical system.
+In order to encode classical information, almost any physical system will do: human beings have cut giant figures into the chalky substrate of the Chiltern hills, hewn laws into stone tablets, and currently store exabytes of data in the magnetic domains of hard disk drives. Over the past century, with the advent of quantum mechanics, it came to be understood that information stored in the state of a quantum system --- \emph{quantum information} --- is very distinct from its classical counterpart. 
+
+Quantum information is encoded in the probability amplitudes of a quantum state, and can therefore exist in an arbitrary coherent superposition. It follows that quantum information can be encoded in an entangled state, and can thus exhibit correlations which are classically forbidden.  Moreover, as has already been discussed, the fact that quantum states cannot be cloned places restrictions on the extent to which quantum information can be reliably ``read out'' in a single shot. 
+
+These fundamental differences between allowed representations and operations on classical and quantum information lead to new applications, devices, and technologies, which cannot be accomplished by classical means. Specifically, quantum information science has revealed fundamentally new modes of information processing, measurement, communication, and simulation, which we detail below.
+
+\subsection{Quantum computing} 
+\label{sec:quantum-computing}
+Quantum systems exhibit classically forbidden phenomena. As a result, quantum information can be processed using operations which are forbidden for classical machines.
+In particular, unitary evolution of quantum information can lead to \emph{interference} effects which do not occur under stochastic evolution of classical information. 
+This leads to the possibility of a \emph{quantum computer}: an entangled, quantum, problem-solving machine.
+It has been shown that by exploiting these new operations, a quantum computer could in principle solve certain computational tasks using exponentially fewer resources than any classical machine. 
+%The history and proposed applications of quantum computers are discussed in section \ref{sec:quantum-computer-apps}. 
+
+To see that quantum information can be advantageously processed using classically forbidden operations, we look to a simple and concrete example due to Deutsch and Jozsa \cite{Deutsch1985}. Given an unknown Boolean function $f$, the task is to determine whether $f$ is \emph{constant}, $f(0)=f(1)$, or \emph{balanced}, $f(0)\ne f(1)$ (i.e. we want the parity of $f$).
+To answer this question classically, we must make two calls to $f$:
+\begin{equation}
+    f(0) \oplus f(1) = 
+    \begin{cases}
+    0~\text{if $f$ is constant}\\
+    1~\text{if $f$ is balanced}
+    \end{cases}
+\end{equation}
+where $\oplus$ denotes addition $\mathrm{mod}~2$. However, implementing $f$ using a two-qubit entangling gate $\unitary_f \ket{x} \ket{a} = \ket{x}  \ket{f(x) \oplus a}$,
+we can effectively make a single call to $f$ with a superposition of both arguments at once
+\begin{align}
+    \unitary_f \, \ket{+} \otimes \ket{-} = 
+    &\ket{0}\otimes\ket{f(0) \oplus 0}-
+    \ket{0}\otimes\ket{f(0) \oplus 1}+\\
+    &\ket{1}\otimes\ket{f(1) \oplus 0}-
+    \ket{1}\otimes\ket{f(1) \oplus 1}.
+    \label{eqn:deutsch}
+\end{align}
+Applying a Hadamard operation to the first qubit, complex amplitudes in (\ref{eqn:deutsch}) destructively interfere to give
+\begin{equation}
+  (\hadamard  \otimes \identity) \unitary_f \ket{+}\otimes \ket{-} = 
+    \begin{cases}
+    \pm \ket{0} \otimes \ket{-} ~\text{if $f$ is constant}\\
+    \pm \ket{1} \otimes \ket{-} ~\text{if $f$ is balanced}
+    \end{cases}
+\end{equation}
+Measurement of the first qubit in the logical basis then immediately reveals the nature of $f$. Note that we only obtain a \emph{global} property of $f$, not full information on the mapping (see section \ref{sec:bs-verification}). This algorithm is easily generalized to systems of $n$ qubits, where it requires exponentially fewer calls to $f$ with respect to all classical algorithms. 
+
+The Deutsch-Josza algorithm provides an attractive illustration of the characteristic properties of many quantum algorithms --- dependence on interference of complex amplitudes, qubits, entangling gates, and ultimately an exponential speedup over classical machines. Unfortunately, the \emph{problem} of Deutsch-Josza is rather contrived, and this algorithm has no known useful application\footnote{In terms of computational complexity, Deutsch-Josza provides an oracle relative to which $\EQP$ (the class of problems exactly soluble by a quantum computer in polynomial time) is distinguishable from $\P$ (decision problems soluble in poly-time by a deterministic Turing machine). However, we do not expect that a Deutsch-Josza machine would have direct ``economically significant'' implications!}.
+Moreover, at the cost of deterministic operation, randomized classical algorithms perform very well at this task, classifying $f$ in polynomial time, and furthermore the leap from $f$ to the oracular $\unitary_f$ arguably renders the quantum-classical comparison somewhat unrealistic. As a result, the main utility of Deutsch-Josza is pedagogical.
+A similar role is played by \emph{Grover search}, an algorithm first described in 1995 by Lov Grover. Grover's algorithm uses a single quantum system, together with a specific class of oracle, to accomplish a polynomial speedup over classical machines for a task resembling database search.
+
+Long before Deutsch-Josza and Grover search, Richard Feynman \cite{Feynman1982d, Feynman1986} laid out the first strong argument as to why one might build a quantum computer. 
+Feynman argued that since the state of a quantum system can exist in a coherent superposition over all allowed eigenstates, and since a system of $n$ particles has exponentially many eigenstates in general, it is likely exponentially hard to simulate such systems using a classical computer. Feynman went on to propose that a quantum computer or \emph{quantum simulator} should be capable of reproducing the dynamics of a system of interest, in a controlled way, using only polynomial resources. We can imagine that much as aircraft wings are numerically simulated prior to construction, drugs, materials and other atomic-scale systems might be designed on a quantum computer prior to synthesis in the laboratory. This application is potentially economically very significant, and would have a dramatic effect on science, medicine, and engineering. Quantum simulation is discussed in further detail in chapter \ref{chap:quantum-chemistry} and section \ref{sec:quantum-walks} of this thesis.
+
+Quantum simulation has almost the opposite problem to Grover search and Deutsch-Josza. Quantum simulators constitute arguably the most practically useful known application of a quantum computer, but it remains very hard to prove either (i) that atomic/molecular systems of interest cannot be efficiently simulated by a classical machine or (ii) that all physical systems \emph{can} be efficiently simulated by a quantum computer!
+
+In 1994, Peter Shor first described an algorithm \cite{Shor1994} which has since become the best-known proposed application for quantum computation. Shor showed that a universal quantum computer, capable of manipulating, entangling and measuring a large number of qubits, could be used to solve the \emph{prime factoring} and \emph{discrete logarithm} problems in polynomial time. This was an extremely powerful result, as the problem of prime factoring is strongly believed to be computationally intractable for classical machines, and is also useful for real-world practical tasks. Specifically, prime factoring is the task of identifying the prime factors $a$, $b$ of a (large) composite $L$-bit number $N=ab$. The best-known classical algorithms run in time exponential in $L$, while Shor's algorithm runs in $O(L^3)$ time. A scalable implementation of Shor's factoring algorithm would break most (but not all) existing classical encryption algorithms, including \gls{rsa} and elliptic-curve cryptography.
+
+We have outlined above a few quantum algorithms most relevant to this discussion. A great many quantum algorithms have since been developed, most of which are outside the scope of this thesis. In chapter \ref{chap:quantum-chemistry}, we introduce a new algorithm for simulation of quantum chemistry. In section \ref{sec:bosonsampling}, we experimentally demonstrate a relatively new quantum algorithm, \bosonsampling, which has particular relevance for the photonic platform addressed here.
+
+\subsubsection{The DiVincenzo criteria} 
+\label{sec:divincenzo-criteria}
+%The Church-Turing thesis states that any calculable function can be evaluated by a single, well-defined class of machine. 
+Although the quantum algorithms described above could in principle be implemented using special-purpose machines, one of the principal goals of quantum information science is the design and construction of \emph{general-purpose}, universal quantum computers. Such a machine could be reconfigured, or \emph{programmed}, to implement any conceivable quantum algorithm, and is arguably the most ambitious and potentially rewarding goal of the entire field of quantum information. The fact that a universal quantum computer could in principle be constructed under the known laws of quantum mechanics has been proven in works by Barenco, Bennett, Cleve, Deutsch, Ekert, DiVincenzo, Lloyd, Shor, Smolin, and many others. See, for example, refs \cite{DiVincenzo1995, Barenco1995, Lloyd1995a, Boykin1999}.
+
+In order to build such a machine we must first select a physical architecture, amenable to experimental implementation, in which to encode, manipulate and measure quantum information. 
+Although we can easily construct algorithms and operations on quantum information which provably cannot be efficiently performed by \emph{any} known machine \cite{Nielsen2004}, any successful platform for quantum computing will require experimental resources which grow at most polynomially with the size of the quantum circuit, or the number of elementary operations required. In order to evaluate the suitability of proposed architectures and technologies for quantum computing, we make use of the \emph{DiVincenzo criteria} \cite{DiVincenzo2000} --- the basic experimental criteria for any scalable platform for quantum computing. Here we list the five criteria most pertinent to our discussion:
+\begin{itemize}
+    \item \textbf{A scalable system with well-characterized qubits.} Single qubits, supporting coherent quantum superposition states, upon which quantum information can be encoded. A single qubit should not be prohibitively experimentally demanding to implement, and experimental resources should scale at most polynomially with the total number of qubits.
+    \item \textbf{The ability to prepare a simple fiducial state.} We must be sure of the initial state of the system. This fiducial state need not be entangled.
+    \item \textbf{Evolution under a universal set of quantum gates.} Lloyd \cite{Lloyd1995a}, DiVincenzo \cite{DiVincenzo1995} and many others have described small, discrete sets of elementary operations on qubits, which can be combined to implement any quantum algorithm. One example of such a \emph{universal gate set} is formed by the (maximally entangling) two-qubit \gls{cnot} gate, together with generic single-qubit operations. All such universal gate sets include at least one entangling operation.
+    \item \textbf{Decoherence times much longer than the gate operation time.}
+        As has already been discussed (section \ref{sec:background-mixture}), interaction with the environment leads drives the state of the system towards a mixed state, in a process referred to as \emph{decoherence}. Since a maximally-mixed state can be modelled by a classical probability distribution, decoherence almost always leads to failure of quantum algorithms. The characteristic rate at which the purity of the qubit state degrades, which is related to the strength of coupling to the environment, must therefore be slow with respect to the time taken to perform a gate operation.
+    \item \textbf{Qubit measurement.} The architecture must allow single-qubit quantum measurements, as described in section \ref{sec:quantum-measurement}. Measurement in the $z$-basis can be combined with a universal gate set to evaluate any possible observable on the system of qubits.
+\end{itemize}
+
+Quantum computation is widely believed to be the most technically challenging of all proposed quantum technologies, and it is likely that any platform satisfying the DiVincenzo criteria would also be capable of implementing other applications, described in sections \ref{sec:qkd} and \ref{sec:metrology}.
+
+\subsubsection{Fault tolerance} 
+\label{sec:errors-in-quantum-computers}
+No useful machine exists in a vacuum. All practical machines are subject to the influence of noise, error, and loss, due to both interaction with the environment and imperfect fabrication or operation of the machine itself. Classical computers overcome noise by two complementary methods. First, the reliability of individual components in modern classical computers is extremely good: typical error rates are on the order of 1 in \num{10e17} operations. The overwhelming majority of these few errors are then detected and corrected by means of redundancy-based error-correcting codes. The simplest example is to encode the bit state $0$ on $n$ bits, $0000\ldots$, and similarly for $1$, in which case error can be exponentially suppressed by means of a simple majority-voting system.
+
+Error correction is similarly essential for quantum computers. Without it, the probability of success of any realistic quantum computation falls off exponentially as the system evolves in time. Fortunately, a number quantum \glspl{ecc} \cite{Raussendorf2001, Raussendorf2003, Shor1995a, Nielsen2004} have been developed which effectively protect quantum states against noise. Owing in part to the no-cloning theorem, these codes are necessarily distinct from the simplest classical techniques, however they are still largely based on redundancy, in that a single \emph{logical} qubit is represented by a number of \emph{system} qubits, whose state is monitored and adjusted to correct errors. 
+As with classical \glspl{ecc}, quantum \glspl{ecc} therefore demand an overhead, in terms of both qubit and gate count, with respect to the na\"ive implementation. In practise, this overhead can be extremely large \cite{Devitt2012}.  The overhead for a given choice of \glspl{ecc} is guaranteed to be polynomial in problem size only when the intrinsic \emph{error rate} is below a certain threshold value. This is the \emph{threshold theorem} \cite{Gottesman2009}, without which scalable quantum computing would likely not be a realistic prospect.
+
+\subsection{Quantum communication} 
+\label{sec:qkd}
+Prime factoring can be seen as a \emph{one-way} function, which is hard to compute, but easy to check.  The security of almost all digital communication is currently guaranteed by the difficulty of the forward problem, which is the basis of the \gls{rsa} algorithm for public-key cryptography. \gls{rsa} provides a method by which two parties can securely communicate, without having to first share a large one-time pad. While \gls{rsa} has been enormously successful, it is by no means perfect. First, it is not known whether factoring is \emph{fundamentally} classically intractable: at any time, an efficient classical factoring algorithm could suddenly be discovered, breaking the security of \gls{rsa}. Secondly, an eavesdropper with access to a scalable quantum computer could use Shor's algorithm to silently decrypt and listen-in on this communication.
+
+While quantum information science enables a realistic attack on \gls{rsa}, it also provides a new technique for secure communication, based on quantum theory itself. In 1984, Bennett and Brassard \cite{Bennett1984} (\acrshort{bb84}) described a method allowing two distant parties to communicate securely over an untrusted channel, using quantum states as the information carrier. This technique, together with its many derivatives, is referred to as \gls{qkd}. The security of \gls{qkd} is guaranteed by the axioms of quantum mechanics, in particular the no-cloning theorem (section \ref{sec:no-cloning}). In the event that an eavesdropper successfully reads private information from the channel, the state of the quantum system carrying that information is measurably disturbed, in which case the honest parties cease communication. In order to eavesdrop on a channel secured by \gls{qkd}\footnote{Assuming a perfect experimental implementation, see ref. \cite{Lydersen2010}.}, an attacker would need to discover physical effects which contradict no-cloning, which would be considerably more surprising than \textsc{Factoring} $\subset \P$.
+
+At the time of writing, \gls{qkd} is one of the few quantum technologies to have reached the market. This reflects the relative experimental accessibility of the task. All commercial \gls{qkd} systems use photons as the information carrier, owing to the many advantages described in section \ref{sec:photons-as-qubits}. Most \gls{qkd} systems either time-bin or polarization encoding, carrying single photons or weak coherent pulses over optical fibre or in free-space. 
+
+Recently, Lydersen et al. reported a functional attack on commercial \gls{qkd} systems \cite{Lydersen2010}, which exploits details of the technical implementation to gain control over the measurement apparatus and steal information. \Gls{diqkd} \cite{Pironio2009}, which necessarily depends on entanglement and nonlocal correlations, has been proposed as a solution to this class of attack.
+In chapter \ref{chap:random-chsh}, we introduce a number of theoretical and experimental techniques which may facilitate \gls{diqkd} in real-world scenarios.
+
+\subsection{Quantum metrology} 
+\label{sec:metrology}
+%\subsection{Quantum simulation} 
+We have argued that since computation is a physical process, quantum mechanics can be used to compute. Moreover, an advantage in computation can be gained by using a quantum machine. Similarly, \emph{measurement} is physical. It turns out that by using a quantum apparatus to probe a system of interest, a number of tangible advantages can be gained with respect to classical methods \cite{Giovannetti2004, Giovannetti2011}. 
+
+Classical measurements are fundamentally limited by what is known as the \emph{shot noise}, or the \emph{standard quantum limit}. Averaging over $n$ measurements of a given observable $A$, by the central limit theorem the statistical uncertainty in the measured value of $A$ scales as 
+\begin{equation}
+\Delta A \propto 1/\sqrt{n}. 
+\end{equation}
+However, by probing the sample using entangled quantum states such as those described in section \ref{sec:hong-ou-mandel}, followed by quantum measurement of the resulting state, this uncertainty can in principle be reduced to a reciprocal scaling $\Delta A \propto 1/n$, violating the standard quantum limit. This method, known as \emph{quantum metrology}, is particularly advantageous when the sample is extremely fragile and prone to damage by the measurement process itself, as it allows the same amount of information to be obtained using fewer discrete measurements. 
+
+We recently performed an experimental implementation \cite{Matthews2013d} of a new scheme for loss-tolerant quantum metrology \cite{Cable2010}, which makes use of the photon counting capability developed in section \ref{sec:counting}. Unfortunately, this work was not completed in time for inclusion in this thesis.
+
+\section{Light}
+\label{sec:light}
+Throughout this thesis we will examine the use of quantum states of light as a testbed for fundamental quantum mechanical phenomena, as well as the basic substrate upon which quantum-photonic technologies are built. We now lay out a theoretical framework to describe both classical and quantum states of light, in particular the quantization of the electromagnetic field, following the approach of Venkataram~\cite{Venkataram2013}. The following analysis is presented in Gaussian units.
+
+\subsection{Light as a wave}
+
+% Useful definitions for Maxwell's equations
+\newcommand{\efield}{\mathbf{E}}
+\newcommand{\hfield}{\mathbf{H}}
+\newcommand{\bfield}{\mathbf{B}}
+\newcommand{\dfield}{\mathbf{D}}
+\newcommand{\jfield}{\mathbf{J}}
+\newcommand{\afield}{\mathbf{A}}
+\newcommand{\vr}{\mathbf{r}}
+\newcommand{\vk}{\mathbf{k}}
+\newcommand{\createk}{\creation_\vk}
+\newcommand{\deletek}{\annihilation_\vk}
+
+Classical electromagnetic effects are governed by Maxwell's equations:
+\begin{eqnarray}
+    %
+    \nabla \times \hfield &=& \frac{1}{c}\left( \frac{\partial\dfield}{\partial t} + 4\pi \jfield_f \right) \label{eqn:faraday} \\ 
+    %
+    \nabla \times \efield &=& -~ \frac{1}{c} \frac{\partial\bfield}{\partial t} \label{eqn:ampere}\\
+    %
+    \nabla \cdot \bfield = 0 &\qquad
+    %
+    & \nabla \cdot \dfield =  4\pi \rho_f  \label{eqn:gauss}
+\end{eqnarray}
+where $\hfield$ is the magnetic field, 
+$\dfield=\varepsilon\efield$ is the electric flux density, $\jfield_f$ is the free current density, $\efield$ is the electric field, and $\bfield=\mu\hfield$ is the magnetic flux density. $\rho_f$ is the free charge density or charge per unit volume, and $c$ is the speed of light.
+The dielectric permittivity $\varepsilon$ and the magnetic permeability $\mu$ are related to the dielectric and magnetic susceptibilities $\chi_e$, $\chi_m$ by 
+\begin{eqnarray}
+\varepsilon(\efield) &=& \varepsilon_0\left[1+\chi_e\left(\efield\right)\right]
+    \label{eqn:dielectric-susceptibility}
+    \\
+\mu(\hfield) &=& \mu_0\left[1+\chi_m\left(\hfield\right)\right]
+\end{eqnarray}
+where $\varepsilon_0$ and $\mu_0$ are the permittivity and permeability of the vacuum, respectively.
+
+In the absence of charges ($\rho_f=0$) and currents ($\jfield_f=0$), Maxwell's equations reduce to
+\begin{equation}
+    \nabla \times \efield = -\frac{1}{c} \frac{\partial \bfield}{\partial t}~; \qquad
+    \nabla \times \bfield = +\frac{1}{c} \frac{\partial \efield}{\partial t}~; \qquad
+    \nabla \cdot \efield = 0~;\qquad
+    \nabla \cdot \bfield = 0.
+    \label{eqn:maxwell-no-charges}
+\end{equation}
+For convenience we have taken $c=1/\sqrt{\mu\varepsilon}$ to be the phase velocity of light in the medium.  The \emph{refractive index} $n$ of the material 
+\begin{equation}
+n=\sqrt{\frac{\mu \varepsilon}{\mu_0 \varepsilon_0}} = \frac{c_0}{c}
+\end{equation}
+relates $c$ to the speed of light in the vacuum $c_0$.
+Taking the curl ($\nabla \times$) of the first two expressions in (\ref{eqn:maxwell-no-charges}) we arrive at the electromagnetic wave equations 
+\begin{equation}
+\nabla ^2 \efield = \frac{1}{c^2} \frac{\partial^2 \efield}{\partial t^2}  ~; \qquad
+\nabla ^2 \bfield = \frac{1}{c^2} \frac{\partial^2 \bfield}{\partial t^2}   .
+\label{eqn:nice-wave-eqn}
+\end{equation}
+The solutions $\efield\left(\vr, t\right)$ and $\bfield\left(\vr, t\right)$ to these equations represent time-dependent electric and magnetic fields --- light --- propagating through the medium at $c \sim 3\times10^8$ m/s. These solutions are subject to the constraints that $\bfield$ and $\efield$ should be perpendicular both to each other and the axis of propagation, and in phase, but may otherwise be very varied in form.  
+
+One solution to (\ref{eqn:nice-wave-eqn}) for an inhomogeneous dielectric is a linearly polarized monochromatic field with wavelength $\lambda$, 
+\begin{equation}
+\efield(\vr, t) = \mathbf{A}(\vr) \, e^{i \left( \omega t - \phi(\vr) \right) }
+\label{eqn:linearly-polarized-monochromatic}
+\end{equation}
+where $\omega=2\pi c / \lambda$ is the angular frequency and $\afield$ is the amplitude vector which determines the polarization. 
+When the medium is homogeneous, or in free space, an even simpler solution is given by a \emph{plane wave} travelling in the $\hat{z}$ direction
+\begin{equation}
+\efield(\vr, t) = \mathbf{A} e^{i \left( \omega t - k z \right) }
+\label{eqn:infinite-field}
+\end{equation}
+where $k=\omega/c$ is the wavenumber.
+%Here the amplitude $\afield$ extends over all space, and as such (\ref{eqn:infinite-field}) does not give a complete description of real fields in the lab,  but does nonetheless provide a useful approximate model of polarized monochromatic light. 
+
+\newcommand{\kmode}{\vk}
+\newcommand{\alphak}{\alpha_{\kmode}}
+We will now consider a \emph{single} eigenmode of the electromagnetic field with wave vector $\vk = k \hat{k}$, where $\hat{k}$ is a unit vector in the direction of propagation.
+For a mode $\vk$, solutions of (\ref{eqn:nice-wave-eqn}) can be separated into a time-dependent complex function $\alphak(t)$ and a spatial function $\efield_0(\vr)$, where by convention the electric field $\efield_\vk$ is taken to be the real part of the product of $\alphak$ and $\efield_0$
+\begin{equation}
+    \efield_\vk(\vr, t) \equiv \mathrm{Re}(\alphak (t) \efield_0 (\vr)) = \alphak^*(t) \efield_0^* (\vr) + \alphak(t) \efield_0(\vr).
+    \label{eqn:maxwell-electric-field-ansatz}
+\end{equation}
+For $\efield_\vk$ and $\alphak$ to be consistent with the wave equation (\ref{eqn:nice-wave-eqn}), they must satisfy
+\begin{equation}
+\alphak(t) = \alphak(0)e^{ickt}~;\qquad \nabla^2\efield_\vk + k^2\efield_\vk = 0.
+\label{eqn:helmholtz}
+\end{equation}
+The second of these two expressions is the Helmholtz equation. 
+%
+The magnetic field must be perpendicular to both $\efield$ and the direction of propagation, 
+$\bfield_\vk \left( \vr, t \right) = \hat{k} \times \efield_\vk \left( \vr, t \right)$
+and is thus related to $\alpha(t)$ and $\efield_0(\vr)$ by
+\begin{equation}
+    \bfield(\vr, t) = \frac{i}{k} 
+    \left[ 
+    \alphak^* (t) \nabla \times \efield_0^* (\vr) - 
+    \alphak (t) \nabla \times \efield_0 (\vr)
+    \right].
+    \label{eqn:maxwell-magnetic-field-ansatz}
+\end{equation}
+In order to find the Hamiltonian of the electromagnetic field, we must integrate the energy density of the electric and magnetic fields over all space,
+\begin{equation}
+   H = \int \mathcal{H} d^3 r = \int \frac{1}{8\pi} \left(\efield^2 +\bfield^2\ \right) d\vr.
+   \label{eqn:em-hamiltonian-integrate}
+\end{equation}
+Combining (\ref{eqn:maxwell-electric-field-ansatz}) and (\ref{eqn:maxwell-magnetic-field-ansatz}), together with careful choice of normalization of $\alpha(t)$ and $\efield_0(\vr)$, we arrive at a Hamiltonian for the electromagnetic field in a mode $\vk$, in terms of the ansatz $\alphak(t)$ 
+\begin{equation}
+   H_\vk = \frac{\hbar c k}{2} \left( \alphak^* \alphak + \alphak \alphak^*\right)
+   =\hbar c k |\alphak|^2 ,
+   \label{eqn:maxwell-hamiltonian-ansatz}
+\end{equation}
+where $\hbar$ is a constant with units of action.
+
+
+
+\subsubsection{Interference} 
+\label{sec:interference}
+When two light fields occupy the same region of space, interference effects occur. The frequency of light is generally speaking too high ($5\times10 ^{14}$ Hz) for the electric field to be observed directly, and most measuring devices are only sensitive to the time-averaged intensity $I= \langle | \efield(\vr, t) | ^2 \rangle$. 
+The net electric field is the sum over modes, $\efield(\vr, t) = \sum_{i} \efield_i(\vr, t)$. For the simple example of interference of two linearly polarized monochromatic fields (\ref{eqn:linearly-polarized-monochromatic}) $\efield_1, \efield_2$, the intensity observed at a point $\vr$ is then given by
+\begin{align}
+    I(\vr, t) 
+    &= 
+    \langle |\efield_1(\vr, t)|^2 \rangle +  
+    \langle |\efield_2(\vr, t)|^2 \rangle +
+    \langle \efield_1 \cdot \efield_2^* \rangle +
+    \langle \efield_1^* \cdot \efield_2 \rangle \\
+    &= I_1 + I_2 + 2(\afield_1 \cdot \afield_2) 
+    \cos \left[ (\omega_1 - \omega_2) t - (\phi_1(\vr) - \phi_2(\vr) ) \right].
+    \label{eqn:reduced-contrast}
+\end{align}
+We thus observe sinusoidal interference patterns in the measured intensity, depending on the relative phase and frequency of the two sources. Note that the strength or \emph{contrast} of the observed interference fringe 
+\begin{equation}
+    C \equiv \frac{I_\mathrm{max} - I_\mathrm{min}}{I_\mathrm{max}+I_\mathrm{min}} \propto \afield_1 \cdot \afield_2
+    \label{eqn:interference-contrast}
+\end{equation}
+depends on the polarization of the two sources: if they have orthogonal polarization the $(\afield_1 \cdot \afield_2)$ term vanishes and $C\rightarrow0$.
+
+
+\subsubsection{Guided modes} 
+\label{sec:guided-modes}
+
+So far, our analysis has been focussed on light in a vacuum or homogeneous medium. Under these conditions, the propagation of laser light is well-approximated by Gaussian beam optics, in which the time-independent component of the electric field is normally distributed about the beam centre,
+\begin{equation}
+    \efield_0(\vr) = \efield_{A}\cdot e^{-||\vr||^2/\omega_0^2}.
+\end{equation}
+Throughout this thesis, as well as Gaussian beam optics in free space, we will make use of optical fibres and waveguides to confine and direct monochromatic light and single photons on-chip. These structures are constructed from two different materials: a \emph{core} with refractive index $n_1$, in which the majority of the propagating electric field is confined, and a \emph{cladding} constituting the substrate or surroundings of the waveguide, with index $n_2$. 
+In this discussion we will describe the confinement and guiding of light in an idealized 1D rectangular waveguide, as shown in figure \ref{fig:introduction-waveguides}. All waveguides used in this thesis are rectangular. Further technical discussion of waveguide geometries and material systems is given in section \ref{sec:integrated-quantum-photonics}.
+
+A working understanding of the confinement of light in an optical waveguide can be obtained from the ray-optics picture, in which a ray of light propagates in a straight line in the waveguide structure. At the interface between core and cladding, the ray is completely internally reflected if and only if the angle of incidence $\phi$ is less than the \emph{critical angle} $\theta_c$, which can be derived from Snell's law
+\begin{gather}
+   n_1 \sin \theta_i  = n_2 \sin \theta_c ~; \qquad
+   \theta_c = \mathrm{arcsin} \frac{n_2}{n_1}.
+\end{gather}
+If this condition is not satisfied, the ray is no longer confined in the waveguide and radiates into the cladding, where it is lost.
+Note that when the waveguide is curved or has a rough interface between core and cladding, there is a greater chance that the ray will meet the interface at an obtuse angle and be lost. Hence in order to achieve low-loss waveguides, we should engineer smooth interfaces and gentle curves. From this intuitive picture we can also see that a greater \emph{refractive-index contrast} 
+\begin{equation}
+    \Delta n = \frac{n_1^2-n_2^2}{2n_1^2}
+\end{equation}
+between core and cladding leads to a larger critical angle, allowing tighter bends and thus smaller, more compact structures.
+
+%Waveguide figure
+\begin{figure}[t]
+\centering
+\includegraphics[width=.9\linewidth]{chapter2/fig/waveguides.pdf}
+\caption[Optical waveguides]{Optical waveguides (a) Rectangular waveguide showing core and cladding, in a bend structure. (b) In the ray-optics picture, light is confined in the waveguide by  total internal reflection when $n_1 \sin (\pi/2 - \phi) \ge n_2$. (c) 1D refractive index profile of a rectangular waveguide, and a single spatial mode.}
+\label{fig:introduction-waveguides}
+\end{figure}
+%End waveguide figure
+
+
+Given a specific device geometry, the Helmholtz equation \ref{eqn:helmholtz} is only satisfied only for a discrete subset of spatial distributions $\efield_0$, referred to as \emph{waveguide modes}. Owing to the complexity and breadth of possible device geometries, the form of these modes must in general be done using numerical mode solvers (FIMMWave \cite{Fimmwave}, Phoenix \cite{Phoenix} etc.), but for a simple one-dimensional model we can find an analytic solution. 
+
+Consider for example the refractive index profile shown in figure \ref{fig:introduction-waveguides} for a waveguide of width $2a$
+\begin{align}
+    & n = n_1 \qquad |x| < a \\
+    & n = n_2 \qquad |x|\ge a.
+\end{align}
+Taking electric field propagation to be in the \emph{transverse electric} ($TE$) mode, which for a particular choice of coordinate system is equivalent to saying that $E_y$ is the only nonzero component of $\efield_0$, (\ref{eqn:helmholtz}) becomes 
+\begin{gather}
+    \frac{\partial E_y}{\partial x^2} = \gamma^2 E_y   \quad |x|<a ~; \qquad
+    \frac{\partial E_y}{\partial x^2} = - \kappa^2 E_y \quad |x|\ge a
+\end{gather}
+in the core and cladding respectively, where $\gamma^2$ and $\kappa^2$ are real parameters which depend on both on the structure and material of the waveguides, and on the wavelength of incident light.  These equations have solutions of the form
+\begin{align}
+    &E_y = G_1 e^{\gamma x} \quad &x \le -a \label{eqn:helm1}\\
+    &E_y = G_2 e^{i \kappa x} G_3 e^{-i \kappa x} \quad &-a < x < a\\
+    &E_y = G_4 e^{-\gamma x} \quad & x \ge a \label{eqn:helm2}
+\end{align}
+where $G_i$ are constants which depend on the waveguide parameters and the optical wavelength.  This captures an important property of optical waveguides which is not described by the ray-optics model: figure \ref{fig:introduction-waveguides}(b) suggests that under total internal reflection the optical field is always fully confined within the core and does not impinge on the cladding, whereas in reality this is not the case.  We see from (\ref{eqn:helm1}) and (\ref{eqn:helm2}) that outside the waveguide core the electromagnetic field is not zero, instead falling off exponentially with distance. This is the \emph{evanescent field} of the waveguide mode, which permits two waveguides to be coupled together without bringing the cores into contact. This is discussed in further detail in section \ref{sec:directional-coupler}.
+
+We have already seen (\ref{eqn:reduced-contrast}) that the contrast of optical interference is reduced when the two sources have differing polarization. By a similar argument, in order to see high-contrast interference between light sources in guided modes, we should engineer the waveguide, through control of the geometry, size, and refractive index, so as to support only a single guided mode --- a single solution of (\ref{eqn:helmholtz}) --- for a target wavelength $\lambda$. These are known as \emph{single-mode} (as opposed to \emph{multimode}) waveguides, and are used throughout this thesis.
+
+\subsection{Light as a photon}  
+\label{sec:light-as-a-photon}
+%\begin{quote}
+%``The career of a young physicist consists of treating the harmonic oscillator in ever-increasing levels of abstraction.''
+%\qauthor{Sidney Coleman}
+%\end{quote}
+Before examining the quantum-mechanical description of light, it will helpful to revise the properties of the classical and quantum harmonic oscillators. In a classical simple harmonic oscillator (SHO), such as a spring or pendulum with spring constant $k$, the force acting on a particle is proportional to its displacement, $F=-kx$. The dynamics are described by the classical SHO Hamiltonian
+\begin{gather}
+KE =  \int F \cdot v \, dt = \frac{1}{2}mv^2 = \frac{p^2}{2m} ~; \qquad
+PE =  \int k \cdot x \, dx = \frac{1}{2}kx^2 = \frac{m\omega^2}{2}\\
+H =KE + PE = \frac{p^2}{2m} + \frac{m\omega^2x^2}{2}
+\label{eqn:sho-hamiltonian}
+\end{gather}
+where $\omega=\sqrt{k/m}=2\pi f$ is the angular frequency. 
+From the Hamilton equations $\dot{p} = -\frac{\partial H}{\partial x}$, $\dot{x} = +\frac{\partial H}{\partial p}$, we arrive at the SHO equation of motion
+\begin{equation}
+    \frac{d^2x}{dt^2} = -\omega^2 x
+    \label{eqn:sho-equation-of-motion}
+\end{equation}
+In close analogy with the general solution of Maxwell's equations (\ref{eqn:maxwell-electric-field-ansatz}), a general solution to (\ref{eqn:sho-equation-of-motion})
+is $\alpha(t) = \alpha(0)e^{-i\omega t}$,
+an unphysical (complex) ansatz. Just as $\efield$, $\bfield$ are related to the real and imaginary parts of $\alphak$ for the electromagnetic field, the complex components of $\alpha(t)$ are mapped by convention to the position and momentum of the SHO, respectively:
+\begin{gather}
+   x(t) = \, \sqrt{\frac{\hbar}{2m\omega}} 
+   \left[ \alpha + \alpha^* \right] 
+   \propto Re\left[ \alpha(t) \right] ~; ~~
+   p(t) = i \sqrt{\frac{\hbar m \omega}{2}} 
+   \left[ \alpha^* - \alpha\right] 
+   \propto Im\left[ \alpha(t) \right] 
+   \label{eqn:sho-solution}
+   \\
+   %
+   %
+   \alpha(t) = \frac{1}{\sqrt{2\hbar}}
+   \left[ 
+   \sqrt{m\omega} x(t) + 
+   \frac{i}{\sqrt{m \omega}} 
+   p(t) 
+   \right].
+\end{gather}
+Hence $\alpha$ can be thought of as providing a compact phase-space representation of the state of the SHO, $(x,p)$.
+Here we have assumed that $\alpha(t)$ is dimensionless, allowing us to rescale by $\hbar$, a constant with units of action. The SHO Hamiltonian (\ref{eqn:sho-hamiltonian}) can then be re-written in terms of $\alpha(t)$ as 
+\begin{equation}
+    H = \frac{\hbar \omega}{2} \left[ \alpha^*(t) \alpha(t) + \alpha(t)\alpha^*(t) \right].
+\end{equation}
+
+We now turn to the quantum harmonic oscillator (QHO).
+The state of a quantum particle is represented by a state vector $\ket{\psi(x)}$ in Hilbert space, and the position and momentum observables become non-commuting Hermitian operators acting on this space
+\begin{equation}
+\hat{x} = x ~; \qquad \hat{p} = -i \hbar \frac{\partial } { \partial x} 
+\end{equation}
+with $\left[\hat{x}, \hat{p}\right] = i\hbar$ (see section \ref{sec:no-cloning}). 
+%
+%
+%
+As with the SHO (\ref{eqn:sho-hamiltonian}), the QHO Hamiltonian is then  given by
+\begin{equation}
+    \hamiltonian = \frac{\hat{p}^2}{2m} + \frac{m\omega^2 \hat{x}^2}{2}
+    \label{eqn:qho-hamiltonian}
+\end{equation}
+and $\ket{\psi}$ satisfies the time-independent Schr\"odinger equation, $\hamiltonian \ket{\psi} = E\ket{\psi}$.
+%FUTURE you should just reference the schrodinger eqn here
+The QHO has an analogous solution to that of the SHO (\ref{eqn:sho-hamiltonian}), where $\alpha, \alpha^\dagger$ are replaced by their quantized counterparts
+\begin{equation}
+  \annihilation = \sqrt{\frac{m\omega}{2\hbar}}\left(\hat{x}+\frac{i}{m\omega}\hat{p}\right)
+  ~;\qquad
+  \creation = \sqrt{\frac{m\omega}{2\hbar}}\left(\hat{x}-\frac{i}{m\omega}\hat{p}\right)
+\end{equation}
+leading to
+\begin{equation}
+   \hat{x} = \, \sqrt{\frac{\hbar}{2m\omega}} 
+   \left( \annihilation + \creation \right) ~;\qquad
+   \hat{p} = i \sqrt{\frac{\hbar m \omega}{2}} 
+   \left( \creation - \annihilation \right) 
+   \label{eqn:creation-annihilation-def}.
+\end{equation}
+The operators $\creation$ and $\annihilation$ are known as the \emph{creation} and \emph{annihilation} operators for the QHO, respectively. $\annihilation$, $\creation$ are not real observables, and are therefore not Hermitian. In contrast with the classical case, however, they do not commute, with $\left[\annihilation, \creation\right] = 1$. They are jointly named the \emph{ladder operators}, since their action on an energy eigenstate is to raise or lower the energy by a single quantum $\hbar \omega$, 
+\begin{equation}
+   \creation \ket{n} = \sqrt{n+1} \ket{n+1} ~; \qquad
+   \annihilation \ket{n} = \sqrt{n} \ket{n-1} ~; \qquad
+   \annihilation \ket{0} = 0.
+   \label{eqn:ladder-action}
+\end{equation}
+We can also define the \emph{number operator} $\hat{N} \equiv \creation \annihilation$, which ``counts'' the number of quanta in an energy eigenstate, $\hat{N} \ket{n} = n \ket{n}$.
+
+
+Using (\ref{eqn:creation-annihilation-def}) together with the commutation relation $\annihilation\creation = \creation\annihilation+1$, the QHO Hamiltonian (\ref{eqn:qho-hamiltonian}) can be re-written as
+\begin{equation}
+    \hamiltonian= \frac{\hbar \omega}{2} \left( \creation \annihilation + \annihilation \creation \right) = \hbar \omega \left( \creation \annihilation + \frac{1}{2} \right),
+    \label{eqn:qho-hamiltonian-ladders}
+\end{equation}
+which has eigenstates $\ket{n}$ of energy $E_n = \hbar \omega \left(n+\frac{1}{2}\right), n \in \{ \mathbb{Z}: n \ge 0 \}$. Note that the energy of the QHO ground state $\ket{0}$ is not zero, $E_0 = \frac{1}{2}\hbar \omega > 0 $. 
+
+We now proceed to quantization of the electromagnetic field. We first note the similarity between the Hamiltonian of the linear electromagnetic field in a mode $\vk$ (\ref{eqn:maxwell-hamiltonian-ansatz}) in terms of an ansatz $\alphak(t)$, and the QHO Hamiltonian (\ref{eqn:qho-hamiltonian-ladders}) in terms of the annihilation operator $\annihilation$.  Similarly, there is a corresponence between the position and momentum operators $\hat{x}, \hat{p}$ and the electric and magnetic fields, $\efield, \bfield$. This allows us to take an analogous approach to the SHO, replacing $\alphak$ and $\alphak^*$ by the ladder operators $\createk, \deletek$ acting on a mode $\vk$, and choosing a dispersion relation $\omega = ck$:
+%FUTURE: get rid of dispersion relation business
+\begin{gather}
+   H_\vk^{EMF} = 
+   \frac{\hbar c k}{2} 
+   \left( \alphak^* \alphak + \alphak \alphak^*\right)
+    ~; \qquad
+    \hamiltonian ^{QHO}= 
+    \frac{\hbar \omega}{2} 
+    \left( \creation \annihilation + \frac{1}{2} \right)
+    \\ \rightarrow \qquad
+    \hamiltonian_{\vk} = \hbar \omega \left( \createk \deletek + \frac{1}{2} \right)
+    \label{eqn:quantized-electromagnetic-hamiltonian}
+\end{gather}
+Now, the state of the electromagnetic field is represented by a vector $\ket{\psi}$ in Hilbert space $\hilspace$, and $\createk$, $\deletek$ are ladder operators acting on $\hilspace$ which create or destroy a \emph{photon} of energy $\hbar \omega$, respectively:
+\begin{equation}
+   \createk \ket{n}_\vk = \sqrt{n+1} \ket{n+1}_\vk ~; \qquad
+   \deletek \ket{n}_\vk = \sqrt{n} \ket{n-1}_\vk ~; \qquad
+   \deletek \ket{0}_\vk = 0.
+\end{equation}
+The eigenstates $\ket{n}_\vk$ of the quantized electromagnetic Hamiltonian (\ref{eqn:quantized-electromagnetic-hamiltonian}) are called the \emph{number} or \emph{Fock} states\footnote{After V. A. Fock, whose name is also given to the \emph{Hartree-Fock} method described in section \ref{sec:hartree-fock}}, and form an orthonormal basis for $\hilspace$. A mode $\vk$ in Fock state $\ket{n}_\vk$ is interpreted as literally containing $\bra{n} \createk \deletek \ket{n} = n$ photons, $n \in \mathbb{Z}$. Note that a mode containing zero photons still has nonzero energy, $E_0 = \hbar \omega /2$: this is the \emph{vacuum energy} of the electromagnetic field. Any Fock state can be written in terms of the vacuum state $\ket{0}_{\vk}$, 
+\begin{equation}
+    \ket{n}_\vk = \frac{1}{\sqrt{n!}}(\createk)^n \ket{0}_{\vk}.
+\label{eqn:single-mode-fock-basis}
+\end{equation}
+and a general superposition state in mode $\vk$ can be written in the Fock basis
+\begin{equation}
+    \ket{\psi}_\vk = \sum_{n=0}^N b_n \ket{n}_\vk.
+\label{eqn:single-mode-fock-superposition}
+\end{equation}
+ 
+To summarize, we have seen that quantization of the electromagnetic field in a single mode $\vk$ leads to solutions which are strongly analogous to the energy eigenstates of the quantum harmonic oscillator, corresponding to the Fock states $\ket{n}$ of $n$ photons, each with energy $\hbar \omega$. All of the experiments described in this thesis, together with most quantum photonic technologies, depend on the use of many photons in many modes, In the next section we outline basic notation and methods used to deal with such states, as well as some associated physical phenomena.
+
+\subsubsection{Photons in modes} 
+Our discussion so far has been limited to the creation and annihilation of photons in a single spatial mode $\vk$. The experimental work presented in this thesis, however, deals with $2\le p\le6$ photons in $2 \le m \le21$ modes, and makes use of both time and polarization degrees of freedom. In order to provide a more complete framework, we map $(\createk, \deletek) \rightarrow (\creation_j, \annihilation_j)$ where $j$ indexes any allowed field mode of the system, including modes in time, space, frequency and polarization.  
+We will principally be concerned with photons which are \emph{indistinguishable} in the sense that any two photons can be swapped in any experimental degree of freedom without changing the state of the overall system.
+Indistinguishable bosons in modes $i$, $j$ obey the \emph{canonical commutation relations}
+\begin{gather}
+    \left[ \annihilation_i, \creation_j \right]  = \delta_{ij} \identity ~;\qquad
+    \Bigl[ \annihilation_i, \annihilation_j \Bigl]  
+    = \left[ \creation_i, \creation_j \right]  = 0,
+    \label{eqn:canonical-commutation-relations}
+\end{gather}
+which capture many important properties of the photonic ladder operators, and will be useful throughout this discussion.
+
+The Hilbert space $\hilspacep$ for the state of $p$ indistinguishable photons in $m$ modes is generated by the tensor product (see section \ref{sec:quantum-mechanics-states}), and we write the eigenstates of an arbitrary number of photons $p=\sum_j n_j$ occupying $m$ modes in Fock notation as 
+\begin{equation}
+    \ket{n}_1 \otimes \ket{n}_2 \ldots  \ket{n}_m    = \ket{n_1, n_2, \ldots n_m} = 
+    \left[\,
+    \prod_{j=1}^m 
+    \frac{1}{\sqrt{n_j!}}
+    \left( \creation_{j} \right) ^{n_j} 
+    \right]
+    \vacuum   
+    \label{eqn:fock-notation}
+\end{equation}
+where $\vacuum \equiv \ket{0}_0 \otimes \ket{0}_1 \ldots \ket{0}_n = \ket{00 \ldots0}$ is the $m$-mode vacuum. 
+%It will be convenient to ignore these shared properties when writing the state of $p$ photons.
+These states form an orthonormal basis for the Hilbert space $\hilspacep$ of $p$ photons in $m$ modes, and an arbitrary pure superposition state can therefore be written as
+\begin{equation}
+    \ket{\psi} = 
+    \sum_i^d
+    b_i 
+    \ket{n_{1,i}, n_{2,i} \ldots n_{m,i}}
+    =
+    \left[
+    \sum_i^d
+    b_i 
+    \prod_{j=1}^m 
+    \frac{1}{\sqrt{n_{ij}!}}
+    \left( \creation_{j} \right) ^{n_{ij}} 
+    \right]
+    \vacuum ~, 
+    \label{eqn:fock-superposition}
+\end{equation}
+where $d$ is the Hilbert space dimension and $\sum_i{|b_i|^2} = 1$. 
+Many experiments in quantum optics deal with a large number of modes and a \emph{fixed} number of photons. 
+The Hilbert space dimension $d$ of $\hilspacep$ corresponds to the number of unique configurations of $p$ indistinguishable photons in $m$ modes, given by the binomial coefficient
+\begin{equation}
+    d=\binom{m+p-1}{p} ~;\qquad D=\binom{m}{p},
+\end{equation}
+where $D<d$ is the dimension of the \emph{collision-free subspace} in which no two photons occupy the same mode.  
+
+
+\subsubsection{The coherent state}
+\label{sec:coherent-state}
+The \emph{coherent state} $\coherent$ is the state of the quantized electromagnetic field whose dynamics most resemble a classical harmonic oscillator. It provides a good approximation to the state generated by a continuous-wave laser --- an essentially classical state of light. It will be important to contrast the behaviour of the coherent state against that of Fock states, in order to motivate the use of single-photon sources throughout this thesis. Here we follow Roy Glauber \cite{Glauber1963a}.
+
+The coherent state is defined as an eigenstate of the annihilation operator $\annihilation$ with eigenvalue $\alpha$,
+\begin{equation}
+    \annihilation\coherent = \alpha \coherent.
+    \label{eqn:define-coherent-state}
+\end{equation}
+%In order to draw comparison with the Fock states, we will first represent $\coherent$ as a superposition of Fock states following the method of Roy Glauber (to whom the first description of such states is due).
+Expressing $\coherent$ in the Fock basis (\ref{eqn:single-mode-fock-superposition}), $\coherent = \sum_{n=0}^\infty b_n \ket{n}$, we can re-write (\ref{eqn:define-coherent-state})
+\begin{equation}
+    \sum_{n=1}^{\infty} b_n \sqrt{n} \ket{n-1} = \alpha \sum_{n=0}^\infty b_n \ket{n} 
+\end{equation}
+and by re-indexing the left hand side,
+\begin{gather}
+    \sum_{n=0}^{\infty} b_{n+1} \sqrt{n+1} \ket{n} = \alpha \sum_{n=0}^\infty b_n \ket{n} \qquad 
+    \rightarrow \qquad b_{n+1} = \frac{\alpha}{\sqrt{n+1}} b_n~\quad \text{for}~~ n\ge0.
+\end{gather}
+This recursive expression provides the superposition coefficients $b_n = \frac{\alpha^n}{\sqrt{n!}}b_0$. Since the state must be normalized $\overlap{\alpha}{\alpha}=1$, we have $1/|b_0|^2 = e^{|\alpha|^2}$.  Choosing the phase of $b_0$ so as to make it real, we arrive at a Fock-basis form for the coherent state,
+\begin{equation}
+    \coherent = e^{-\frac{|\alpha|^2}{2}} \sum_{n=0}^{\infty} \frac{\alpha^n}{\sqrt{n!}} \ket{n} =
+    e^{\alpha \creation - \alpha^* \annihilation} \vacuum.
+    \label{eqn:coherent-state-fock-basis}
+\end{equation}
+The coherent state $\ket{\alpha}$ has average photon number $\expect{n} = |\alpha|^2$, but in contrast with the Fock state $\ket{n}$ there is a nonzero probability of detecting more than $n$ photons simultaneously.
+In general, the probability $P(n)$ of detecting photon number $n$ from $\coherent$ has a Poissonian distribution:
+\begin{equation}
+    P(n) = |\overlap{n}{\alpha}|^2 = e^{-|\alpha|^2} \frac{|\alpha|^{2n}}{n!}.
+\end{equation}
+%FUTURE: better discussion of poissonian/not poissonian statistics
+
+The normalized second-order correlation function for photons generated in a single spatial mode at times $t=0$, $t+\tau$
+\begin{equation}
+g^{(2)}(\tau)=\frac
+{
+    \expect{ \creation_0 \creation_\tau \annihilation_\tau \annihilation_0 }
+}{
+    \expect{ \creation_0 \annihilation_0} \expect{ \creation_\tau \annihilation_\tau }
+}~;\quad
+g^{(2)}(0)=\frac {
+    \expect{ (\creation)^2  \annihilation^2} }{
+    \expect{ \creation \annihilation }^2 } 
+=
+\frac {Var(n) - \expect{n}} {\expect{n}^2} + 1
+,
+\end{equation}
+characterises the relationship between the mean and variance of the photon number distribution, and 
+is similar but not equivalent to the classical cross-correlation function (\ref{eqn:cross-correlation}). 
+For the coherent state,
+\begin{equation}
+    g^{(2)}(0)=\frac { \expect{ (\creation)^2  \annihilation^2}
+    }{ \expect{ \creation \annihilation }^2 } 
+    =
+    \frac{\bra{\alpha} \alpha^* \hat{N} \alpha \ket{\alpha}}
+    {\bra{\alpha}\alpha^* \alpha\ket{\alpha}} = \frac{|\alpha|^4}{|\alpha|^4} = 1
+    \label{eqn:coherent-state-g2}
+\end{equation}
+However, for a Fock state $\ket{n}$, $g^{(2)}(0)$ is less than unity
+\begin{equation}
+    g^{(2)}(0)=\frac { \expect{ (\creation)^2  \annihilation^2}
+    }{ \expect{ \creation \annihilation }^2 } 
+    =
+    \frac{\bra{n}(\hat{N}-1)\hat{N} \ket{n}}
+    {\bra{n}\hat{N}\ket{n}^2}
+    = 1-\frac{1}{n}  \le 1.
+    \label{eqn:antibunching}
+\end{equation}
+For a given light source, if $g^{(2)}(0)<1$ then the photon-number distribution $P(n)$ has a smaller variance than the equivalent Poisson distribution, and the source is said to be \emph{sub-Poissonian} and \emph{nonclassical}. This effect is referred to as photon \emph{antibunching}, in the sense that it is unlikely or impossible for many photons to arrive simultaneously at the detector.  For incoherent (chaotic) light the opposite is true, and the twofold detection probability is instead enhanced with respect to that of statistically independent particles, giving $g^{(2)}>1$. This is the \emph{Hanbury-Brown-Twiss} \cite{Brown1956b} effect, and is referred to as \emph{bunching}, since photons appear to clump together upon arrival.
+
+\subsubsection{Time evolution of photons}
+General methods for time evolution of quantum states are discussed in section \ref{sec:time-evolution}.
+In this thesis, time evolution is almost always due to a linear-optical \emph{circuit} --- a static, discrete network of waveguides and/or bulk optical elements, which takes an input state $\thestate_\lin$ to an output state $\thestate_\lout$.  A lossless, time-independent circuit can always be completely described by  unitary matrix $\unitary$ which maps between the input and output modes of the device, labelled $a_i$ and $b_j$ respectively. 
+
+Starting from a general pure input state in the form of (\ref{eqn:fock-superposition}), 
+we can study time-evolution in the Heisenberg picture, writing
+\begin{gather}
+    \thestate_\lout = 
+    %\unitary \thestate_\lin = 
+    \unitary 
+    \thestate_\lin
+    =
+    \unitary 
+    \left[
+    \sum_i 
+    b_i 
+    \prod_{j=1}^m 
+    \frac{\left( \creation_{a_j} \right) ^{n_{ij}}}{\sqrt{n_{ij}!}}
+    \right]\unitaryd \unitary \vacuum
+    =
+    \left[
+    \sum_i 
+    b_i 
+    \prod_{j=1}^m 
+    \frac{\left( \unitary \creation_{a_j} \unitaryd \right) ^{n_{ij}}}{\sqrt{n_{ij}!}}
+    \right]\vacuum
+    \label{eqn:photons-heisenberg}
+\end{gather}
+where we have used the fact that $\unitary\vacuum=e^{i\phi}\vacuum \rightarrow \vacuum$ (optical circuits described by unitary operators do not create or destroy photons, and the global phase is unobservable) and $\unitary \unitaryd = \unitaryd \unitary = \identity$. Now, the output-mode creation operators can be written in terms of the input fields
+\begin{equation}
+    \creation_{b_j} = \unitary \creation_{b_j} \unitaryd.
+    \label{eqn:ladder-time-evolution}
+\end{equation}
+The time-evolution of general multiphoton states can thus be computed based on a model of the \emph{single-particle} statistics, $\unitary$. Since single-photon solutions of the Heisenberg equation have identical solutions to the classical field, this allows us to model general multiphoton behaviour starting from a classical understanding of the system.
+The unitary $\unitary$, which completely and uniquely characterizes the circuit, can always be represented as an $m \times m$ matrix, where in general $m$ is much smaller than the Hilbert space dimension of $\hilspacep$.  
+%
+
+Note that although these calculations can be performed based on a classical starting-point, that is not to say that all of the resulting multiphoton behaviour can be explained by a classical model, as we will see in the next section.  Furthermore, there is strong evidence to suggest that not all states and probabilities generated by (\ref{eqn:photons-heisenberg}) can be efficiently calculated on a classical computer --- in many cases the number of terms in the expansion is exponentially large in $p$. See sections \ref{sec:permanents} and \ref{sec:bosonsampling} for further discussion of this point.
+
+It will often be convenient to re-write (\ref{eqn:ladder-time-evolution}) for the input field operators in terms of the output fields and a unitary matrix $\transfer$, which is analogous to the classical transfer matrix
+\begin{equation}
+    \creation_{a_i} = \sum_j^m \mathbf{\transfer}_{ij}\, \creation_{b_j}~;\quad \transfer^\dagger \transfer = \identity.
+\end{equation}
+
+\subsubsection{The beamsplitter}
+\label{sec:beamsplitter}
+
+The \gls{bs}, shown schematically in figure \ref{fig:beamsplitter-dips}(a), is a basic component of optical circuits.  The most common design of a bulk-optical \gls{bs} consists of two triangular prisms of BK-7 borosilicate glass, glued together with the resin of a fir tree\footnote{The Canada balsam fir, \emph{Abies balsamea.}} so as to form a cube with a plane interface across the main diagonal. Half-silvered mirrors, microscope slides, and integrated optics (section \ref{sec:quantum-photonics}), amongst others, can all be used to construct effective beamsplitters. A light beam incident at $45\degs$ to the interface is split into two orthogonal output modes, with a fraction 
+$r=I_r/I$ of the input intensity reflected at $90\degs$ to the incident beam,
+and $t=I_t/I=1-r$ transmitted. 
+The \gls{bs} is thus completely characterized by the \emph{reflectivity} $r$ and \emph{transmissivity} $t$, also referred to as the \emph{coupling ratio} $\eta=t$.
+A \emph{50:50 \gls{bs}} is designed to have $r=t=\frac{1}{2}$. 
+
+If a classical light field is injected into one of the two input modes~$a_1, a_2$,  the effect of the \gls{bs} is to split the 
+complex amplitude $\alpha$ of the input field across the two output modes, conserving energy and momentum, as
+\begin{align}
+    &\alpha_{b_1} = \alpha_{a_1} \sqrt{t} + i \alpha_{a_2} \sqrt{r}~,\quad
+    &\alpha_{b_2} = i \alpha_{a_1} \sqrt{r} + \alpha_{a_2} \sqrt{t}~,\\
+    \rightarrow \quad   &\alpha_{a_1} = \alpha_{b_1} \sqrt{t} - i \alpha_{b_2} \sqrt{r}~,\quad
+    &\alpha_{a_2} = - i \alpha_{b_1} \sqrt{r} + \alpha_{b_2} \sqrt{t}.
+    \label{eqn:input-output}
+\end{align}
+Here the factor $i$ arises on reflection, and is necessary for energy to be conserved. 
+The details of this k$\mathrm{\bar{o}}$an of experimental optics, ``the photon picks up a phase on reflection'', are not often discussed, and the effect is less obvious than it might seem. Full analysis, given for example in \cite{Zetie2000}, is outside the scope of this thesis.
+The relations (\ref{eqn:input-output}) lead directly to the quantum beamsplitter transformation for ladder operators in the Heisenberg picture
+\begin{align}
+    &\creation_{a_1}  \xrightarrow{BS} \creation_{b_1} \sqrt{t} + i \creation_{b_2} \sqrt{r} ~,\quad
+    &\creation_{a_2}  \xrightarrow{BS} i \creation_{b_1} \sqrt{r} + \creation_{b_2} \sqrt{t}.
+    \label{eqn:beamsplitter-ladder}
+\end{align}
+The beamsplitter has an associated unitary operator $\unitarybs$ as well as a $\transfer$-matrix, 
+\begin{gather}
+    \transferbs(r)=
+    \left[
+    \begin{array}{cc}
+        \sqrt{t} & i\sqrt{r} \\
+        i\sqrt{r} & \sqrt{t} 
+    \end{array}
+\right]
+\label{eqn:beamsplitter-unitary}
+\end{gather}
+allowing (\ref{eqn:beamsplitter-ladder}) to be re-written as 
+\begin{gather}
+\begin{bmatrix} \creation_{a_1}\\ \creation_{a_2} \end{bmatrix} 
+=
+\left[
+\begin{array}{cc} \sqrt{t} & i\sqrt{r}\\ i\sqrt{r} & \sqrt{t} \end{array} 
+\right]
+\begin{bmatrix} \creation_{b_1}\\ \creation_{b_2} \end{bmatrix} 
+=
+\begin{bmatrix} 
+    \creation_{b_1}\sqrt{t}  + i\creation_{b_2}\sqrt{r} \\ i\creation_{b_1}\sqrt{r} + \creation_{b_2}\sqrt{t} 
+\end{bmatrix}.
+\end{gather}
+%
+%
+% Beamsplitter figure
+\begin{figure}[t!]
+\centering
+\includegraphics[width=.9\textwidth]{chapter2/fig/bs_dips.pdf}
+\caption[Beamsplitters and Hong-Ou-Mandel interference]{ 
+(a) A bulk-optical beamsplitter is modelled as having two single-mode input ports $a_1$, $a_2$ and two output ports $b_1$, $b_2$. If bright light is injected into input port $a_1$, a fraction $r$ of the total light intensity will be reflected into output port $b_2$, while $t = 1-r$ is transmitted to $b_1$. (b) In a Hong-Ou-Mandel interference experiment, two indistinguishable photons are sent into ports $a_1, a_2$ of a \gls{bs}. There are four possible outcomes of the experiment: both photons can be transmitted, both reflected, one transmitted and one reflected, and vice-versa. (c) When the photons are perfectly indistinguishable, the first two measurement outcomes destructively interfere and the probability of coincidental detection at $b_1$, $b_2$ vanishes. By tuning the distinguishability of the photons, we can map out the \emph{Hong-Ou-Mandel dip} in the coincidence rate.  Experimental data is used here only for illustration purposes, and is shown complete with error bars and accidental coincidence count-rates in figure \ref{fig:cnot-mz-dip}.  }
+\label{fig:beamsplitter-dips}
+\end{figure}
+% End beamsplitter figure
+%
+%
+Let's compare the behaviour of single photons incident on a 50:50 BS with that of the coherent state.
+If we inject a single photon into mode $a_1$, the system evolves as
+\begin{equation}
+    \creation_{a_1}\vacuum \xrightarrow{BS} \unitarybs \creation_{a_1} \unitarybs^\dagger \vacuum  = \frac{1}{\sqrt{2}}(\creation_{b_1} + i\creation_{b_2})\vacuum =
+    \frac{1}{\sqrt{2}}\left(\ket{1_{b_1}0_{b_2}} +i\ket{0_{b_1}1_{b_2}}\right).
+    \label{eqn:bs-photon-output}
+\end{equation}
+Note that the photon is only ever detected in one or other of the output ports, never both at the same time ($\overlap{\psi}{11}$ = 0). This is the effect of photon antibunching (\ref{eqn:antibunching})
+which  was first experimentally confirmed in 1986 by Grangier, Roger, and Aspect, \cite{Grangier1986}, constituting arguably the first strong evidence for fully particle-like behaviour of the photon.
+It is interesting to note that when written in the Fock basis, (\ref{eqn:bs-photon-output}) is locally equivalent to a Bell state (\ref{eqn:bell-states}). See ref. \cite{Tan1991a} for further discussion of entanglement and nonlocality of a single photon.
+
+If we instead inject a single coherent state $\coherent_{a_1}$ at input port $a_1$, the output state~is
+\begin{equation}
+    \unitarybs \coherent_{a_1} = 
+    \exp\left[
+        \frac{
+            ( \alpha \creation_{b_1} - \alpha^* \annihilation_{b_1} ) +
+        i ( \alpha \creation_{b_2} + \alpha^* \annihilation_{b_2} )}
+{\sqrt{2}}
+    \right] \vacuum
+    =
+    \frac{i}{\sqrt{2}}  \, \coherent_{b_1}  \otimes \coherent_{b_2} 
+    \label{eqn:coherent-output}
+\end{equation}
+which \emph{does} have nonzero $\ket{11}$ terms ($\overlap{\psi}{11}\ne0$), allowing two photons to be coincidentally detected at both output ports and leading to $g^{(2)}(0)>1$ (\ref{eqn:coherent-state-g2}). 
+
+Although the single photon and the coherent state are distinguished by correlated detection statistics (i.e. antibunching), in non-correlated measurements they give essentially identical measurement outcomes. For example, the probability that a single detector will fire at either output port of a beamsplitter is the same for both a single- photon source and a coherent state $\ket{\alpha=1}$,
+\begin{equation}
+    P(n_{b_1}\ge1) = P(n_{b_2}\ge1) = \frac{1}{2}.
+\end{equation}
+%FUTURE: this is still pathetic.
+
+\subsection{Quantum interference}
+\label{sec:quantum-interference}
+To see a stronger distinction between quantum and classical behaviour of photons, we now consider a situation in which multiple light sources are used, rather than one. 
+Dirac famously addressed experiments of this type, arguing that since interference between different sources would seem to involve the creation or destruction of photons, violating conservation of energy, it should not occur:
+\begin{quote}
+    Each photon then interferes only with itself.  Interference between two different photons never occurs. 
+\qauthor{P. A. M. Dirac, \emph{The Principles of Quantum Mechanics} \cite{Dirac1982}} \end{quote}
+We will now show that this intuition, which is supported by our everyday experience of the behaviour of light, does not always hold. Specifically, we will see that two indistinguishable photons launched into different ports of a 50:50 \gls{bs} interfere with one another, precluding simultaneous detection of photons at two output ports --- an effect which has no classical analogue. 
+
+Quantum interference, as this effect is known, is thus the basic mechanism that we will use to allow one photon to ``talk'' to another.
+It is used throughout this thesis to implement entangling gate operations on path-encoded photonic qubits, and is essential for linear-optical quantum computing (discussed in section \ref{sec:klm}) as well as the ``boson computer'' (section \ref{sec:bosonsampling}). In section \ref{sec:quantum-walks}, we observe generalized quantum interference between up to 5 photons in 21 spatial modes.
+
+\subsubsection{Two-photon interference}
+\label{sec:hong-ou-mandel}
+Consider the situation shown in figure \ref{fig:beamsplitter-dips}(b), in which two single photons are sent into the input ports of a 50:50 \gls{bs} ($a_1$, $a_2$ respectively). 
+We assume that the photons are indistinguishable in all degrees of freedom apart from path, having the same polarization, wavelength etc., For classical particles, this experiment has four possible outcomes: both particles can be transmitted, both reflected, one transmitted and one reflected, and vice versa. Since there are no interference effects for classical particles, the detection probability at output ports $(i,j)$ is simply given by the product of the corresponding single-particle probabilities, $P(i \cap j) = P(ij) = P(i) \cdot P(j)$,
+\begin{align}
+    & P(2_{b_1}0_{b_2}) = P(b_1 b_1) = P(b_1)\cdot P(b_1) = \frac{1}{2} \cdot \frac{1}{2} = \frac{1}{4}~; \quad
+    P(0_{b_1}2_{b_2}) = P(b_2 b_2) =  \frac{1}{4}\\
+    &P(1_{b_1}1_{b_2}) = P(b_1 b_2 \cup b_2 b_1) = P(b_1 b_2)+P(b_2 b_1) = \frac{1}{4}+\frac{1}{4} = \frac{1}{2}.
+     \label{eqn:classical-particles-no-dip}
+\end{align}
+For photons, the output state of the \gls{bs} is given by
+\begin{align}
+    \ket{1_{a_1}1_{a_2}} = \creation_{a_1} \creation_{a_2} \vacuum 
+    \quad \xrightarrow{BS} \quad
+    &\frac{1}{2} 
+    \left( \creation_{b_1} +i  \creation_{b_2} \right)
+    \left( i\creation_{b_1} +  \creation_{b_2} \right) \vacuum\\
+    =
+    &\frac{i}{2} 
+    \left(   (\creation_{b_1})^2 -  \creation_{b_1} \creation_{b_2} +\creation_{b_2} \creation_{b_1} + (\creation_{b_2})^2 \right)
+    \vacuum.
+\end{align}
+Using the canonical commutation relations (\ref{eqn:canonical-commutation-relations})  this becomes
+\begin{equation}
+    \thestate_\lout = 
+    \frac{1}{2} 
+    \left(   (\creation_{b_1})^2  +  (\creation_{b_2})^2 \right) \vacuum
+    = \frac{1}{\sqrt{2}} \left( \ket{2_{b_1}0_{b_2}} + \ket{0_{b_1}2_{b_2}} \right) ,
+    \label{eqn:noon-state}
+\end{equation}
+where we have ignored the global phase $i$ (which cannot be measured).
+We then have
+\begin{equation}
+    P(2_{b_1}0_{b_2}) = \overlapp{2_{b_1}0_{b_2}}{\psi} = \frac{1}{2}~; \quad 
+    P(0_{b_1}2_{b_2}) = \frac{1}{2}~;\quad
+    P(1_{b_1}1_{b_2}) = 0.
+\end{equation}
+Thus the probability that two photons are simultaneously detected at different output ports, the probability of coincidental detection, vanishes, This is in strong contrast with the behaviour of classical particles
+(\ref{eqn:classical-particles-no-dip}), and can only be explained by interference between the two sources. This is the famous \gls{hom} interference effect, also known as two-photon quantum interference, first proposed and experimentally demonstrated in 1987 by Hong, Ou and Mandel \cite{Hong1987}. 
+
+Note that the state (\ref{eqn:noon-state}) is not separable --- it cannot be written as a product state of the two systems as (\ref{eqn:separable-state}), and is therefore entangled. This a $\ket{NOON}$ state, which can be used to achieve quantum-enhanced precision in measurements, as discussed in section \ref{sec:metrology}. 
+%How did the \gls{bs}, a passive linear optical element, generate a seemingly entangled state? This question is discussed further in section \ref{sec:single-photon-nonlocality}.
+
+%Distinguishable photons
+For distinguishable photons, the situation is comparable to that of classical particles. 
+To see this, let each mode $a_i$ now be associated with \emph{two} modes $(a_i, a_i')$, which are distinguishable (orthogonal) in, for instance, polarization or time. Now, the system evolves as 
+\begin{align}
+    \ket{1_{a_1}0_{a_1'}0_{a_2}1_{a_2'}} = \creation_{a_1} \creation_{a_2'} \vacuum 
+    \quad  \xrightarrow{BS} \quad
+    \frac{i}{2} 
+    \left(   \creation_{b_1}\creation_{b_1'} +  \creation_{b_1} \creation_{b_2'} -\creation_{b_2} \creation_{b_1'} + \creation_{b_2}\creation_{b_2'}  \right)\vacuum.
+\end{align}
+Since the two photons can in principle be distinguished by this extra degree of freedom, the creation operators no longer commute
+$\creation_{b_1}\creation_{b_2'}\ne\creation_{b_2}\creation_{b_1'}$ and the output state is then
+\begin{equation}
+    \thestate_\lout= 
+    \frac{i}{2} 
+    \Bigl(
+      \ket{1_{b_1}1_{b_1'}0_{b_2}0_{b_2'}} 
+    + \ket{1_{b_1}0_{b_1'}0_{b_2}1_{b_2'}} 
+    - \ket{0_{b_1}1_{b_1'}1_{b_2}0_{b_2'}} 
+    + \ket{0_{b_1}0_{b_1'}1_{b_2}1_{b_2'}}
+\Bigl).
+\end{equation}
+Then, tracing over the orthogonal modes, we recover classical particle statistics (\ref{eqn:classical-particles-no-dip}), with nonzero probability of coincidental detection at separate output ports:
+\begin{gather}
+    P(2_{b_1}0_{b_2}) = \overlapp{1_{b_1} 1_{b_2'}}{\psi} = \frac{1}{4}~; \quad 
+    P(0_{b_1}2_{b_2}) = \frac{1}{4}~;\\
+    P(1_{b_1}1_{b_2}) = \overlapp{1_{b_1} 1_{b_2'}}{\psi}  + \overlapp{1_{b_1'} 1_{b_2}}{\psi} = \frac{1}{2}.
+\end{gather}
+
+%Map out the dip
+In experimental demonstrations of quantum interference, the average coincidence count-rate $c(1_{b_1}1_{b_2}) = C\cdot P(1_{b_1}1_{b_2})$ is very often measured as a continuous function of the distinguishability of the photon pair, where $C$ is the total count-rate across all detection patterns. By controlling the arrival time (as in \cite{Hong1987} and in this thesis) or polarization of one photon with respect to the other, a so-called \emph{\gls{hom} dip} in coincidences can be mapped out. 
+Figure \ref{fig:beamsplitter-dips}(c) shows a \gls{hom} dip measured using an integrated beamsplitter (section \ref{sec:directional-coupler}), in which the pair distinguishability is tuned by delaying the arrival time of one photon with respect to the other, on the order of the coherence time of the photon (picoseconds). When the delay is much greater than the coherence time, the photons are fully distinguishable and $P(1_{b_1}1_{b_2})=1/2$, while for zero delay, the photons are maximally indistinguishable and $P(1_{b_1}1_{b_2})\rightarrow0$.  The shape of the dip depends on various properties of the photons themselves, including their coherence time and spectral properties. An experimental example is given in section \ref{sec:cnot-mz-dip}.
+
+In practice, various experimental imperfections including but not limited to uncontrolled polarization rotations, spectral correlation, imperfect matching of spatial modes at the beamsplitter, and timing errors mean that real photon pairs are never truly indistinguishable, and $P(1_{b_1}1_{b_2})$ does not go exactly to zero. See section \ref{sec:cnotmz-source} for further discussion. The \emph{visibility} of two-photon quantum interference is defined as
+\begin{equation}
+    V=\frac{C^c - C^q}{C^c},
+    \label{eqn:hom-dip-visibility}
+\end{equation}
+where $C^c$, $C^q$ are average coincidence count-rates $c(1_{b_1}1_{b_2})$ for the case of distinguishable (classical) and indistinguishable (quantum) input pairs, respectively. The visibility gives a useful metric of the \emph{utility} of photons generated by a given source, and will be used throughout this thesis. When the only source of experimental imperfection is photon pair distinguishability, the visibility can be found from the density matrices of the two photons in a similar way to the purity (\ref{eqn:purity}), $V\propto Tr(\dema_1 \dema_2)$. 
+
+For practical purposes, it would save a lot of time and money if we could reproduce the Hong-Ou-Mandel dip using attenuated laser pulses rather than expensive single-photon sources. Taking, for example, a coherent state with $\alpha=\sqrt{0.1}$, 
+\begin{equation}
+    \ket{\alpha=\sqrt{0.1}} = \sqrt{0.90}\ket{0} + \sqrt{0.09}\ket{1}  + \sqrt{0.002} \ket{2} \ldots
+\end{equation}
+any single-photon detection event is very likely to have originated from the $\ket{1}$ term. Na\"ively, a coherent state thus appears to somehow approximate the single-photon Fock state. However, a difficulty arises in the use of many such sources --- since  detection is necessarily probabilistic, we cannot \emph{synchronise} effective single-photon generation across all sources. In other words, we cannot be sure that $n$ single-detection events corresponded to the generation of $n$ photons in $n$ modes, leading to temporal distinguishability and thus limited visibility of quantum interference.
+
+Rarity et al. \cite{Rarity1997}, showed that two classical beams $\coherent_{a_1}$, $\coherent_{a_2}$, incident on a \gls{bs} with randomly varying phase, will produce a dip in coincidences as a function of temporal delay with visibility
+\begin{equation}
+    V = 2\frac{\expect{I_{a_1}}/\expect{I_{a_2}}}{(\expect{I_{a_1}}/\expect{I_{a_2}} +1)^2},
+\end{equation}
+where $I_{a_1}$, $I_{a_2}$ are the intensities of the two input beams.
+For $\expect{I_{a_1}}=\expect{I_{a_2}}$, $V=1/2$. Hence no coherent state (indeed, no classical state of light) will produce a Hong-Ou-Mandel dip with visibility $>1/2$.
+
+As a result, in order to see multiphoton quantum interference --- which is a pre-requisite for many photonic quantum technologies --- we need alternative photon sources, with improved synchronicity. Ideally, we would have access to a ``push-button'' deterministic source of single-photon Fock states, however such devices do not currently exist. The experimental implementation of \gls{sps} providing a good approximation to this ultimate goal are discussed in section \ref{sec:sources}.
+
+\subsubsection{Calculating states and probabilities in linear optics}
+\label{sec:permanents}
+Throughout this thesis we will deal with circuits constructed from many linear-optical components (beamsplitters and phase-shifters) acting on a fixed, small number of photons in as many as 21 path or polarization modes. We will now outline a general method by which detection probabilities and output state vectors can be calculated for arbitrary numbers of photons, both distinguishable and indistinguishable, in generic linear-optical networks. Here we largely follow the detailed analysis of Stefan Scheel \cite{Scheel2004a}.
+
+Recall that any pure superposition state can be written in the many-mode Fock basis (\ref{eqn:fock-superposition}). The input and output states for a $p$-photon, $m$-mode experiment 
+\begin{equation}
+    \ket{\psi}_\lin = 
+    \sum_{i=1}^d g_i \ket{ n_{1}^a , n_{2}^a \ldots n_{m}^a}_i~;\quad
+    \ket{\psi}_\lout = 
+    \sum_{i=1}^d h_i \ket{ n_{1}^b , n_{2}^b \ldots n_{m}^b}_i
+    \label{eqn:permanent-input-output}
+\end{equation}
+are completely characterized by the complex probability amplitudes $g_i$, $h_i$, respectively. 
+As before, modes $a$ and $b$ label the input and output ports of the circuit, although our notation has changed slightly.
+The states $\ket{ n_{1}^a , n_{2}^a \ldots n_{m}^a}_i$ correspond to the $i^{th}$ unique permutation of $n$ photons in $m$ modes, and together form a basis for the Hilbert space $\hilspacep$. 
+
+In Fock notation, we count the number of photons in each mode. Equivalently, for each photon $j$ we can write the index $z_j$ of the mode it occupies:
+For example, for two photons in three modes:
+\begin{align*}
+    &  \ket{n_1=2, n_2=0, n_3=0} = \ket{z_1=1, z_2=1}\\
+    &  \ket{n_1=1, n_2=1, n_3=0} = \ket{z_1=1, z_2=2}\\
+    &\quad \ldots\\
+    &  \ket{n_1=0, n_2=0, n_3=2} = \ket{z_1=3, z_2=3}.
+\end{align*}
+Note that the second representation can be significantly more efficient for small numbers of photons in large circuits.
+%We will refer to these permutations using the notation
+%\begin{equation}
+    %\ket{\lambda}_i^a = \ket{ n^a_{1, i} , n^a_{2, i} \ldots n^a_{m, i}} 
+    %= \ket{z_{1, i} , z_{2, i} \ldots z_{p, i}},
+%\end{equation}
+%where $n_{j,i}$  is the number of photons in the $j^{th}$ mode and 
+%$z_{k, i}$ is the mode index of the $k^{th}$ photon, for a particular basis-state index $i$,
+%\begin{equation}
+    %\ket{z_{1} , z_{2} \ldots z_{p}} = 
+    %\left[\,\prod_{j=1}^m \frac{1}{\sqrt{n_m!}} \right]
+    %\left[\,\prod_{k=1}^p  \creation_{z_k} \right] \vacuum
+    %.
+%\end{equation} 
+%For example, two photons in three modes form a basis for $\hilspacep$
+%\begin{align*}
+    %&\ket{\lambda}_1 =  \ket{2_1, 0_2, 0_3} = \ket{1, 1}\\
+    %&\ket{\lambda}_2 =  \ket{1_1, 1_2, 0_3} = \ket{1, 2}\\
+    %&\quad \quad \ldots\\
+    %&\ket{\lambda}_6 =  \ket{0_1, 0_2, 2_3} = \ket{3, 3}.
+%\end{align*}
+%
+
+Let's consider the evolution of Fock states in an arbitrary two-mode circuit described by the matrix
+\begin{equation}
+    \transfer=
+   \begin{bmatrix}
+   s_{11} & s_{12} \\ 
+   s_{21} & s_{22} 
+   \end{bmatrix} 
+   .
+\end{equation}
+A single photon injected into input port $a_1$ evolves as 
+\begin{equation}
+    %\left[
+   %\begin{array}{cc} 
+       %\textcolor{rr}{s_{11}} & \textcolor{rr}{s_{12}} \\ 
+       %\textcolor{gg}{s_{21}} & \textcolor{gg}{s_{22}} 
+   %\end{array} 
+   %\right] 
+    %\transfer
+    \transfer \,
+    \creation_{a_1}
+    \vacuum 
+    = \left(s_{11} \creation_{b_1} + s_{12} \creation_{b_2}\right) \vacuum
+    = s_{11}\ket{1^b_1 0^b_2} + s_{12}\ket{0^b_1 1^b_2}.
+\end{equation}
+Since no photons are injected into mode $a_2$, the second row of $\transfer$ has no effect, and the output probability amplitudes are simply $h_1=s_{11}$, $h_2=s_{12}$.  
+%
+When two photons injected into modes $a_1$ and $a_2$ respectively, both columns and rows of the matrix are significant:
+\begin{gather}
+    %\unitary\ket{10} = 
+    \transfer
+    %\left[
+   %\begin{array}{cc} 
+       %\textcolor{rr}{s_{11}} & \textcolor{rr}{s_{12}} \\ 
+       %\textcolor{rr}{s_{21}} & \textcolor{rr}{s_{22}} 
+   %\end{array} 
+   %\right] 
+    \creation_{a_1} \creation_{a_2} \vacuum 
+   %= (s_{11} \creation_1 + s_{12} \creation_2) 
+     %(s_{21} \creation_1 + s_{22} \creation_2) \vacuum\\
+     = \frac{1}{\sqrt{2}} s_{11}s_{21} \ket{2_1^b 0_2^b}
+     + \frac{1}{\sqrt{2}} s_{12}s_{22} \ket{0_1^b 2_2^b}
+     + (s_{11}s_{22} + s_{12}s_{21}) \ket{1_2^b1_2^b} .
+\end{gather}
+For $s_{11}=s_{22}=\sqrt{t}$, $s_{12}=s_{21}=i\sqrt{r}$ we obtain the two-photon output state of a general beamsplitter, and for $r=\frac{1}{2}$ we recover the \gls{hom} dip (\ref{eqn:noon-state}). For the input state $\ket{1_11_2}$, the output probability amplitudes $h_i$ therefore depend on $\transfer$ as
+\begin{gather*}
+    h_1 =  \frac{1}{\sqrt{2}} s_{11}s_{21}~;\quad
+    h_2 =  s_{11}s_{22} + s_{12}s_{21}~;\quad
+    h_3 =  \frac{1}{\sqrt{2}} s_{12}s_{22}.
+\end{gather*}
+We can re-write these relations as
+\begin{equation}
+    h_1 = \frac{1}{2\sqrt{2}} \perm
+   \begin{bmatrix}
+       s_{11} && s_{11}\\
+       s_{21} && s_{21}
+   \end{bmatrix} ;\quad
+    h_2 =  \perm  
+   \begin{bmatrix}
+       s_{11} && s_{12}\\
+       s_{21} && s_{22}
+   \end{bmatrix} ;\quad
+    h_1 = \frac{1}{2\sqrt{2}} \perm  
+   \begin{bmatrix}
+       s_{12} && s_{12}\\
+       s_{22} && s_{22}
+   \end{bmatrix},
+   \label{eqn:two-photon-permanents}
+\end{equation}
+where $\perm(M)$ is the \emph{permanent} of a matrix. The permanent of an $n\times n$ matrix $M$ is defined in much the same way as the determinant $\mathrm{det}(M)$, but without the alternating sign:
+\begin{equation}
+\det (M) = \sum_{\sigma \in S_n} \mathrm{sgn}(\sigma_i) \prod_{i=1}^n M_{i \sigma_i} ~;\quad
+    \perm (M) = \sum_{\sigma \in S_n} \prod_{i=1}^n M_{i \sigma_i}, 
+\end{equation}
+where $\sigma_i$ is a single permutation in the group $S_n$ of all possible permutations of $M$. 
+%For a particular permutation $\sigma$, the product $\prod_{i=1}^n M_{i \sigma_i}$ is called the \emph{diagonal}, and the permanent is thus the sum over all diagonals of $M$.
+
+The advantage of representing $h_i$ in the form of (\ref{eqn:two-photon-permanents}) is this:
+%
+%
+Consider an arbitrary $m$-mode linear-optical circuit described by $m \times m$ matrices $\unitary$ and $\transfer$. When a given Fock state $\ket{n_1^a n_2^a \ldots n_m^a}$ is sent into the circuit, the probability amplitude $h_i$ corresponding to detection of the state $\ket{n_1^b n_2^b \ldots n_m^b}_i$ at the output is in general given by
+\begin{equation}
+    h_i = \bra{n_1^b n_2^b \ldots n_m^b}_i \unitary \ket{n_1^a n_2^a \ldots n_m^a} =
+    \left(\prod_{j=1}^m n_j^a! \right)^{-\frac{1}{2}}
+    \left(\prod_{k=1}^m n_k^b! \right)^{-\frac{1}{2}}
+    \perm \left(\transfer[z^a | z^b] \right),
+    \label{eqn:permanent-fock-state}
+\end{equation}
+where the expression $\transfer[z^a | z^b]$ constructs a new matrix from the columns and rows of $\transfer$,  corresponding to the chosen input ($z^a$) and output ($z^b$) ports respectively \cite{Scheel2004a}. To see how this works, consider again the example of $p=2$, $m=3$. If photons are injected at ports $a_1$ and $a_2$, the probability amplitude corresponding to coincidental detection at output ports $b_2$ and $b_3$ is proportional to the permanent of a matrix constructed from rows (1, 2) and columns (2, 3) of $\transfer$:
+\begin{equation}
+\transfer = 
+\begin{bmatrix}
+    \textcolor{black}{s_{11}} & \textcolor{rr}{s_{12}} & \textcolor{rr}{s_{13}} \\
+    \textcolor{black}{s_{21}} & \textcolor{rr}{s_{22}} & \textcolor{rr}{s_{23}} \\
+    \textcolor{gg}{s_{31}} & \textcolor{black}{s_{32}} & \textcolor{black}{s_{33}}
+\end{bmatrix}
+    \rightarrow 
+    \transfer[z^a | z^b]= 
+\begin{bmatrix}
+    \textcolor{rr}{s_{12}} & \textcolor{rr}{s_{13}}  \\
+    \textcolor{rr}{s_{22}} & \textcolor{rr}{s_{23}} 
+\end{bmatrix} ~;\quad
+    h_i = 
+    \perm 
+\begin{bmatrix}
+    \textcolor{black}{s_{12}} & \textcolor{black}{s_{13}}  \\
+    \textcolor{black}{s_{22}} & \textcolor{black}{s_{23}}  
+\end{bmatrix} 
+\end{equation}
+Note that when more than one photon occupies the same mode in the input or output state, rows and columns of $\transfer$ will be repeated in $\transfer[z^a | z^b]$. 
+
+Equation (\ref{eqn:permanent-fock-state}) computes the probability amplitude for detection of one Fock state given another as input to the circuit. For an arbitrary superposition of input states (\ref{eqn:permanent-input-output}), each output probability amplitude is simply given by a linear sum over the Hilbert space
+\begin{equation}
+    h_i = \bra{n_1^b n_2^b \ldots n_m^b} \unitary \ket{\psi_in} = 
+    \sum_j^d
+    \bra{n_1^a n_2^a \ldots n_m^a}_i \unitary \ket{n_1^a n_2^a \ldots n_m^a}_j.
+\end{equation}
+Probabilities, corresponding to experimentally detected count rates, can then be computed by the Born rule,
+\begin{equation}
+    P^Q([n_1^b n_2^b \ldots n_m^b]_i) = |h_i|^2.
+\end{equation}
+By taking the absolute-square \emph{before} calculating the permanent, we destroy interference between different terms in $\transfer$ and hence obtain detection probabilities corresponding to distinguishable photons --- classical statistics:
+\begin{equation}
+    P^C([n_1^b n_2^b \ldots n_m^b]_i) =
+    \left(\prod_{k=1}^m n_k^b! \right)^{-1}
+    \perm \left( |\transfer[z^a | z^b] |^2 \right).
+    \label{eqn:permanent-probabilities}
+\end{equation}
+Note that the normalization constant is modified, since these are now distinguishable particles.
+
+This method provides a very convenient route to the calculation of state vectors and detection probabilities in linear optics for arbitrary interferometers, and is used throughout this thesis. Since the technique is based almost entirely around the calculation of permanents, we can make use of the best known generic classical algorithms for $\perm(M)$, rather than having to tailor our numerical methods to the physics in question.
+
+The relationship between bosonic statistics and the permanent was first noted by Caianiello \cite{Caianiello1953}, and was mentioned in Valiant's 1979 proof \cite{Valiant1979a} that the permanent is in general exponentially hard to compute. As such this method does not scale, and we are currently limited to problem sizes of approximately 7 photons in $\sim$ 50 modes. The computational complexity of the permanent and associated linear optics experiments are discussed in depth in section \ref{sec:bosonsampling} of this thesis.
+
+
+\subsection{Interferometers}
+Throughout this thesis we will make use of path and polarization interferometers to manipulate and interfere quantum states of light. It will be useful to briefly examine the components and behaviour of two specific examples: the \gls{mzi} and the Reck-Zeilinger scheme. In chapters \ref{chap:cnot-mz}---\ref{chap:quantum-chemistry} we use \glspl{mzi} to encode and manipulate qubits in a small-scale circuit model quantum processor, and the Reck-Zeilinger scheme is used in section \ref{sec:bosonsampling} to implement $m\times m$ Haar-random unitary matrices.
+
+\subsubsection{The Mach-Zehnder interferometer}
+\label{sec:mach-zehnder-interferometer}
+A typical bulk-optical \gls{mzi} is shown in figure \ref{fig:mach-zehnder}. The \gls{mzi} has two input ports corresponding to ($a_1$, $a_2$) of a 50:50 beamsplitter, which splits a beam injected into either port into two paths. A relative phase-shift $\varphi$, equivalent to a path-length difference $dz=\varphi \lambda / 2 \pi$, is introduced into one arm. The two paths are then mixed at a second 50:50 \gls{bs}, the output ports of which are monitored by single-photon detectors or photodiodes, $D_0$ and $D_1$. A phase shift acting, for example, on arm $b_2$ of the interferometer transforms $\creation_{b_2} \rightarrow e^{i\varphi} \creation_{b_2}$ and can be written as a unitary matrix
+\begin{equation}
+    \unitary_\text{PH}(\varphi) = 
+    \begin{bmatrix}
+        1 & 0 \\
+        0 & e^{i \varphi} 
+    \end{bmatrix}
+    =
+    e^{-i\varphi/2} 
+    \begin{bmatrix}
+        e^{i\varphi/2} & 0 \\
+        0 & e^{-i \varphi/2} 
+    \end{bmatrix}
+    \rightarrow
+    \begin{bmatrix}
+        e^{i\varphi/2} & 0 \\
+        0 & e^{-i \varphi/2} 
+    \end{bmatrix}
+    ,
+    \label{eqn:phase-shift-unitary}
+\end{equation}
+where we have chosen to ignore the global phase $-\varphi/2$ as it cannot be measured in the two-mode system considered here.
+We can then write the matrix corresponding to the entire \gls{mzi}, 
+\begin{align}
+    \unitary_\mzi(\varphi) 
+    &=  \unitary_{BS_2} \unitary_\text{PH}(\varphi) \unitary_{BS_1}\\
+    &= 
+    \frac{1}{\sqrt{2}}
+    \begin{bmatrix}
+        1 & i \\
+        i & 1
+    \end{bmatrix}
+    \begin{bmatrix}
+        e^{i \varphi/2} & 0 \\
+        0 & e^{-i \varphi/2} 
+    \end{bmatrix}
+    \frac{1}{\sqrt{2}}
+    \begin{bmatrix}
+        1 & i \\
+        i & 1
+    \end{bmatrix}
+   = 
+    i
+    \begin{bmatrix}
+    \sin(\varphi/2) & \cos(\varphi/2) \\
+    \cos(\varphi/2) & -\sin(\varphi/2)
+    \end{bmatrix}
+    ,
+    \label{eqn:mzi-to-bs}
+\end{align}
+where the global phase $i$ can again be neglected. If light is injected into port $a_1$ of the \gls{mzi}, the intensity at ($D_1$, $D_2$) therefore depends on the phase $\varphi$ as
+\begin{equation}
+    I_{D_1}=I_0\sin^2(\varphi/2)~;\quad
+    I_{D_2}=I_1\cos^2(\varphi/2).
+\end{equation}
+These are the interference fringes as shown in figure \ref{fig:mach-zehnder}(b).
+
+Note that $\unitary_\mzi$ strongly resembles a variable-reflectivity beamsplitter (\ref{eqn:beamsplitter-unitary}) $\unitarybs(r)$. In fact, by applying phase shifts before and after the \gls{mzi} the circuit can be made identical to a beamsplitter with arbitrary reflectivity $r$:
+\begin{equation}
+\unitarybs = 
+    \begin{bmatrix}
+        \sqrt{t} & i\sqrt{r} \\
+        i\sqrt{r} & \sqrt{t}
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        \sin(\varphi/2)    & i \cos(\varphi/2)\\
+        i \cos(\varphi/2)  & \sin(\varphi/2)
+    \end{bmatrix}
+    =
+    -i
+    \begin{bmatrix} 1 & 0 \\ 0 & i \end{bmatrix}
+    \unitary_\mzi(\varphi)
+    \begin{bmatrix} 1 & 0 \\ 0 & i \end{bmatrix},
+    \label{eqn:mzi-is-bs}
+\end{equation}
+where $\varphi = 2\cos^{-1}(\sqrt{r})$. 
+%
+The \gls{mzi} structure therefore allows us to convert a passive device with fixed beamsplitter reflectivities into a \emph{reconfigurable} device by adding controlled phase-shifts. Experimentally it is often considerably easier to dynamically control a phase shift than a beamsplitter reflectivity, and this technique is used extensively throughout this thesis.  
+
+We can further extend this result to show that an \gls{mzi} with external phase shifts can implement \emph{any unitary operator} in the group $SU(2)$, i.e. any lossless two-mode operation. To see this, note that $\unitary_\mathrm{MZI}$ with external phaseshifts (\ref{eqn:mzi-is-bs}) is identical to rotation by an angle $\theta = \varphi + \pi$ about the $x$-axis of the Bloch sphere (figure \ref{fig:bloch-sphere}), 
+\begin{equation}
+\rotx(\theta) = e^{i \theta \pauli_x /2} 
+= 
+-i \begin{bmatrix} 1 & 0 \\ 0 & i \end{bmatrix}
+\unitary_\mzi(\varphi) 
+\begin{bmatrix} 1 & 0 \\ 0 & i \end{bmatrix}
+,
+\end{equation}
+and that a phase shifter (\ref{eqn:phase-shift-unitary}) corresponds to a rotation about the $z$-axis, $\unitary_\text{PH}(\varphi) = \rotz(\varphi) = e^{i \varphi \sigma_z /2}$. A simple geometric argument leads to the observation that these two rotations are sufficient to take any point on the Bloch sphere to any other point, including a global phase --- that is, to map any pure state to any other pure state of a two-level system. Any unitary operator in $SU(2)$ can therefore be realised using an \gls{mzi} with phaseshifters at the input and output: 
+\begin{equation}
+\unitary  
+= \rotz{\gamma}\rotx{\beta} \rotz{\alpha} 
+= e^{i \gamma \pauli_z}e^{i \beta \pauli_x} e^{i \alpha \pauli_z} 
+= \unitary_\text{PH}(\gamma') \unitary_\mzi(\beta') \unitary_\text{PH}(\alpha'),
+\end{equation}
+where $\alpha$, $\beta$, $\gamma$ are real numbers --- the Euler angles \cite{Tilma2002}.
+A single photon in an \gls{mzi} thus provides a convenient encoding for the two level system of a \emph{qubit} --- this is discussed in further detail in section \ref{sec:path-encoding}.
+
+%MZI figure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[t!] \centering
+\includegraphics[width=\textwidth]{chapter2/fig/mzi.pdf}
+\caption[Mach-Zehnder interferometer]{ 
+The Mach-Zehnder interferometer. (a) A light beam is divided into two paths by a beamsplitter, and one path is phase-shifted with respect to the other by by a relative phase $\varphi$. The two beams are then mixed on a second beamsplitter, giving rise to (b) interference fringes in the measured intensity at detectors $D_1$, $D_2$.  }
+\label{fig:mach-zehnder} \end{figure}
+%End MZI figure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Note that the interferometer is sensitive to phase shifts on the order of the wavelength $dz \sim \lambda$. This sensitivity allows the \gls{mzi} to be used for extremely precise interferometric measurements of distance, refractive index, and other optical properties of interest. 
+However, this sensitivity is a double-edged sword --- in order to construct a stable \gls{mzi} we must ensure that the relative positions of the beamsplitters and mirrors are static to within a small fraction of the optical wavelength, i.e. $\sim$ nm. In a bulk optical setup, this is extremely difficult to achieve due to thermal expansion/contraction and acoustic vibration of the apparatus. Although intrinsically stable bulk optical interferometers can be built, for instance using beam displacers \cite{Martin-Lopez2012} or a Sagnac architecture \cite{OBrien2003}, these schemes introduce further complexity and are not scalable. As a result, many experiments in quantum optics use polarization encoding in free-space, which is intrinsically stable --- as only a single spatial mode is used. 
+
+With the recent advent of \gls{iqp} it has become possible to build complex, multi-mode interferometers on-chip. By embedding the interferometer in a monolithic substrate, stable path-interferometry can be scaled to devices with thousands of optical modes, while simultaneously being miniaturized by a factor of a million \cite{Silverstone2013} with respect to equivalent bulk-optical apparatus. 
+Path-encoding then becomes a very natural choice, particularly since on-chip polarization-encoding is currently problematic.  This topic is discussed in detail in section \ref{sec:integrated-quantum-photonics}.
+
+
+
+
+\subsubsection{Linear-optical implementation of any unitary operator}
+\label{sec:reck-scheme}
+% Reck figure
+\begin{figure}[t!]
+\centering
+\includegraphics[width=\textwidth]{chapter2/fig/reck.pdf}
+\caption[Linear-optical implementation of any unitary operator]{
+Any unitary operator $\unitary$ on $m$ optical modes can be implemented using $2\times 2$ optical elements --- beamsplitters and phase-shifters. (a) Original figure, reproduced from \cite{Reck1994}. Blue lines represent phase-shifters, short black lines are beamsplitters with arbitrary reflectivity. 
+(b) Stabilization of the interferometer in (a) would be practically very challenging in a bulk-optical architecture. The same circuit can instead be implemented using integrated photonics (section \ref{sec:quantum-photonics}), providing interferometric stability and miniaturization. This circuit is implemented, without phase-shifters, in section \ref{sec:bosonsampling} of this thesis. (c) Beamsplitters drawn in (a), (b) must have variable reflectivity. In an integrated circuit, we replace each variable beamsplitter by an \gls{mzi}, allowing the effective reflectivity of each splitter to be controlled by a phase-shifter, leading to the circuit shown in (d).
+}
+\label{fig:reck-scheme}
+\end{figure}
+% End Reck figure
+%
+
+% Say that you can do it
+As we have already seen, an \gls{mzi} surrounded by two phase-shifters can implement an arbitrary unitary operation on two modes ($\unitary \in SU(2)$).  
+How does this generalize to circuits with more than two modes? What is the class of operations that we can implement on $m$ modes, using only linear-optical elements?
+
+As shown by Reck and Zeilinger \cite{Reck1994}, \emph{any $m \times m$ unitary operator} $\unitary$ corresponds to a linear-optical circuit on $m$ modes, constructed from beamsplitters and phase-shifters only. That is, any $\unitary$ has a decomposition as a product 
+\begin{equation}
+    \unitary = \unitary_T \cdot \unitary_{T-1} \ldots \unitary_1,
+\label{eqn:reck-decomposition}
+\end{equation}
+where each $\unitary_T$ acts nontrivially on at most two modes and does not affect the remaining m-2 modes.  A simple proof that this should be possible is given by Aaronson and Arkhipov \cite{Aaronson2010a}.  We have already seen that each two-mode $\unitary_T$ can always be implemented using an \gls{mzi} with a total of three phase shifters. Given a target unitary $\unitary$, the task is then to perform the decomposition (\ref{eqn:reck-decomposition}).  In fact, this decomposition is equivalent to a standard technique for QR decomposition\footnote{This implies that numerical methods identical to the Reck-Zeilinger decomposition are provided in almost any numerical linear-algebra package capable of QR decomposition (e.g. LAPACK). Your home router probably knowns how to build Reck schemes.}
+of a matrix using \emph{Givens rotations} --- $2\times2$ matrices corresponding to $\unitary_T$. The circuit for $\unitary$ in terms of optical elements $\unitary_T$ can thus be found for any discrete $\unitary$.
+
+In their paper, Reck and Zeilinger go on to show how this decomposition can be implemented using a \emph{single} linear optical network, which is reconfigured by means of phase shifters and variable beamsplitters to implement any $\unitary$.  In general, the circuit uses $O(m^2)$ elements. In this design, the network is \emph{local} in the sense that each $\unitary_T$ acts on pairs of adjacent waveguides, considerably simplifying the experimental implementation. The general form of the circuit is shown in figure \ref{fig:reck-scheme}(a). The design lends itself to an implementation in using integrated optics, where interferometric stability is simple to achieve. Equivalent waveguide circuits are shown in figures \ref{fig:reck-scheme}(b, d). 
+
+Although the scheme is perhaps more easily visualized in path, it should be emphasised that the modes $m$ can in principle correspond to any degree of freedom of the photon, so long as the corresponding beamsplitter and phase-shifter operations can be constructed. A recent example \cite{Russell} uses a combination of path and polarization modes in a bulk-optical setup.
+
+If we can use Reck-Zeilinger to implement any unitary matrix, does that mean that we can build a universal gate-set for a quantum computer using only beamsplitters and phase-shifters? To answer this question, it should be emphasised that Reck-Zeilinger allows us implement an arbitrary unitary on \emph{modes}, whereas $\unitary_\mathrm{CNOT}$ acts on \emph{qubits}. Using a Reck scheme we can implement any $m \times m$ matrix dictating the dynamics of a \emph{single} photon in an $m$-mode circuit, i.e. acting on the single-photon Hilbert space $\hilspace_m^{1}$. Following the method outlined in section \ref{sec:permanents}, this then \emph{generates} the $d\times d$ matrix $\mathcal{U}$ acting on the full Hilbert space of $p$ photons in $m$ modes, $\hilspacep$, which is in general exponentially larger ($d = \binom{m+1-p}{p}$). Since this is the space onto which our qubits are mapped, by a simple parameter-counting argument we cannot always use Reck-Zeilinger to deterministically implement arbitrary unitary operations on photonic qubits. In principle, we could map $n$ qubits to the state of a single photon in $2^n$ modes, in which case $\unitary=\mathcal{U}$ and Reck-Zeilinger \emph{can} be used to implement universal quantum computing --- but the necessary experimental resources clearly scale exponentially in $n$. The latter scheme, which cannot provide an exponential speedup over classical machines, has recently been suggested for superconducting qubits \cite{Geller2012}.
+
+
+% Resource counting
+% Computational complexity, postselection
+
+\subsection{Nonlinear optics}
+\label{sec:nonlinear-optics}
+The majority of optical effects observed in nature are linear, in the sense that the properties of the material or medium are independent of the incident light field.  
+%
+%The solutions to Maxwell's equations in such scenarios are in the form of a simple wave equation, allowing the principles of superposition ($f(x_1+x_2...) = f(x_1)+f(x_2)$) and homogeneity ($f(ax)=af(x)$) to be employed. 
+%
+Under these conditions, the wavelength of light is not changed when passing through the medium, and a light source will never have control over the behaviour of another. 
+In linear media, the dielectric perimittivity $\varepsilon$ is a constant function of the dielectric susceptibility of the material $\chi_e$ (\ref{eqn:dielectric-susceptibility}), and does not depend on the electric field
+\begin{equation}
+    \varepsilon(\efield) = \varepsilon_0\left[1+\chi_e\right].
+\end{equation}
+
+However, with the advent of light sources such as the laser, it has become possible to engineer situations in which the passage of an intense light beam through an optical medium temporarily modifies the properties of the material itself to a significant extent. This can generate new optical fields or cause self-modulation of the incident beam, allowing ``light to control light'' where that control is mediated by the optical material. 
+
+The effect of a strong optical field incident on a nonlinear medium can be described in terms of the dielectric polarization vector $\mathbf{P}$, which is introduced into the expression for the electric flux density $\dfield$ in Gauss' law (\ref{eqn:gauss}) as 
+\begin{equation}
+    \dfield(\efield) = \varepsilon \efield  = \varepsilon_0 \left[1+ \chi_e\right] \efield
+    \quad \rightarrow \quad 
+    \dfield \left(\efield \right) = \varepsilon_0\efield + \mathbf{P}\left(\efield \right)
+\end{equation}
+where
+\begin{equation}
+    \mathbf{P}\left(\efield\right) = \varepsilon_0( \chi^{(1)}_e \efield + \chi^{(2)}_e \efield^2 + \chi^{(3)}_e \efield^3 + \ldots )\
+\label{eqn:chi_nonlinear}
+\end{equation}
+%
+Here $\chi_e \equiv \chi_e^{(1)}$ is the standard (linear) dielectric susceptibility, while $\chi^{(2)}_e$ etc. characterise the higher-order nonlinear response of the material. In most nonlinear media the magnitude of these terms decreases rapidly with order, \emph{i.e.}
+\begin{equation}
+\chi_e^{(1)} \gg  \chi_e^{(2)} \gg \chi_e^{(3)} \ldots
+\end{equation}
+and in order for $\chi_e^{(2)}$ to be nonzero, the material must be birefringent.
+
+This nonlinear response allows nonlinear materials to mediate an effective interaction between photon pairs. However, since $\chi_e^{(1)} \gg  \chi_e^{(2)}$, any such effect is typically very weak. As a result it is technically very difficult to use such media to entangle two photons initially prepared in a separable state, for example. This difficulty, together with a potential solution to effective photon interaction which does not directly depend on intrinsic optical nonlinearity, is discussed further in section \ref{sec:klm}.
+
+\section{Quantum photonics}
+\label{sec:quantum-photonics}
+In order to implement any of the quantum technologies described in section \ref{sec:quantum-technologies}, we must first choose a physical system in which to encode quantum information. As already discussed, this system should support the preparation, controlled coherent manipulation, and readout of single quanta. This leads to a challenging set of near-incompatible requirements: In order to avoid decoherence and the unwanted introduction of mixture, the system must be carefully protected from interaction with the environment, while, at the same time --- 
+in order to achieve the entangling operations required for most quantum technologies ---
+amenable to strong, controlled pairwise interaction. Moreover, the experimentalist should have access to a number of control parameters with direct influence on the system's state.
+
+Over the past few decades, a range of physical systems have emerged as leading solutions to this problem. Cold atoms \cite{Blatt2008} and charged ions \cite{Lanyon2013}, held in a variety of electromagnetic traps, satisfy many of the desired criteria, in particular the availability of strong pairwise interaction. Superconducting qubits \cite{Devoret2013}, based on Josephson junctions, as well as \gls{nv} centers in diamond \cite{Robledo2011} and phosphorous impurities in silicon \cite{Kane1998}, are more immediately amenable to monolithic integration, and have recently seen considerable industrial interest \cite{Ronnow2014}.  However, ions, atoms, and spins all readily interact with both light and matter and the major limiting factor of many of these matter-based platforms is environment-induced decoherence. Much of the experimental challenge therefore involves the careful isolation of the system of interest from environmental effects, often requiring ultrahigh vacuum and/or cryogenic temperatures.
+
+These difficulties lend favour to the prospect of an all-optical photonic quantum computer, where qubits are encoded in the quantum state of single photons.
+In general, photons interact only very weakly with their environment, and single photons propagating in free space or optical fibre at \gls{rtp} suffer negligible decoherence. Over the past half-century, single photon sources (section \ref{sec:sources}), and high-efficiency single photon detectors (section \ref{sec:detectors}) have become widely available. Deterministic single-qubit operations are very easily implemented using passive linear optics, as described in section (\ref{sec:mach-zehnder-interferometer}). Many classical imaging and measurement techniques are optical, and photons are a natural choice for many applications of quantum metrology. Owing to their speed, photons are also natural candidates when quantum information must be moved over an appreciable distance, either between registers in a quantum computer, or over long-distance communication channels \cite{URen2004}.
+
+High-fidelity quantum states of single photons are now routinely generated, manipulated and measured at \gls{rtp}, and many early demonstrations of quantum effects, including superposition \cite{Taylor1909}, nonlocality \cite{Aspect1982c}, large-scale entanglement \cite{Yao2012}, two-qubit gates \cite{OBrien2003}, \gls{qkd} \cite{Dixon2008}, quantum metrology \cite{Rarity1990f}, quantum algorithms \cite{Lu2007c, Lanyon2007, Politi2009a}, \glspl{ecc} \cite{Barz2013}, etc. have used single photons at near-visible wavelengths.
+
+
+\subsection{Photons as qubits}
+\label{sec:photons-as-qubits}
+% Okay so photons are good to encode
+% Here is how you encode. We have already seen how to do SU(2)s
+A single photon is associated with a number of continuous variables, including position and frequency, and in general occupies an infinite-dimensional Hilbert space. In order to encode a photonic qubit, we must therefore restrict the dynamics to an effective two-level system. In principle this can be achieved using a single cavity mode, mapping logical qubit states $\ket{0}$ and $\ket{1}$ to the vacuum and single-photon Fock state respectively. However, this simple encoding has obvious drawbacks: for instance, rotation of a single qubit from $\ket{0}$ to $\ket{1}$ becomes experimentally challenging, requiring a photon source.
+
+Instead, it is experimentally much more convenient to use two modes and one photon per qubit. Modes in frequency, time, and orbital angular momentum \cite{Cai2012} are routinely used to encode quantum information, however, in this thesis we will only consider \emph{path encoding} and \emph{polarization encoding}.
+
+\subsubsection{Path encoding}
+\label{sec:path-encoding}
+\emph{Path encoding}, otherwise known as \emph{dual-rail} encoding, stores a qubit as a propagating photon in a superposition of two optical spatial modes $a_0$ and $a_1$. The two logical-basis states of the qubit, \ket{0} and \ket{1}, correspond to states of the photon occupying each spatial mode respectively. Mapping from qubits to the Fock-state representation,
+\begin{equation}
+    \alpha \ket{0} + \beta \ket{1}  \equiv 
+    \alpha \ket{1_{a_0}0_{a_1}} + \beta \ket{0_{a_0}1_{a_1}} .
+\end{equation}
+As described in section \ref{sec:mach-zehnder-interferometer}, deterministic, arbitrary unitary operations on two spatial modes are easily accomplished using an \gls{mzi}. Any path-encoded state can thus be mapped to another using beamsplitters and phaseshifters.
+Techniques for state preparation and measurement of path-encoded qubits are shown in section \ref{sec:cnotmz-state-preparation} and \ref{sec:cnotmz-measurement}.
+%Readout of a path-encoded qubit is performed by single-photon detection. Placing a detector in one path enables projective measurement on the corresponding qubit state. Placing detectors in both paths, and assigning eigenvalues of $\pm1$ to each qubit state respectively, yields the $\pauli_z$ measurement
+%\begin{equation}
+    %\pauli_z = \ket{0}\bra{0} - \ket{1}\bra{1}.
+%\end{equation}
+
+Path encoding has the advantage of easily scaling to higher-dimensional \emph{qudit} encodings, where a $d$-level system is encoded using a single photon together with $d$ spatial modes. The result of Reck-Zeilinger (section \ref{sec:reck-scheme}) allows arbitrary deterministic rotations of path-encoded qudits using beamsplitters and phaseshifters only. This possibility is discussed further in section \ref{sec:quantum-walks}.
+
+As long as we can engineer single-mode optics, path-encoding  is relatively easy to implement. However, when realised using bulk optics, thermal instability and mechanical vibration of the experimental setup will give rise to uncontrolled time-varying phase shifts in the interferometer. This has the effect of adding mixture to the state, and is largely indistinguishable from decoherence. Although active stabilization or Sagnac architectures can be used to overcome this difficulty, these techniques are expensive and complicated and, for bulk optical setups, path-encoding has largely been avoided in favour of polarization-encoded qubits. 
+
+More recently, \gls{iqp} (\ref{sec:integrated-quantum-photonics}), which provides inherent interferometric stability, has enabled path-encoding on a large scale.
+
+\subsubsection{Polarization encoding}
+\label{sec:polarization-encoding}
+Path-encoding suffers from the difficulty of \si{\nano \metre} path-length matching, and as such is very challenging to implement in bulk-optics, or when communicating over long distances. \emph{Polarization encoding}, in which the logical basis states of the qubit are mapped to the horizontal $\ket{H}$ and vertical $\ket{V}$ polarization states of the photon, overcomes these problems. Since both polarizations propagate in the same spatial mode, there is no difficulty of path-length matching. Deterministic arbitrary single-qubit rotations on polarization-encoded qubits can easily be accomplished using a system of birefringent quarter-wave and half-wave plates, following a decomposition of $\unitary$ which is analogous to that of the \gls{mzi}. Polarization-encoding has the further advantage that polarization-entangled states are naturally generated by \gls{spdc}, as described in section \ref{sec:spontaneous-parametric-downconversion}.
+
+Polarization encoding is not amenable to qudit encodings. Moreover, the ability to faithfully transport and manipulate polarization-encoded states in optical waveguides is not currently well-developed, as described in section \ref{sec:silica-on-silicon}.
+
+In general, we can deterministically convert between path and polarization encodings using a \gls{pbs}, which transits and reflects horizontally and vertically polarized light, respectively. Using a similar notation to figure \ref{fig:beamsplitter-dips},
+\begin{equation}
+    \unitary_\mathrm{PBS} = 
+    \ket{H_{a_1}}\bra{H_{b_1}} +
+    \ket{H_{a_2}}\bra{H_{b_2}} +
+    i\ket{V_{a_1}}\bra{V_{b_2}} +
+    i\ket{V_{a_2}}\bra{V_{b_1}} 
+    .
+\end{equation}
+
+\subsection{Linear-optical quantum computing} 
+\label{sec:klm}
+In section \ref{sec:quantum-photonics}, we argued that photonics offers an advantage over many other approaches to the implementation of quantum technologies, owing to the inherent reluctance of photons to interact with their environment. However, this comes at a cost, in that photons are \emph{also} very reluctant to interact with one another. This presents a serious challenge to the implementation of entangling operations required by many quantum technologies.  Direct photon-photon interaction is so weak as to never be seen outside a particle accelerator. Although nonlinear Kerr media (section \ref{sec:nonlinear-optics}) can be used to mediate an effective interaction between photons, this effect is many orders of magnitude too weak ($\chi^{(3)} \approx \SI{1e-22}{\metre^2 \volt^{-2}}$) to be feasible. Extremely strong optical non-linearities can be obtained when photons interact with a solid-state atom-like system, such as a charged ion or a quantum dot, however, the current performance  of these technologies, particularly with respect to loss and coupling strength, is far from sufficient for quantum computation \cite{Kok2005, Devitt2007}.
+
+As a result, it may then appear that photonic quantum computing is forbidden by strong technological constraints. 
+In 2001, Knill, Laflamme and Milburn (\acrshort{klm}) set out to formalize this reasoning, in order to show that without a strongly nonlinear optical medium or component, scalable photonic quantum computing should be impossible. 
+To the surprise of many, they found \cite{Knill2001} the converse: that full-scale, universal quantum computation can be scalably achieved using only single-photon sources, single photon detectors, and a linear-optical network, together with \emph{adaptive measurement}, a.k.a. feed-forward.
+
+At the heart of the \gls{klm} quantum computer is \gls{hom} interference, as described in section \ref{sec:hong-ou-mandel}. As has already been discussed, indistinguishable bosons in linear-optical circuits exhibit highly non-classical interference effects, and generate correlations which cannot be classically reproduced. However, as was shown by Kok and Braunstein \cite{Kok2000}, these phenomena cannot be used to implement \emph{deterministic} entangling gates on photonic qubits. For example, the 2-photon NOON state (\ref{eqn:noon-state}) generated by a \gls{bs} is entangled, but it is not obvious how to convert this state to a Bell state (\ref{eqn:bell-states}) using linear optics alone.
+The first insight of \gls{klm} was to show that quantum interference of Fock states in a simple linear-optical network could \emph{probabilistically} implement a maximally entangling operation on two qubits. A construction and experimental implementation of a two-qubit gate derived from the original proposal of \gls{klm} is given in section \ref{sec:ralph-cnot}. 
+
+A fundamentally probabilistic gate is problematic for scalable quantum computation, as the success probability of composite circuits built from such gates will in general fall off exponentially with circuit size. The second, extremely significant result of \gls{klm} was to show that such probabilistic gates can be \emph{bootstrapped} into a scalable architecture, using ancillary photons together with measurement and feed-forward. Sending extra photons into the circuit, which are not used to encode logical qubits, detection events registered at the output can then be used to obtain classical information on the success or failure of the gate. This information is then used to reconfigure the circuit downstream of the gate, essentially correcting for failure.  \gls{klm} showed that this feed-forward technique can be used to render linear-optical entangling gates asymptotically deterministic, with only a polynomial resource overhead. Specifically, \gls{klm} give a linear-optical construction for a maximally entangling \gls{cz} gate with success probability scaling as $p^2/(p+1)^2$ in the number of ancilla photons $p$.
+
+By removing the need for strong natural optical non-linearities, the result of \gls{klm} significantly reduces the experimental difficulty of photonic quantum computation, and as a result has attracted considerable experimental interest \cite{OBrien2009, Gasparoni2004}. 
+However, the resource overhead necessary for scalable operation, while polynomial, is prohibitively large for real-world implementations. Fortunately, a number of recent proposals \cite{Nielsen2004a, Browne2005} have significantly improved on the original result. Using a \emph{one-way} model of quantum computation based on the generation and measurement of \emph{cluster states}, these schemes dramatically reduce the resource overhead required for scalability, to the extent that realization of linear-optical quantum computation is now arguably more of an engineering challenge than an open theoretical question. A number of experimental implementations have since been reported \cite{Walther2005c, Prevedel2007, Ceccarelli2009}.
+
+\subsection{Sources} 
+\label{sec:sources}
+We have already seen that the coherent state generated by a laser (section \ref{sec:coherent-state}) is not appropriate for experiments which depend on multiphoton quantum interference. Most photonic quantum technologies depend on light sources which do not admit a classical description. Arguably the most technically demanding is the \emph{on-demand single-photon source}. This would be a device which deterministically generates indistinguishable single-photon Fock states $\ket{0}$ in a single mode, on demand. Currently, no such device exists, and the development of scalable \glspl{sps} remains a very significant challenge for the realization of quantum technologies. A scalable on-demand \gls{sps} would have immediate applications for \gls{qkd} \cite{Horikiri2005}, and metrology \cite{Matthews2013d}, and would represent a very significant step towards tangible quantum speedup in information processing tasks (section \ref{sec:bosonsampling}).
+
+Leading candidates for deterministic single-photon sources include artificial-atom systems \cite{Eisaman2011} such as \gls{nv} centres in diamond, quantum dots, and various atomic systems. There is no fundamental limit to the probability of success of such \glspl{sps}. However, these techniques currently do not achieve sufficient performance --- in particular, with respect to out-coupling efficiency and photon indistinguishability --- to be immediately applicable to the demanding multiphoton experiments described in this thesis. 
+
+Historically, a great many proof-of-principle demonstrations of quantum information tasks have been accomplished using non-deterministic \glspl{sps} based on parametric nonlinear optical processes. We will focus our discussion on these sources, which are used throughout the experiments described in this thesis.
+
+Non-deterministic, spontaneous photon sources do not directly provide a route to scalable quantum technologies, as the probability of generating $p$ indistinguishable photons falls off exponentially with $p$. However, it has recently been suggested \cite{Collins2013, Jeffrey2004} that by \emph{multiplexing} many nondeterministic sources in parallel, together with single-photon detection and a fast switching network, it should be possible to construct an asymptotically deterministic on-demand source with polynomial resource overhead. This provides an alternative route to a scalable single-photon source, which is particularly amenable to monolithic integration (section \ref{sec:integrated-quantum-photonics}).
+
+\subsubsection{Spontaneous parametric down-conversion} 
+\label{sec:spontaneous-parametric-downconversion}
+ %SPDC figure
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{chapter2/fig/spdc_schematic.pdf}
+\caption[Spontaneous parametric downconversion]{(a) Type-I \gls{spdc} cone structure. Downconverted photon pairs are generated at diametrically oppposed points about the pump axis, on a cone with a typical opening angle of $\sim3 ^{\circ}$. (b) Type-II cones. Entangled photon pairs lie at the intersection of the two cones (green spheres). (c) Conservation of energy. (d) Conservation of momentum: the phase-matching condition.}
+\label{fig:spdc_schematic}
+\end{figure}
+ %End SPDC figure
+
+Nonlinear optics (section \ref{sec:nonlinear-optics}), when combined with single photon detection (section \ref{sec:detectors}), provides a convenient and historically very successful route to approximate, non-deterministic single-photon sources.  
+
+The result of the $\chi^{(2)}$ nonlinearity introduced in (\ref{eqn:chi_nonlinear}) is to allow so-called \emph{3-wave mixing} effects. These include \emph{sum-frequency generation} in which two pump beams with frequencies ($\omega_1$, $\omega_2$) generate a new optical field with $\omega_1 \pm \omega_2$, and \acrfull{spdc}, in which a single pump beam $\omega_0$ generates two daughter fields with frequencies $\omega_1$ and $\omega_2$.  \gls{spdc} allows a light beam to be arbitrarily down-converted to a longer wavelength, and as such has many classical applications. In this thesis we are principally concerned with \gls{spdc} as a source of quantum states of light --- single photons.
+
+In the quantum picture of \gls{spdc}, a high-energy pump photon in a single mode with wavevector $\vk_0$ is incident on a nonlinear birefringent crystal with a $\chi^{(2)}$ nonlinearity. The pump photon splits into two daughter photons in modes $\vk_1$, $\vk_2$, referred to as the \emph{signal} and \emph{idler} for historical reasons. This process must of course preserve conservation of energy and momentum, having
+\begin{equation}
+\omega_1+\omega_2 = \omega_0~; \quad \quad
+\vk_1+\vk_2 = \vk_0.
+\label{eqn:energy-and-phase-matching}
+\end{equation} 
+Throughout this thesis we will optimize our sources to generate indistinguishable photon pairs with $\omega_1 = \omega_2$.
+
+Adding the interaction terms generated by (\ref{eqn:chi_nonlinear}) to the quantized Hamiltonian of the free electromagnetic field (\ref{eqn:quantized-electromagnetic-hamiltonian}) and summing over all modes, we can write the \gls{spdc} Hamiltonian \cite{Mandel1995} 
+\begin{equation}
+    \hamiltonian = \sum_{i=0}^2 \hbar \omega_i \left(\hat{n}_i + \frac{1}{2}\right) + \hbar g \left[ \creation_1 \creation_2 \annihilation_0 + \text{h.c.}\right] ,
+\end{equation}
+where $\creation_1$, $\creation_2$ are creation operators for photons in the signal and idler modes respectively, $\annihilation_0$ corresponds to annihilation of the pump photon, and $g \propto \chi^{(2)}$ is a coupling constant which ensures that the conditions of (\ref{eqn:energy-and-phase-matching}) are met.
+
+\newcommand{\spdc}{\ket{\Psi_\text{SPDC}}}
+Usually the applied pump is an intense laser beam, modelled by the coherent state $\coherent$ with $\expect{\hat{n}_1(t)}, \expect{\hat{n}_2(t)} \ll |\alpha|^2$. Since the pump field is then effectively classical, we can re-write the interacting part of $\hamiltonian$ as
+\begin{equation}
+    \hamiltonian_I = i \xi \hbar \left( \creation_1 \creation_2 + \text{h. c.} \right),
+\end{equation}
+where the classical properties of the pump, including the fast modulation $e^{-i\omega_0 t}$, have been lumped together with $g$ into $\xi$. Assuming that the signal and idler modes are initially prepared in the vacuum state $\ket{0_1 0_2}$, time evolution of the system is then governed by the unitary operator $\unitary=e^{-i\hamiltonian_I t/\hbar}$, leading to an output state
+\begin{align}
+    \spdc
+    &= \unitary  \ket{0_10_2}\\
+    &\approx e^{\xi \hbar t \creation_1 \creation_2}\ket{0_10_2} \\
+    &=\sum_{j=0}^\infty \frac{\gamma^j}{j!} 
+    \left(\creation_1\right)^j
+    \left(\creation_2\right)^j
+    \ket{0_10_2} 
+    = \sum_{j=0}^\infty \gamma^j \ket{j_1j_2}\\
+    &= \ket{0_10_2} + \gamma  \ket{1_11_2} + \gamma^2 \ket{2_12_2} + \gamma^3 \ket{3_13_2} \ldots
+    \label{eqn:spdc-state}
+\end{align}
+where $\gamma = t \xi$ and we have assumed that $|\gamma| \ll 1$. 
+
+% Reduce to two photons
+The importance of the \gls{spdc} state ($\ref{eqn:spdc-state}$) for applications in quantum photonics is this: when $\gamma$ is small such that $\gamma \gg \gamma^2 \gg \gamma^3 \ldots$, the state $\spdc$ is well-approximated by a superposition of the vacuum and a two-photon state $\ket{1_11_2}$:
+\begin{equation}
+    \spdc \approx \vacuum + \gamma\ket{1_11_2}.
+\end{equation}
+A single-photon detection event in the idler arm therefore \emph{heralds} a single-photon Fock state in the signal arm with high probability, and vice-versa. Moreover, by using two detectors and counting in the \emph{coincidence basis} (\emph{i.e.} only registering events in which both signal and idler detectors clicked) we post-select on the $\ket{1_1 1_2}$ term, allowing $\spdc$ to be used as an approximate source of indistinguishable photon pairs. 
+
+Most experiments in quantum optics are performed using non-number resolving (``bucket'') detectors, which cannot distinguish between Fock states $\ket{n}$. If a coincidence click is registered across the signal and idler modes,  there is a small probability $|\gamma|^4$ that this event came from the $\ket{2_12_2}$ term in ($\ref{eqn:spdc-state}$), leading to partial mixture of the effective experimental state.  Increased pump power, while increasing the overall downconversion rate, leads to a greater value of $\gamma$ and an increased relative probability of detection events due to higher-order terms. If the desired state is $\ket{1_11_2}$, as is the case throughout this thesis, this effect degrades the quality of the measured state. 
+
+% Something about type-II
+The allowed signal and idler modes are those which meet the conditions energy conservation and phase-matching (\ref{eqn:energy-and-phase-matching}).  This depends on the experimental geometry, the nonlinear material, the pump, signal and idler wavelengths, and a variety of other experimental parameters. In \emph{type-I phase-matching}, photon pairs with identical polarization are generated at diametrically opposed points on a cone centred about the pump axis (figure \ref{fig:spdc_schematic}(a)). The opening angle of the cone depends on the pump wavelength and the properties of nonlinear material --- in particular, the orientation of the crystal lattice with respect to the pump beam. Photons generated by tyoe-I \gls{spdc} are entangled in wavelength, time, and space, but not in polarization, and we therefore collect the state $\ket{V_1V_2}$. In \emph{type-II phase-matching}, photons are generated in \emph{two} overlapping cones with orthogonal polarization \cite{Kwiat1995} 
+as illustrated in figure \ref{fig:spdc_schematic}(b). At the points where the cones overlap, since we cannot distinguish one photon from another nor from which cone either photon was collected, the state is entangled in polarization across four modes (paths $1$, $2$ and polarizations $H$, $V$),
+\begin{align}
+    \ket{\Psi_\text{SPDC-II}} 
+    &\propto  
+    \sum_{n=0}^\infty 
+    \gamma^n
+    \left[ \sum_{m=0}^n 
+        (-1)^m
+        \ket{n-m_{H1}, m_{V1}, m_{H2}, n-m_{V2}}
+    \right]\\
+    &=
+        \vacuum
+        + \gamma \ket{1_{H1}, 0_{V1}, 0_{H2}, 1_{V2}}
+        - \gamma \ket{0_{H1}, 1_{V1}, 1_{H2}, 0_{V2}} + \text{h.f.}
+\end{align}
+After post-selection on detection of one photon in each spatial mode and re-normalization this is equivalent to
+\begin{equation}
+    \ket{\Psi^-} = \frac{1}{\sqrt{2}}\left(\ket{H_1V_2} - \ket{V_1H_2}\right),
+    \label{eqn:type-ii-bell}
+\end{equation}
+which is a maximally entangled Bell state (section \ref{sec:entanglement}).
+
+Most of the experimental work in this thesis makes use of type-I \gls{spdc} to generate indistinguishable photon pairs, both in the CW and pulsed regimes. The exception is section \ref{sec:noisy-entanglement-witness}, in which type-II \gls{spdc} is used to generate polarization-entangled states in the form of (\ref{eqn:type-ii-bell}).
+
+\subsection{Detectors} 
+\label{sec:detectors}
+In order to read-out quantum information from a photonic system, we must almost always use single-photon detectors. Classical detectors, sensitive only to macroscopic light intensity, are usually not sufficient to obtain a quantum advantage. When a single photon, (typically with energy $\hbar \omega \approx \SI{10e-21}{\joule}$) is incident on the active area of a single-photon detector, we would like to raise a macroscopic, classically accessible flag or signal. Ideally, this process would be deterministic and fast, allowing detection events to be correlated in time. Such an idealised single-photon detector, acting on a mode $k$, is described in the Fock basis by the projector $\Pi_d = \ket{1_k}\bra{1_k}$, with
+\begin{equation}
+    \mathrm{Tr} \left( \Pi_d \vacuum \bra{\mathbf{0}}\right) = 0 ~;\quad \mathrm{Tr} \left( \Pi_d \ket{1} \bra{1} \right) = 1.
+\end{equation}
+All practical single-photon detectors face the difficulty of amplifying the small change in energy imparted by a single photon to the macroscopic level. As a result, real-world single-photon detectors suffer from a number of imperfections, the most significant of which is limited detection (quantum) efficiency. Strong amplification also leads to electrical noise, which manifests as so-called \emph{dark counts} --- signals which positively indicate single-photon detection, when no photon was incident on the detector. Moreover, all electronic signals suffer from timing uncertainty or \emph{jitter}, limiting the timing resolution of the device. The amplification process is often based on an avalanche or breakdown from an initial fragile state, leading to a finite \emph{dead-time}, during which the detector is unresponsive. Finally, the majority of existing single-photon detectors generate the same output signal for all Fock states other than the vacuum --- that is, they are not sensitive to the photon \emph{number}. In section \ref{sec:detection-scheme}, we experimentally test pseudo-number resolving detectors constructed from many non-number-resolving parts.
+
+The detectors used throughout this thesis were \emph{Perkin-Elmer} silicon \glspl{apd}, operating in Geiger (free-running) mode. A strong reverse bias is applied to a silicon P-N junction, such that a single incident photon is sufficient to raise an electron from the valence band into the conducting band, triggering an avalanche of electric current amplification, and leading to a voltage pulse across the diode. This pulse is detected and conditioned by a digital microprocessor, which ultimately outputs a clean TTL pulse for time-correlated counting. Silicon \glspl{apd} typically achieve a quantum efficiency of \SI{\sim60}{\percent} at \SI{808}{\nano \metre}, although this can vary significantly between devices, and exhibit typical dark-count rates on the order of \SI{100}{\hertz}. While the diode itself is maintained significantly below room temperature by a Peltier cooling system, Si \glspl{apd} do not require cryogenic cooling, facilitating our experiments. 
+
+\subsection{Integrated quantum photonics} 
+\label{sec:integrated-quantum-photonics}
+% Bulk till 2008
+Bulk optics has historically been very successful as a platform for proof-of-principle tests of quantum physics, as well as rapid prototyping of quantum technologies. However, this approach --- in which \si{\centi\metre}-scale optical elements are bolted to a \SI{\sim 3}{\metre} $\times$ \SI{1.5}{\metre} optical bench weighing \SI{\sim 1}{\tonne} --- is not expected to scale to experiments demanding large numbers of photons or qubits. First, there is simply not enough physical space in a typical laboratory. Secondly, as the complexity of the optical apparatus is increased, the demand on the experimentalist in terms of alignment and stabilization grows rapidly.
+
+%Ever since the earliest demonstrations of general-purpose computing machines, there has been interest in the idea of an all-optical classical computer. During the 20th century this idea fell out of favour, in light of the success of electronic computers. However, 
+
+In recent years, as optical networking, energy efficiency, and parallelism have become increasingly important for general-purpose computing, there has been renewed interest in 
+the all-optical transport, switching, and processing of large volumes of classical information. In the course of development of these technologies, which include optical interconnects and fast fiber-optic network switches, there has been considerable investment in the field of \emph{integrated photonics}: monolithic, miniaturized chips which generate, guide, manipulate and measure light.
+
+In 2008, Politi et al. reported \cite{Politi2008} the first demonstration of an \emph{integrated quantum photonic chip}. The authors used established commercial fabrication techniques to construct complex linear-optical networks of beamsplitters on a \si{\centi\metre}-scale optical chip. These devices were shown to support high-fidelity \cite{Laing2010a} classical and quantum interference of single photons generated by \gls{spdc}, with a reported \gls{hom}-dip visibility of $1.001\pm0.004\%$. These were the first results in what is now a broad field of \emph{integrated quantum photonics}.  Other early demonstrations include on-chip quantum metrology \cite{Matthews2009} and a compiled implementation of Shor's factoring algorithm \cite{Politi2009a}.
+
+\Gls{iqp} provides a reduction in the scale of optical circuits, by at least an order of magnitude with respect to bulk optics. Moreover, monolithic integration provides operational advantages, one of the most significant of which is intrinsic stability of optical phase and mode-matching. 
+%Since all optical elements are embedded in a monolithic slab of material, interferometers are no longer subject to noise due to mechanical vibration or thermal drift.  
+This inherent stability has since allowed a number of demonstrations using path-encoded qubits, which in bulk optics are extremely susceptible to mechanical vibration and thermal drift. 
+Moreover, owing to the degree of control and precision afforded by modern lithographic fabrication techniques, mode-matching at integrated beamsplitters can be very well-engineered, further improving the visibility of quantum and classical interference.
+These advantages in scale and stability immediately enabled the demonstration of quantum effects in circuits which would be unmanageably complex in a bulk-optical setup. Peruzzo \cite{Peruzzo2010} reported quantum walks of photon pairs in an array of 21 sites  (see section \ref{sec:quantum-walks}), as well as quantum interference in a 4-mode coupler \cite{Peruzzo2011}.
+Since the on-chip propagation distance can be much smaller than that of the equivalent bulk setup, integrated quantum photonic chips can also serve to reduce net photon loss, accelerating the speed at which experiments can be performed.
+
+The first demonstrations of \gls{iqp} used a lithographically-fabricated glass (silica)-based material system (section \ref{sec:silica-on-silicon}). More recent demonstrations have highlighted the potential benefits of various alternative materials and fabrication techniques. Of particular interest is the prospect of integrated \glspl{sps} and single-photon detectors, together with classical digital electronics, potentially enabling a full quantum system-on-a-chip. Integrated spontaneous sources have been reported in silicon \cite{Matsuda2012, Silverstone2013} and lithium niobate \cite{Sohler2008}. Integration of optical waveguides with high-efficiency superconducting single-photon detectors was reported by Calkins et al. \cite{Calkins2013}. Increasingly sophisticated devices \cite{Spagnolo2013, Crespi2011, Tillmann2013} have recently been fabricated using a direct-write technique \cite{Marshall2009}, which also allows for three-dimensional waveguide structures \cite{Poulios2013, Rechtsman2013}.
+
+In the following section, we describe the design and implementation of a novel quantum photonic chip, incorporating two path-encoded qubits. We then go on to show the utility and flexibility of this chip in chapters \ref{chap:delayed-choice}--\ref{chap:quantum-chemistry}. This device, if constructed in bulk, would occupy a full optical bench --- clearly illustrating the significant practical advantage already afforded by \gls{iqp}.
+
+% References
+\bibliographystyle{unsrt}
+\bibliography{main.bib}

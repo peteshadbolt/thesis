@@ -1,0 +1,20 @@
+#!/bin/bash
+rm thesis.aux
+rm chapter1/chapter1.aux
+rm chapter2/chapter2.aux
+rm chapter3/chapter3.aux
+rm chapter4/chapter4.aux
+rm chapter5/chapter5.aux
+rm chapter6/chapter6.aux
+rm chapter7/chapter7.aux
+pdflatex thesis.tex
+bibtex chapter1/chapter1.aux
+bibtex chapter2/chapter2.aux
+bibtex chapter3/chapter3.aux
+bibtex chapter4/chapter4.aux
+bibtex chapter5/chapter5.aux
+bibtex chapter6/chapter6.aux
+bibtex chapter7/chapter7.aux
+pdflatex thesis.tex
+makeglossaries thesis
+pdflatex thesis.tex

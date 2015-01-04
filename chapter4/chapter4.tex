@@ -1,0 +1,299 @@
+\begin{savequote}[100mm] 
+Any other situation in quantum mechanics, it turns out, can be explained afterwards by saying, ``you remember the case of the experiment with the two holes? It's the same thing.'' 
+\qauthor{Feynman}
+\end{savequote}
+
+\chapter{A Quantum Delayed-Choice Experiment}
+\label{chap:delayed-choice}
+
+\section{Introduction} 
+This chapter concerns the fundamental concept of \emph{wave-particle duality}. We begin with an introduction to the topic, and an overview of key results from the literature. We then demonstrate a variation on Wheeler's celebrated \emph{delayed-choice} experiment, in which the choice of the classical observer is replaced by the state of an ancillary quantum system. This allows two mutually exclusive measurement settings to be simultaneously entertained in coherent superposition, giving rise to continuous morphing between wave-like and particle-like behaviour. Our experimental results support the understanding that the photon is neither particle nor wave, and that it does not ``choose in advance'' to behave as one or the other. 
+
+In this discussion I have attempted to follow closely the approach of Richard Feynman \cite{Feynman1963}, and I draw on some insight due to David Z. Albert \cite{Albert1994}.
+
+\section{Young's double slit} 
+\label{sec:young-double-slit}
+Young's double slit is a thought experiment to do with waves and particles. By means of a simple apparatus, it reveals \emph{the one true mystery of quantum mechanics}. Young's double slit is a ``triangle'' (section \ref{sec:triangles}), in the sense that it is a contrived experiment whose results cannot be elegantly explained by classical laws. Attempts are often made to shoehorn this experiment into a classical framework, but none achieve the elegance and generality of the quantum mechanical formalism. In the course of this discussion, we will see that quantum systems are neither particles nor waves, and that they are neither here, nor there, nor in two places at once, nor nowhere at all! Thus Young's double slit exposes in a very simple way the inadequacy of our everyday classical language when dealing with quantum phenomena. 
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=0.99\textwidth]{chapter4/fig/young_double_slit.pdf}
+\caption[Young's double slit and the Mach-Zehnder interferometer]{Wave-particle duality. 
+    (a) Young's double slit experiment. Single quanta, for instance electrons or photons, are sent one-by-one towards a mask into which two holes ($A$, $B$) have been cut. On the far side of the shield the wavefunction of the particle interferes with itself, giving rise to a complex interference pattern in the distribution of detection events at an imaging screen. 
+Wave interference drawing taken from T. Young, Course of Lectures on Natural Philosophy and the Mechanical Arts, 1807.
+(b) Similar interference effects are seen in the Mach-Zehnder interferometer. The intensity of light and the probability of detection, in either detector varies as a sinusoidal function of the path length difference $\varphi$ in the interferometer.}
+\label{fig:young-double-slit}
+\end{figure}
+
+Consider a machine gun, pointed at a mask in which two holes ($A, B$) have been made. The holes can be opened or closed at will. The gun sprays bullets across some solid angle, and from time to time a bullet will go through one or other of the holes. At a screen on the far side of the mask, a bullet detector registers the arrival of the bullet and its position on the $x$-axis (figure \ref{fig:young-double-slit}(a)). Bullets are corpuscular, indistinguishable particles, which for the purpose of this discussion are assumed to be indestructible and pass through one hole only, never both at the same time. The number of bullets arriving at the detector in a single shot is either zero or one --- simultaneous detection of two bullets never occurs.
+
+Having fired many times and detected $N$ bullets, we can estimate the probability of detection at a particular point on the $x$-axis as $p_{AB}(x) = n_{AB}(x) / N$, where $n(x)$ is the total number of bullets detected at position $x$, and the subscript $AB$ denotes the case where both holes are open. The full probability distribution over $x$ consists of two overlapping lobes, corresponding to photons passing through holes $A$ and $B$ respectively (figure \ref{fig:young-double-slit}(a), curve (ii)). If we block hole $A$ we observe a single-lobed distribution $p_B(x)$ corresponding to photons passing through hole $B$  only, and vice-versa. The probability distribution observed when both holes are open is equal the sum of the single-hole distributions, $p_{AB} = p_A+p_B$. This is a direct implication of the fact that bullets, being solid and lumpy, do not \emph{interfere} with themselves.
+
+Now we replace the machine gun with a source of waves. Perhaps stones are thrown into a lake at an appropriate distance, such that sinusoidal plane waves are incident upon the mask. 
+%If the source is far enough from the mask, we can assume that by the time the waves reach it they are well approximated by a sinusoidal plane wave.  
+These waves pass through the holes $A$ and $B$, and finally arrive at a detection screen at the far side. The depth $d(t)$ of the water rises and falls continuously in peaks and troughs, and is not discrete or countable.  The detection screen is sensitive only to the \emph{average} disturbance, energy dissipation at a point, or \emph{intensity}, a continuous variable $I_{AB}(x) \propto \int d(x, t)^2 dt$ at position $x$ on the screen. 
+
+%At any instant in time, this intensity is distributed across the screen and is not localised at one point.  
+If we perform this experiment using water, or light, or any other kind of wave, we see a complex distribution of intensity as shown in figure \ref{fig:young-double-slit}(a), curve~(i). Part of this complexity is due to wave interference. A single wavefront from the source passes through \emph{both} holes at once, giving rise to wave components originating from each of the two holes, whose peaks arrive at a given point on the screen with differing \emph{phase} by virtue of the geometrical difference in path length. Two peaks together give a large intensity, while a peak and a trough cancel out. The function describing $I_{AB}$ is thus composed of a $sinc$ term, corresponding to diffraction through a \emph{single} hole, and a sinusoidal term due to wave interference between the two holes.  If we block hole $B$, $I_{A}(x)$ reduces to a $sinc$ function only, and all interference effects disappear. As a result, $I_{AB}\ne I_{A}+I_{B}$, in strong contrast with bullets. 
+
+What happens if we repeat this experiment using a source of quantum particles? Here we will discuss photons, but essentially identical results are observed for electrons, atoms, and even large molecules such as $C_{60}$ (buckminsterfullerene) \cite{Arndt1999}.  
+%In place of a machine gun or wave generator, 
+We take a source which, upon pressing a button, generates a single photon --- the Fock state $\ket{1} = a^\dagger \ket{0}$. A single-photon detector (see section \ref{sec:detectors}) is arranged at a position $x$ on the far side of the mask, in the plane of the screen. 
+%This might be an APD, a photomultiplier or a single-photon sensitive CCD array (see section \ref{sec:single-photon-detectors}). 
+A photon is sent towards the holes,
+%. If it is not absorbed by the wall, or otherwise lost during its journey from source to detector, 
+and with some probability $p_{AB}(x)$ the detector will \emph{click}, generating an electrical pulse.  This output is binary --- either the detector clicks, absorbing $\hbar \omega$ of energy, or it does not. Using a true single-photon (Fock-state) source, simultaneous detection of a photon at two separate detectors is never observed (see section \ref{sec:coherent-state}). In this sense, photons behave very much like particles. They arrive at the detector as corpuscular, indivisible lumps, and it is natural to think that they might also \emph{travel} as such, physically passing through one hole or the other.
+
+Having fired many photons and registered $N$ detection events, as with bullets, we begin to saturate the probability distribution $p_{AB}(x) = n_{AB}(x)/N$. If photons are entirely particle-like, we expect to see two lobes, as in curve (ii). Instead, we measure probability distributions with the exact form of curve (i)! If we block one or other of the holes, we recover single-lobed $sinc$-like probability distributions, as with water waves.  Thus the photonic probability distribution does \emph{not} obey $p_{AB} = p_{A}+p_{B}$, and can only be described in terms of wave interference between components arising simultaneously from holes $A$ and $B$. Now we encounter a serious philosophical problem. 
+
+It is natural to ask: \emph{where was the photon} when it passed through the holes? Did it travel through a single hole, as a particle, or both, as a wave? If we take two detectors and place them inside holes $A$ and $B$, we only ever detect the photon at one hole or the other, never registering a detection event in both holes simultaneously. This must be true for energy to be conserved. 
+Now,
+\begin{itemize}
+    \item If the photon passed through \emph{one hole only}, and did not pass through the other, we cannot explain the wave interference effects observed.
+    \item If the photon passed through \emph{both holes simultaneously}, as if it were a wave, then it stands to reason that we could detect it at both holes simultaneously,  which \emph{never} occurs.
+    \item If the photon does not pass through either hole, then we would never detect it at all --- but we do.
+\end{itemize}
+So, the photon does not pass through hole $A$ nor hole $B$ alone, and it does not pass through both holes simultaneously, and it does not pass through \emph{neither} hole --- but it nevertheless arrives at the screen! In this experiment, the photon exhibits \emph{wave-particle duality}, seemingly travelling and arriving as a lump, as if it were a particle, but simultaneously exhibiting wave interference --- phenomena which are classically mutually exclusive.  Contained in this experiment is the full mystery of quantum mechanics.
+
+Young's double slit experiment was first convincingly performed by Sir Geoffrey Taylor in 1909, who used a gas flame together with smoked glass\footnote{The intensity of light in Taylor's experiment was roughly equivalent to a candle burning at a distance of one mile. J. J. Thompson's expectation, which turned out to be incorrect, was that the diffraction pattern should be modified in the limit of very low light levels, as the corpuscular nature of the photon appeared.}
+to generate ``feeble light'', and observed interference fringes in the shadow cast by a sewing needle \cite{Taylor1909}. In 1961, the experiment was first performed using electrons \cite{Jonsson1974}. More recent experimental results include double-slit interference of Buckminsterfullerene \cite{Arndt1999}, and an electron interference experiment using micromachined slits \cite{Bach2013} which could be opened and closed at will.
+
+%FUTURE: Discussion of extensions to Young, inc. Steinberg et al.
+
+\subsection{Wave-particle duality in the MZI}
+Throughout the rest of this chapter, it will be convenient to modify the experimental arrangement somewhat with respect to Feynman's original proposal. Figure \ref{fig:young-double-slit}(b) shows a Mach-Zehnder interferometer (MZI, section \ref{sec:mach-zehnder-interferometer}), which exhibits all of the essential behaviour of Young's double slit, but is somewhat easier to analyse. Single photons are sent into one input port of $BS_1$, pass through the two paths of the interferometer and interfere with themselves at $BS_2$. 
+The two arms of the interferometer have a path length difference $\varphi$.
+$BS_1$ assumes the role of the shield and holes, and $BS2$ provides an interface at which the two beams may interfere, in a similar role to the screen. Two detectors, $D_0$ and $D_1$, record single-photon detection events at each output port of $BS_2$. The probability of detecting a photon at a given detector is a sinusoidal function of $\varphi$:
+\begin{equation}
+    p(D_0)=\cos^2\left(\frac{\varphi}{2} \right)~;~~ p(D_1)=\sin^2\left(\frac{\varphi}{2} \right).
+\end{equation}
+In this interference pattern we clearly see the wavelike properties of the photon. 
+
+In the double-slit scenario discussed previously, the screen is deliberately placed at a considerable distance from the shield such that diffraction patterns from the two slits overlap at the screen. Detection of a photon at a point $x$ therefore does not yield any information about which path (hole) was taken. It is easy to see that if the screen is placed in the near-field, without any overlap, full which-way information is obtained upon detection --- but no interference (wave-like) effects are seen. An analogous choice of measurement setting can be performed in the MZI. When $BS_2$ is removed from the interferometer, every detection event tells the observer whether the photon took the upper or lower path --- full which-way information --- but the interference pattern necessarily cannot be observed. In this case the detection probabilities no longer depend on $\varphi$:
+\begin{equation}
+    p(D_0)=\frac{1}{2}~;~~ p(D_1)=\frac{1}{2}
+\end{equation}
+If we define this mode of operation as fully particle-like behaviour, then we can view the removal of $BS_2$ as switching from wave-like to particle-like measurement apparatus, where each configuration reveals a complementary aspect of the photon.
+%In every single-photon measurement, regardless of the experimental setup, the output of a single-photon detector is discrete --- photons arrive in countable, particle-like lumps. However, by switching $BS_2$ in and out of the interferometer, we can switch between a measurement which fully reveals wave-like behaviour to one in which photons behave exactly as though they were classical particles, probabilistically choosing one path or the other. 
+
+%\subsection{Nonlocality in Young's double slit}
+%\label{sec:single-photon-nonlocality}
+%FUTURE: nonlocality in young's double slit
+
+\subsection{Complementarity}
+\label{sec:complementarity}
+Niels Bohr's \emph{complementarity} is the fundamental physical principle at the heart of the Copenhagen interpretation of quantum theory, and enforces limitations on the interface between quantum systems and the classical data available to an experimentalist. It states that in order to observe complementary properties of a quantum system, an experimentalist must necessarily employ mutually incompatible arrangements of the measurement apparatus. Complementarity was characterized by Bohr as follows:
+\begin{quote}
+    ``\ldots it is only the mutual exclusion of any two experimental procedures, permitting the unambiguous definition of complementary physical quantities, which provides room for new physical laws'' \cite{Bohr1935a}
+\end{quote}
+In Young's double slit, as we have already seen, we can arrange the apparatus so as to measure particle-like behaviour of the photon, \emph{watching} it take one path or the other. However, in order to see wavelike interference effects from which the phase $\varphi$ can be inferred, we must adopt an experimentally incompatible measurement setup, obscuring all which-way information. That we cannot use both measurement setups at once is not merely a consequence of inadequate apparatus, or lack of imagination on behalf of the experimentalist.  It is simply a consequence of the fact that experimental data is by definition classical --- pencil marks on a piece of paper,  or magnetic domains on a hard disk --- and cannot therefore exist in quantum superposition.  Thus, as was emphasized by Bohr, a single configuration of any given measurement apparatus may only reveal \emph{part} of the quantum mechanical phenomenon. Only by use of multiple configurations or instances of the classical measurement apparatus is the fullness of wave-particle duality, or any other quantum effect, revealed. 
+
+Bohr's principle has only very recently been successfully quantified in \emph{universal complementarity relations}, such as those due to Ozawa and Hall \cite{Hall2004, Ozawa2003}. It was shown that if two incompatible observables $\hat{A}$ and $\hat{B}$, $[\hat{A}, \hat{B}]\ne0$ are approximated by $\hat{A}_{est}$ and $\hat{B}_{est}$,  $[\hat{A}_{est}, \hat{B}_{est}]=0$, then the rms error $\epsilon(\hat{G}_{est}) \equiv \langle(\hat{G}_{est} - \hat{G})^2\rangle ^{1/2}$ in measurements of these observables must satisfy
+\begin{equation}
+    \epsilon(\hat{A}_{est})  
+    \epsilon(\hat{B}_{est})  
+    +
+    \epsilon(\hat{A}_{est})  
+    \Delta \hat{B}
+    +
+    \Delta \hat{A}
+    \epsilon(\hat{B}_{est})  
+    \ge \frac{c}{2}
+    \label{eqn:universal-complementarity}
+\end{equation}
+where $\epsilon(\hat{G}_{est}) \equiv (\langle\hat{G}^2\rangle - \langle\hat{G}\rangle^2) ^{1/2}$ is the \emph{spread} in the quantity $G$. This formalizes the notion that although the inaccuracy in either observable can individually be made arbitrarily small, one cannot simultaneously measure both to an arbitrary degree of accuracy. This relation was recently experimentally tested by Weston et al. \cite{Weston2013} under conditions in which previously discovered, non-universal complementarity relations fail.
+
+Complementarity lies at the heart of the Copenhagen interpretation of quantum mechanics. In contrast with de Broglie-Bohm carrier-wave theory \cite{Bohm1995} (in which the photon has a literal particle-like trajectory even when unobserved) and the many-worlds interpretation due to Everett \cite{Everett1956} (in which wavefunction collapse does not occur at all), complementarity states that the photon is neither particle-like nor wavelike until it is measured, at which point the wavefunction collapses in accordance with the choice of measurement apparatus.
+
+ % Setups of Wheeler's delayed choice and quantum delayed choie
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{chapter4/fig/3d_setups.pdf}
+\caption[Wheeler's (quantum) delayed choice experiment]{
+(a) Wheeler's delayed choice experiment. A photon is sent into a Mach-Zehnder interferometer. Upon arrival at the first beamsplitter $BS_1$, it is split into quantum superposition across both paths. A space-like separated random number generator (RNG) then toggles a fast optical switch, closing or opening the interferometer by insertion or removal of $BS_2$, leading to wave-like or particle-like measurement of the photon respectively. Two detectors, $D_0$ and $D_1$, reveal wave-like behaviour in the event that the interferometer is closed, otherwise particle-like statistics are seen.
+(b) Quantum delayed choice. The optical switch is replaced by a quantum-controlled beamsplitter: a controlled-Hadamard gate. An ancilla photon controls this gate: ancilla states $\ket{0}$ and $\ket{1}$ lead to presence and absence of $BS_2$ respectively. By preparing the ancilla in a superposition state, $BS_2$ is effectively placed into a superposition of present and absent, leading to a superposition of wave-like and particle-like measurement.
+}
+\label{fig:delayed-choice-setups}
+\end{figure}
+ %End setups figure
+
+\section{Wheeler's delayed choice experiment}
+Upon first encountering Young's double slit experiment, many physicists are disturbed by its implications. This discomfort does not typically reduce as a function of time --- with greater understanding it should increase! It is nonetheless natural to attempt to find comfort in a classical understanding of the experiment, where meaningful comparison can be drawn between the behaviour of the photon and that of everyday objects in the macroscopic world.
+
+One such classical explanation is very simple to imagine, if somewhat extravagant in conception. Let us allow that the photon is \emph{sentient}, or is otherwise able to examine and assess the experimental apparatus prior to measurement. 
+If the photon determines that measurement device is arranged so as to reveal particle-like behaviour --- that is, $BS_2$ is removed from the interferometer --- then before it reaches $BS_1$, the decision is made to become \emph{fully particle-like}, throwing away all wave-like properties. Upon arrival at $BS_1$ the photon chooses one path or the other, exactly as though it were a particle.  It then propagates through the apparatus with impunity, ultimately reproducing exact particle-like statistics: $p(D_0)=p(D_1)=1/2$. If $BS_2$ is instead present, corresponding to a wave-like measurement, the photon decides in advance to adopt a fully wave-like nature. Wave interference is then observed at the detectors, from whose output the phase $\varphi$ may be inferred, without any need for the photon to choose a particular path upon arrival at $BS_1$. 
+
+Complementarity and the necessity of incompatible measurement devices make it difficult to distinguish this pseudo-classical hidden-variable model from the quantum mechanical reality. A particularly elegant approach, which makes life very hard for the sentient photon, was proposed by John Wheeler in 1978 \cite{Wheeler1978, Wheeler1984}. The trick in Wheeler's \emph{delayed-choice} experiment, shown in figure \ref{fig:delayed-choice-setups}(a), is to postpone the choice of measurement apparatus until such time as the photon is inside the interferometer. Once the photon has passed $BS_1$, a fast classical switch is used to remove or insert $BS_2$ at will. Now, upon arrival at $BS_1$, the photon must choose to behave as particle or wave \emph{without prior knowledge of the measurement apparatus}. Hence, if it is true that the photon adopts the pathological classical behaviour described above, we expect to see a deviation from the quantum predictions.
+
+Delayed-choice experiments have been performed in a variety of physical systems \cite{Alley1987, Hellmuth1987,Lawson-Daku1996,Kim2000,Jacques2007}, all of which confirm the quantum predictions. Of particular significance is a recent result \cite{Jacques2007} of Jacques et al., in which relativistic space-like separation between the random choice of measurement setting and the entry point of the interferometer ($BS_1$) was achieved for the first time. Here, a nitrogen vacancy colour centre in diamond was used as the source of single photons, ensuring extremely close approximation to the Fock state $\ket{1}$. An electro-optic phaseshifter, controlled by a quantum random number generator at 4.2MHz, was used to implement the choice of measurement setting. 
+
+
+
+\section{Quantum Delayed Choice} 
+In delayed-choice experiments, the choice of the observer is generally implemented using a classical optical switch, fast enough to effectively insert or remove $BS_2$ while the photon is still in flight. This classical-controlled beamsplitter is driven by a single bit from a random number generator, or the free and independent choice of the experimentalist.  The main distinguishing feature in our work 
+is that the classical random bit is replaced by an ancilla qubit $\ket{\psi}_a$, which drives a \emph{quantum-controlled beamsplitter}, as shown in figure \ref{fig:delayed-choice-setups}(b). 
+This configuration was first proposed in a theoretical work due to Radu Ionicioiu and Daniel Terno \cite{Ionicioiu2011c},
+
+It is helpful in this analysis to note that Wheeler's interferometer and photon together form a path-encoded qubit (see section \ref{sec:path-encoding}), where the $\ket{1}_s$ and $\ket{0}_s$ states correspond to a photon in the upper and lower arms of the interferometer respectively.  In our experiment the ancilla qubit is also path-encoded, and is implemented using a second photon. We will refer to these as the \emph{system} and \emph{ancilla} photon/qubit/interferometer respectively. 
+
+Upon arrival at $BS_1$, the system photon splits into a coherent superposition over the upper and lower  spatial modes of Wheeler's interferometer, 
+\begin{equation}
+\ket{\psi}_s = \hat{BS_1}\ket{0}_s = \frac{1}{\sqrt{2}}\left(\ket{0}_s + \ket{1}_s\right),
+\end{equation}
+and is then phase-shifted due to the path-length difference $\varphi$
+\begin{equation}
+    \ket{\psi}_s \xrightarrow{\varphi} \ket{\psi_{particle}}_s = \frac{1}{\sqrt{2}}\left(\ket{0}_s + e^{i\varphi}\ket{1}_s\right).
+\label{eqn:system-qubit-particle}
+\end{equation}
+If the ancilla qubit is prepared in the state $\ket{0}_a$, the quantum-controlled beamsplitter does not act, and $BS_2$ is effectively absent. The interferometer is thus left open, and the final state of the system is simply given by (\ref{eqn:system-qubit-particle}). In this case, the probability of detecting the system photon in either detector is $p(D_0) = p(D_1) = |\overlap{0}{\psi}_s|^2 = 1/2$. Every detection event yields full which-way information, and no wave interference is observed.
+
+If the ancilla is instead prepared in $\ket{1}$ the quantum-controlled beamsplitter always acts on the system qubit, closing the interferometer. This gives rise to wave interference such that 
+\begin{equation}
+    \ket{\psi}_s \xrightarrow{BS_2} \ket{\psi_{wave}}_s = \cos\frac{\varphi}{2}\ket{0}_s + \sin \frac{\varphi}{2}\ket{1}_s.
+\label{eqn:system-qubit-wave}
+\end{equation}
+The probability that the system photon is detected at $D_0$ is now a sinusoidal function of the phase, $p(D_0) = \cos^2\left(\frac{\varphi}{2}\right)$, and $p(D_1) = \sin^2\left(\frac{\varphi}{2}\right)$.  
+Formally, the quantum-controlled beamsplitter is then equivalent to the controlled-Hadamard operation $CH$--- a maximally-entangling two-qubit gate --- acting on the system qubit, with the ancilla as the control: 
+\begin{eqnarray}
+&U_{CH}=\ket{0_a0_s}\bra{0_a0_s} + \ket{0_a1_s}\bra{0_a1_s} + 
+\ket{1_a+_s}\bra{1_a0_s} + \ket{1_a-_s}\bra{1_a1_s} \nonumber \\
+&=
+ \left(
+\begin{array}{cccc}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\
+0 & 0 & \frac{1}{\sqrt{2}} & \frac{-1}{\sqrt{2}} 
+\end{array}
+\right).
+\label{eqn:controlled-hadamard}
+\end{eqnarray}
+When the ancilla qubit is prepared in a generalized superposition state 
+\begin{equation}
+\ket{\psi}_a=\cos(\alpha)\ket{0}_a+\sin{\alpha}\ket{1}_a,
+\label{eqn:delayed-choice-ancilla}
+\end{equation}
+the second beamsplitter $BS_2$ is effectively placed in a coherent superposition of present and absent. 
+The global state of the two qubits then evolves to 
+\begin{equation}
+    \begin{split}
+    \ket{\Psi_f(\alpha, \varphi)} = 
+    &\cos \alpha ~ \ket{0}_a \otimes \ket{\psi_{particle}(\varphi)}_s\\
+    +&\sin \alpha ~ \ket{1}_a \otimes \ket{\psi_{wave}(\varphi)}_s
+\end{split}
+\end{equation}
+which is entangled for $0 < \alpha < \pi/2$ --- maximally so for $\alpha = \pi/4$ and $\phi = \pi/2$.
+The detection probability at $D_0$ is given by
+\begin{eqnarray}
+    p(D_0)(\varphi, \alpha) &=& p(D_0)_{particle} \cos^2\alpha + p(D_1)_{wave} \sin^2\alpha \nonumber \\
+&=&  \frac{1}{2} \cos^2\alpha + \cos^2(\frac{\varphi}{2}) \sin^2\alpha
+\label{eqn:intensity}
+\end{eqnarray}
+and $p(D_1) = 1 - p(D_0)$.  Hence, in contrast with traditional implementations of Wheeler's delayed choice experiment, we are able to tune coherently and \emph{continuously} between particle-like ($\alpha=0$) and wave-like ($\alpha=\pi$) statistics. 
+
+An important distinguishing feature of the quantum delayed-choice setup concerns the ordering of events. Note that since the dynamic classical switch of Wheeler's traditional experiment is replaced by a static controlled-unitary operation, there is no longer any ``delayed choice'' in this delayed-choice experiment, and there is no need for fast switching. If the ancilla is (for example) prepared in an equal superposition, it travels balistically through the device without any explicit choice of measurement setting ever being made. Before either photon is detected, the choice of measurement setting remains in coherent superposition, encoded in the \emph{entangled} state of system and ancilla. Only when the ancilla is detected does the wavefunction collapse to one or other measurement setting. As a result, the specific timing of the choice measurement setting is inconsequential, and can even be performed \emph{after} the system photon has been detected.
+
+ %Fringe figure
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{chapter4/fig/chip.pdf}
+\caption[Quantum delayed-choice experiment: experimental setup]
+{
+The \acrshort{cnotmz} provides all the necessary hardware and a sufficient degree of reconfigurability to implement a quantum delayed-choice experiment. Wheeler's interferometer is mapped to  the target qubit of the \acrshort{cnotmz}, with $dc_2$ and $\phi_2$ in the roles of $BS_1$ and the internal phase shift $\varphi$
+respectively. The ancilla qubit is prepared using $dc_1$ and $dc_3$ together with phase shifter $\phi_1$. The quantum-controlled beamsplitter is constructed from the linear optical $CZ$ gate --- three directional couplers ($dc_6$, $dc_7$ and $dc_8$) with coupling ratio $1/3$ --- and single-qubit $W$ gates implemented using $dc_4$, $dc_5$, $dc_{9}$, and $dc_{11}$ together with $\phi_4$ and $\phi_6$.
+For certain values of $\alpha$ and $\varphi$, the output state of the $CH$ gate is entangled. By measuring each qubit in a particular set of measurement bases controlled using $U_{Alice}$ and $U_{Bob}$, we are able to violate a Bell inequality on $\ket{\Psi_f}_{as}$, thus ruling out local hidden variable models in which the photon decides in advance to behave as a particle or wave.}
+\label{fig:delayed-choice-chip}
+\end{figure}
+ %End fringe figure
+
+
+\subsection{Experimental setup} 
+As we have already noted, the quantum delayed-choice arrangement of \cite{Ionicioiu2011c} can be seen as a system of two path-encoded qubits, where the quantum-controlled beamsplitter is implemented by a $CH$ gate. It turns out that the \acrshort{cnotmz} device described in chapter \ref{chap:cnot-mz} provides all the necessary hardware and a sufficient degree of reconfigurability to implement the experiment, as outlined in \ref{fig:delayed-choice-chip}.
+
+As in chapter \ref{chap:cnot-mz}, two photons from an SPDC source are used to encode two qubits in pairs of waveguides. Wheeler's interferometer is implemented using the state preparation stage of the target qubit. The system photon is coupled into the chip, whereupon it is split across two paths by $dc_2$, a 50/50 directional coupler. Wheeler's phase, $\varphi$, is controlled by a thermal phaseshifter ($\phi_2$). 
+The ancilla photon is injected into the upper two waveguides on the device (previously referred to as the control qubit). State preparation of the $\ket{\psi}_a$ is accomplished using the MZI formed by directional couplers $dc_1$ and $dc_3$, where phase shifter $\phi_1$ controls the $\alpha$ parameter.
+
+ %Fringe figure
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{chapter4/fig/fringes.pdf}
+\caption[Morphing between wave-like and particle-like behaviour.]{Continuous morphing between wave-like and particle-like behaviour of the system photon, as a function of the state of the ancilla qubit $\ket{\psi(\alpha)}_a$. (a) Experimentally measured probability of detection at $D_0$, conditional on detection of a second photon at either $D_2$ or $D_3$ (white dots). The surface is a fit to the data, using equation \ref{eqn:intensity} with an additional prefactor to  account for limited visibility of quantum interference. (b) Ideal (simulated) behaviour.
+}
+\label{fig:delayed-choice-morph}
+\end{figure}
+ %End fringe figure
+
+
+The $CH$ gate is implemented using the non-deterministic postselected linear-optical $CZ$ gate previously described (couplers 6,7,8, section \ref{sec:ralph-cnot}). The $CH$ gate is equivalent to $CZ$ up to local rotations. Specifically, 
+\begin{equation}
+U_{CH} = (I \otimes W) U_{CZ} (I \otimes W)
+\end{equation}
+where 
+\begin{equation}
+W = 
+\left(
+\begin{array}{cccc}
+\cos\frac{\pi}{8} & \sin\frac{\pi}{8} \\
+\sin\frac{\pi}{8} & -\cos\frac{\pi}{8} \\
+\end{array}
+\right).
+\end{equation}
+Implementing $W$ gates using directional couplers $dc_4$, $dc_5$, $dc_{9}$ and $dc_{11}$ together with phaseshifters $\phi_4$ and $\phi_6$, we can thus implement a controlled-Hadamard gate on the system qubit, effectively closing or opening the interferometer containing $\phi_2$ depending on the state of the ancilla. As with linear-optical $CZ$ and \acrshort{cnotp} gates, this gates succeeds  with $1/9$ probability and its operation depends on high visibility quantum interference, requiring that the ancilla and system photons are indistinguishable in all degrees of freedom.
+
+Four silicon APDs are used to detect single photons at the output of the chip. As before, we only register a subset of two-photon coincidence events ($D_0D_2$, $D_0D_3$, $D_1D_2$, $D_1D_3$) so as to post-select on successful operation of the entangling gate.
+
+
+\subsection{Results} 
+
+When sweeping the phase $\varphi$ in Wheeler's interferometer, we should see qualitatively different behaviour of the system photon depending on the ancilla phase $\alpha$. Specifically, when $\alpha = \pi/2$ we expect to see a sinusoidal wave interference pattern in the probability of detection at $D_0$ and $D_1$, while for $\alpha=0$ we should see no interference. For intermediate values of $\alpha$, we expect continuous morphing between wave-like and particle-like behaviour, as the effective probability amplitude for the presence of $BS_2$ is gradually reduced. Experimental data exhibiting this effect is shown in figure \ref{fig:delayed-choice-morph}. We measured $p(D_0)$ and $p(D_1)$ for 21 values of $\varphi$ in the interval $\left[\pi/2, 5\pi/2\right]$ and 11 values of $\alpha$ in the interval $\left[0, \pi/2\right]$.
+
+A similar experiment was carried out at the same time \cite{Kaiser2012} by Kaiser et al. in the group of S\'ebastien Tanzilli (Nice). In contrast with our work, the authors make use of polarization entanglement directly from the SPDC source, rather than implementing a non-deterministic linear-optical entangling gate, and do not make use of path-encoding. The authors measure morphing between particle and wave behaviour qualitatively identical to the result shown in figure \ref{fig:delayed-choice-morph}, again with extremely good agreement between experiment and theory.  The decision to use polarization encoding in this implementation is largely motivated by the fact that stable Mach-Zehnder interferometers are difficult to construct in a bulk architecture. This perhaps highlights the fact that the technological advances of integrated quantum photonics, although intended primarily as a route to scalable quantum computation and practical quantum technologies, also provide advantages for more fundamental scientific investigations.
+
+\section{Device-independent tests of wave-particle duality} 
+The principal goal of delayed-choice experiments is to test the classical, hidden-variable hypothesis that the photon decides in advance to behave as a particle or a wave. Although as experimentalists we place a certain amount of trust in the notion that the behaviour of our experimental apparatus is repeatable and consistent, we must concede that the result shown in \ref{fig:delayed-choice-morph} does not absolutely rule out the hidden-variable model. Even though we have good reason to believe that the ancilla qubit is truly placed in the coherent superposition (\ref{eqn:delayed-choice-ancilla}), the morphing behaviour in figure \ref{fig:delayed-choice-morph} could also be explained if it is instead prepared in the mixed state 
+\begin{equation}
+    \dema_a = \cos^2(\alpha) \ket{0}\bra{0}_a+\sin^2(\alpha)\ket{1}\bra{1}_a.
+\end{equation}
+Under these circumstances the ancilla qubit can be equally replaced by a classical random bit with $p(0)=\cos^2(\alpha)$, whose state is decided \emph{before} the system photon passes the first beamsplitter. The system photon is thus free to play the old trick of examining the experimental apparatus --- including this random bit --- in order to choose particle or wave behaviour in advance, and the result of figure \ref{fig:delayed-choice-morph} thus admits a classical, hidden-variable model.
+
+ %CHSH figure
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{chapter4/fig/chsh.pdf}
+\caption[Nonlocal statistics in a quantum delayed-choice experiment.]{CHSH parameter $S$ as a function of the phase $\varphi$ in Wheeler's interferometer and the ancilla parameter $\alpha$. All local hidden variable models satisfy $|S|\le2$. (a) Experimental data (white points), with a 2D sinusoidal fit. Points marked in yellow exhibit nonlocal statistics, violating Bell-CHSH. (b) Numerical simulation of ideal behaviour.
+}
+\label{fig:delayed-choice-chsh}
+\end{figure}
+ %End%chsh figure
+
+In order to show that the choice of measurement apparatus could not have been known in advance, we must ensure that the $CH$ gate exhibits unambiguously quantum behaviour under the circumstances of the quantum delayed-choice experiment. As we have already seen, the output of the $CH$ gate is ideally pure and entangled for almost all values of $\varphi$ and $\alpha$. As a result, we can test for quantum behaviour in a device independent way --- that is, without having to place any trust in the measuring apparatus --- by attempting to violate a Bell inequality (section \ref{sec:nonlocality}) using the bipartite state of the system and ancilla photon.
+
+\subsection{Results} 
+Experimentally, we give the ancilla qubit to Alice, who chooses from one of two measurement bases using the interferometer $U_{Alice}$ formed by $dc_{10}$ and $dc_{12}$, together with phaseshifters $\phi_5$ and $\phi_7$ and detectors $D_2$ and $D_3$. The system photon is assigned to Bob, who performs local measurements using $U_{Bob}$: $dc_{13}$ together with $\phi_8$ and detectors $D_0$ and $D_1$. The choice of measurement operators $\hat{A}_{0,1}, \hat{B}_{0,1}$ was tailored for the specific class of states generated in the quantum delayed-choice scenario --- the operators usually chosen for Bell-CHSH with the singlet state do not lead to violation here. We measured the Bell-CHSH parameter $S(\varphi, \alpha)$ over the same parameter space used in figure \ref{fig:delayed-choice-morph}, measuring a maximal violation $S(\pi/2, \pi/4) = 2.45 \pm 0.03$. Experimental data is shown together with a simulation in figure \ref{fig:delayed-choice-chsh}.
+
+Had we been able to perform the Bell test without succumbing to any loopholes, we could now conclude decisively that the photon does not choose in advance to behave as a particle or a wave. However, a loophole-free Bell inequality remains experimentally out of reach --- although progress continues to be made \cite{Scheidl2010, Giustina2013a} --- and our experiment does not in fact close \emph{any} of the standard loopholes.  For instance, we make the standard fair-sampling assumption (allowing us to discard inconclusive results and post-select on successful operation of the $CH$ gate.  The detection loophole remains open due to limited detection efficiency, and we must also assume independence between the operation of the photon source and the choice of measurement setting used in the Bell inequality test. As usual, if the photons could know in advance the choice of measurement setting in the Bell test, then a local model can mimic Bell inequality violations.  
+
+\subsection{Discussion} 
+The Greek philosopher Democritus (c. 460 BC) --- proponent of atomistic theory, scourge of Plato, and staunch advocate of cheerfulness --- is quoted by Schr\"odinger as having said, with respect to the fundamental makeup of the universe,
+\begin{quote}
+    ``By convention there is sweetness, by convention bitterness, by convention colour, in reality only atoms and the void.'' \cite{Durant1939}
+\end{quote}
+Democritus goes on to emphasize the importance of \emph{measurement}, and the difficulty with which experimental results are reconciled with our internal understanding of the world:
+\begin{quote}
+    ``Foolish intellect! Do you seek to overthrow [the senses], while it is from [them] that you take your evidence?''
+\end{quote}
+Even earlier, Lucretius (c. 99 BC) assigned a particle-like character to light:
+\begin{quote}
+``The light and heat of the sun; these are composed of minute atoms which, when they are shoved off, lose no time in shooting right across the interspace of air in the direction imparted by the shove.''
+\end{quote}
+The history of science has since been marked by intense debate between particle and wave theories of physics, in particular with respect to the nature of light.  In \emph{Opticks} \cite{Newton1704}, Isaac Newton describes a great many experiments exploring the ``reflections, refractions, inflections and colours of light''. Despite the emphasis of this work on optical wave phenomena, a central hypothesis is the corpuscular nature of light, in whose defence Newton cites the tendency to travel in straight lines and cast stark shadows --- ``light does not bend into the shadow''.  This understanding was later contested by the wave theories of Huygens, Young, and Maxwell in particular, whose theory of electromagnetic waves proved so powerful as to render the corpuscular theory untenable. 
+In the first decade of the 20$^{th}$ century, new explanations for the troublesome behaviour of of black-body radiation and the photoelectric effect, due to Planck and Einstein respectively, gave new legs to the idea of an indivisible particle of light with energy $\hbar \omega$, the photon, and ultimately lead to the quantum theory of light used throughout this thesis. 
+
+So, does the quantum delayed-choice experiment described here add anything to our scientific understanding of the nature of light? Certainly, all of our experimental results are consistent with known quantum theory, and this is of course true for the ``traditional'' delayed-choice and double-slit experiments. Since we do not close all possible loopholes, our Bell-CHSH inspired test does not achieve device-independence, although it certainly strengthens the argument that the $CH$ gate functions as advertised. It would be interesting to perform a more refined version of our experiment, with space-like separation of Alice and Bob and with loopholes closed, although it seems unlikely that this will be technologically feasible very soon.  I think that it is important to ask whether the quantum delayed-choice setup teaches us anything about the  photon over and above that which can be inferred from photonic Bell-CHSH tests. Can we construct self-consistent theories of quantum mechanics, in which the photon decides in advance to behave as a particle or a wave (in some meaningful sense), but which nonetheless permit Bell-CHSH violation? If not, then my impression is that this work provides a useful and attractive pedagogical tool, but nothing more.
+
+\section*{Statement of work}
+All of the experimental data presented here was measured jointly by Alberto Peruzzo and myself. 
+
+% References
+\bibliographystyle{unsrt}
+\bibliography{main.bib}

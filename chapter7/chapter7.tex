@@ -1,0 +1,26 @@
+\begin{savequote}[90mm] 
+Actually, if we wanted to, although it's expensive, we could put detectors all over [\ldots] and build up the whole curve simultaneously\ldots
+\qauthor{Feynman} 
+\end{savequote}
+
+\chapter{Increased complexity}
+\label{chap:hilbert-space-telescope}
+% Why do you want to build a camera, why do you want so many detectors
+\section{Introduction}
+A survey of the literature reveals a rich history of experiments in which $p$ photons are sent through an optical circuit with $m$ modes. The experimentalist looks to see where the photons went, examining spatio-temporal correlations using an array of single-photon detectors, in an effort to determine whether the experiment is (i) working properly and/or (ii) doing anything interesting.  
+
+In general, the number of possible detection patterns across $m$ modes grows as ${m \choose p}$, and can be extremely large even for modest values of $m$ and $p$. 
+It is therefore often convenient or even essential to use a greater number of detectors $d\le m$ than photons, allowing ${d \choose p}$ patterns to be monitored simultaneously. 
+True number-resolving single photon detectors (section \ref{sec:detectors}) are not currently widely available.  However, number-resolving detection can instead be achieved using multiplexed non-number-resolving detectors, again demanding the ability to operate and monitor many detectors in parallel.
+
+In this chapter we describe experiments using $\le$5 photons in $\le$21 modes, leading to tens of thousands of possible events. In order to efficiently assess the physics and performance of these experiments we need a detection system akin to a camera, capable of recording and correlating events across many detectors in parallel. To this end, we have constructed a novel detection system using 16 Si APD single photon detectors, supported by electronics and hardware capable of simultaneously monitoring all possible $p$-fold detection events up to $p=16$ in real-time. Owing to the capacity of this machine to efficiently photograph quantum states with very large Hilbert space dimension, we euphemistically refer to it as a \emph{Hilbert space telescope}.  This system has so far enabled at least three experiments which otherwise would not have been possible, two of which are described in this section\footnote{The third, completed very recently, is described in a pre-print \cite{Matthews2013b} due to Matthews et al.}.
+
+In section \ref{sec:quantum-walks} we describe experiments using up to five photons in structured and unstructured interferometers, designed to implement both \emph{quantum walks} and the so-called \bosonsampling problem. We reconstruct time-correlated images of the multiphoton output state of these devices, observing a clear signature of generalized bosonic bunching in Hilbert spaces of up to $\sim$50,000 dimensions. We make use of this capability to test two unique approaches to efficient verification of \bosonsampling.
+\input{chapter7/counting}
+\input{chapter7/walks}
+
+\section*{Statement of work}
+The majority of my contribution to work described in this section has been in the construction and programming of the counting system (section \ref{sec:counting}), as well as analysis of multiphoton data. I also performed many of the numerical simulations, and worked on data acquisition in the lab.
+
+\bibliographystyle{unsrt}
+\bibliography{main.bib}

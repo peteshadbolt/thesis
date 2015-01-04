@@ -1,0 +1,427 @@
+\chapter{Quantum Chemistry on a Photonic Chip}
+\label{chap:quantum-chemistry}
+
+\section{Introduction}
+In previous chapters we have seen that quantum mechanics permits strong nonlocal correlations which are classically forbidden. It turns out that this makes it very difficult to engineer a classical digital computer to mimic the behaviour of quantum systems --- it seems very likely that the general problem is classically intractable. However, we have good reason to believe that a quantum computer \emph{should} be able to efficiently simulate most quantum systems of interest. 
+
+In this chapter we  provide a proof-of-principle demonstration of a new algorithm for quantum computers that would give precise calculations of chemical energies and configurations in regimes where classical techniques either fail to give good answers or require exponential computing power.
+We first examine existing methods for the simulation of quantum systems on classical and quantum computers, with particular focus on quantum chemistry. We then describe our algorithm, and discuss its distinguishing features with respect to existing techniques. Finally, we use this algorithm in a two-photon experiment, simulating the Helium Hydride molecule on the \acrshort{cnotmz} chip previously described.
+
+\section{Simulating quantum mechanics}
+In a large laboratory in Washington DC, a robot arm originally designed to spot-weld car bodies has been installed. Stacked around the walls of the lab are 450,000 micro-test tubes, each containing a different chemical primitive. 24 hours a day, seven days a week, this arm, together with a computer vision system, tests prospective drugs for toxicity and efficacy against human-borne diseases \cite{S2008}. Drug discovery currently has a 99.9\% failure rate, accounting for a significant proportion of the billion dollars it takes to bring a new drug to market. The process of discovery of new high-temperature superconductors, catalysts, and  photovoltaics is not far removed from this trial-and-error approach. 
+
+In such fields as mechanical engineering, architecture, microelectronics and aerospace,  the design process can be made almost entirely deterministic owing to the power of computer models to predict the success or failure of a given design, without the need for real-world testing. In many cases the computer can itself become the designer, rapidly searching through a large parameter space for optimal geometries or structures.  Why is it that many drugs and new materials are not designed in this way?
+
+In \emph{Simulating physics with computers} \cite{Feynman1982d}, Feynman describes the intrinsic difficulty of simulating nature, as well as a radical new approach to the problem:
+\begin{quote}
+``Nature isn't classical, dammit, and if you want to make a simulation of nature, you'd better make it quantum mechanical, and by golly it's a wonderful problem, because it doesn't look so easy.''
+\end{quote}
+Here I will attempt to paraphrase Feynmans argument. Let us define a computer simulation of some physical system as being \emph{efficient} when the number of computer components required (gate operations, memory units and so on) is a polynomial function of the space-time volume of the physical system of interest. If, on the other hand, the necessary computational resources scale exponentially with the problem size, we say that the simulation is inefficient and --- if we have any ambition to tackle progressively larger problems ---  useless. There is generally speaking a one-way correspondence between the space or memory required by an algorithm and its execution time: roughly speaking, if an algorithm really needs an exponential amount of memory, it will not be able to even \emph{address} all that data in polynomial time, let alone solve the problem at hand. 
+
+Consider for example the problem of simulating a system of $n$ coins, each of which can be found in the state $H$ or $T$. The system has $2^n$ possible states:
+\begin{eqnarray*}
+   &H_0H_1H_2H_3\ldots H_n\\
+   &T_0H_1H_2H_3\ldots H_n\\
+   &\ldots\\
+   &T_0T_1T_2T_3\ldots T_n
+\end{eqnarray*} an exponentially large state space.
+However, the system only ever occupies \emph{one} of these states at a time. Thus the instantaneous state of a system of $n$ coins can always be efficiently represented by $n$ bits of memory, with a simple one-to-one mapping $H \rightarrow 0, T \rightarrow 1$. 
+
+Coins flips are often used as a source of randomness. Assuming each flip produces a random output, the expectation value of some function $f(X)$ of $n$ coin flips depends on the probability distribution over all possible outcomes:
+\begin{equation}
+   \langle f(X) \rangle = \langle f(x_0x_1\ldots x_n) \rangle = \sum_{j=1}^{2^n} f(x_j)p(x_j)
+   \label{eqn:big-expectation}
+\end{equation}
+where $x_j$ is the $j^{th}$ possible outcome of the classical random variable $X$ corresponding to $n$ coin flips. It may appear at first that in order to simulate such a probabilistic system of coins, we must represent the full probability distribution $P(X)$ in the computer's memory, and compute the behaviour of the system by directly evaluating expectation values of the form (\ref{eqn:big-expectation}). This would again render the problem intractable, since $P(X)$ has exponentially many entries. However, if we allow that the evolution of the computer from state to state can \emph{itself} be random, then we \emph{can} efficiently simulate the physics of coins --- simply by exposing bits in memory to a set of probabilistic operations equivalent to those experienced by the coins themselves. In some sense, we generate the probability distribution $P(X)$ without explicitly writing it down. Since the evolution of bits in a deterministic classical computer can be made approximately random with a polynomial overhead in resources, all experiments which depend on random coin flips can be efficiently simulated on a computer.
+
+Now let us consider the problem of simulating a system of $n$ quantum coins, equivalent to spin-$\frac{1}{2}$ particles or qubits. Each coin individually may be in an arbitrary superposition state $\ket{\psi} = \alpha \ket{H} + \beta \ket{T}$. The state of the full system is in general entangled:
+\begin{eqnarray}
+\ket{\Psi} &=& a_0\ket{H_0H_1H_2H_3\ldots H_n}\\
+           &+& a_1\ket{T_0H_1H_2H_3\ldots H_n}\\
+           &\ldots& \\
+           &+& a_{2^n}\ket{T_0T_1T_2T_3\ldots T_n},
+    \label{eqn:big-state}
+\end{eqnarray}
+where $a_i$ are complex probability amplitudes with $\sum_i |a_i^2| = 1$. How should we represent this state on a classical computer? Na\"ively, we can write down the real and imaginary parts of each $a_i$ using $2\times 2^n$ floating-point variables, an approach which is exponentially costly in time and space. Immediately this representation problem appears hard, but we have previously prevailed in simulating random phenomena, achieving an exponential advantage over the na\"ive approach through a simple modification of the computer. Can we accomplish a similar trick for quantum coins, and use a classical computer to efficiently represent and evolve the quantum state\footnote{Note that this question is related to the \emph{Extended Church-Turing Thesis}, discussed in section \ref{sec:bosonsampling} of this thesis.}?
+
+The first piece of evidence to the contrary is the nonlocal behaviour of quantum states, described and experimentally tested in sections \ref{sec:nonlocality}, \ref{sec:cnot-mz-chsh} and \ref{chap:random-chsh} of this thesis. Since quantum states can exhibit correlations which provably cannot be reproduced by any local classical system, we might expect that it would be difficult to persuade classical bits in a CPU to accurately mimic the evolution and measurement of the quantum state. However, this argument does not say anything about scaling --- perhaps such correlations can be emulated, in a completely local way, with a small (polynomial) overhead? 
+
+At this point we head into the territory of (quantum) computational complexity theory, where a great deal of beautiful work has been done, but much remains to be proved. In 1995, Peter Shor described \cite{Shor1995} a polynomial-time quantum algorithm for prime factorization. No polynomial-time classical algorithm for prime factoring exists, and the  problem is generally believed to be exponentially hard for classical computers, although there is no proof.  If factoring is indeed outside of $\P$, then a universal full-scale quantum computer running Shor's algorithm would constitute a ``physical system of interest'', albeit contrived, which cannot be efficiently simulated by any classical machine. Further evidence has recently been provided by Aaronson and Arkhipov, in their resent proposal for the \bosonsampling linear optical quantum computer, discussed in detail in section \ref{sec:bosonsampling}. The authors provide very strong evidence that efficient simulation of the quantum behaviour of single photons in certain classes of linear optical network is classically intractable. This result arguably has stronger implications for the complexity of quantum simulation, as the implications of a polynomial-time classical algorithm for \bosonsampling would be much more dramatic than the discovery of a fast classical factoring algorithm. 
+
+%The general question of the computational complexity of quantum simulation is strongly related to the extended Church-Turing thesis (ECT), discussed further in section \ref{sec:extended-church-turing} of this thesis, which conjectures that such an efficient classical simulation should always be feasible.  The validity of the ECT remains an open question, and 
+
+So we end up with a reasonable hunch that the simulation of small things --- molecules, drugs, materials ---is sometimes classically intractable, and we can see a number of bright lights in the darkness which support this understanding.  This is not to say that \emph{all} quantum systems are intrinsically difficult to simulate classically,  for instance, an $n$-body system whose state remains separable throughout its evolution is simulated using the same method as for probabilistic classical systems. Only a subset of natural phenomena exhibit sufficiently strong quantum correlations as to be classically intractable. Certain regimes of organic \cite{Babbush2012} and inorganic chemistry \cite{Halasz2012}, superconducting materials \cite{Anderson1987, Moessner2000} and quantum magnetism \cite{Britton2012}, and microbiology, for instance photosynthesis \cite{Sarovar2010}, all fall into this regime. Here we will focus our attention on problems in the field of \emph{quantum chemistry}.
+
+\section{Quantum chemistry} 
+\begin{quote}
+    The underlying physical laws necessary for the mathematical theory of a large part of physics and the whole of chemistry are thus completely known, and the difficulty is only that the exact application of these laws leads to equations much too complicated to be soluble. 
+   \cite{Dirac1929}
+   \qauthor{Paul Dirac, 1929 } 
+\end{quote}
+Quantum chemistry is the experimental and theoretical study of the quantum mechanical behaviour of chemicals.  The fundamental goal is the ability to compute and comprehend the properties and dynamics of large molecules, without the need to directly synthesise and test them in the lab.  
+Owing to the complexity of these calculations, a considerable fraction of this research is dedicated to numerical studies.  The roots of the field lie in the early observations of quantum electronic behaviour due to Faraday, Kirchhoff, Boltzmann and Planck. Later developments were made by Linus Pauling, in his famous work on the quantum mechanical nature of the chemical bond \cite{Pauling1939}, as well as Llewellyn Thomas and Enrico Fermi, to name but a few. 
+
+\subsection{Definition of the problem}
+Let's assume that we know the chemical composition of a molecule of interest, having some information on its geometry, the relative positions, masses and charges of the nuclei, etc.  For most chemical systems of interest, the full molecular wavefunction $\Psi$ can be factorized into electronic and nuclear components via the Born-Oppenheimer approximation \cite{Born1927}
+\begin{equation}
+    \Psi = \psi_e \times \psi_n,
+\end{equation}
+after which we assume that the nuclei are stationary and effectively classical, since they are so much more massive than the electron. The problem then is to solve the time-independent Schr\"odinger equation for a system of $N$ nuclei and $n$ electrons
+\begin{equation}
+    i\hbar \frac{\partial}{\partial t} \psi_e = \hat{H}_e \psi_e ,
+    \label{eqn:electronic-schrodinger-equation}
+\end{equation}
+where $\hamiltonian_e$ is the Hamiltonian for the electronic structure problem, which can be written 
+\cite{Kassal2011}
+in second-quantized form as
+\begin{equation}
+    \hamiltonian_e = \sum_{ij} h_{ij} \creation_i \annihilation_j + \sum_{ijab} h_{ijab} \creation_i \creation_j  \annihilation_a \annihilation_b .
+    \label{eqn:electronic-structure-hamiltonian}
+\end{equation}
+Here $\creation_j$ and $\annihilation_j$ are the fermionic ladder operators, which create and destroy electrons in a \emph{molecular spin orbital} (``energy level'') $j$. The first term in (\ref{eqn:electronic-structure-hamiltonian}) is due to the electronic kinetic energy, the second is a result of electron-electron (Coulomb) interaction. 
+
+Analytic solutions to the electronic structure problem exist for small molecules such as the Hydrogen atom, but in general we must take a numerical approach.
+The basic quantity of interest for chemists is usually an energy 
+$E=\bra{\lambda_0} \hamiltonian_e \ket{\lambda_0}$
+or energy difference $\Delta E$, where $\ket{\lambda_0}$ is an eigenstate of $\hamiltonian$. Frequently we are interested in the dependence of this energy on some molecular or external degree of freedom:
+\begin{itemize}
+    \item How much effort must we exert in order to pull this atom away from the rest of the molecule? What is the complete form of the interaction potential energy surface of the molecule as a function of its own configuration?
+    \item How high is the energy barrier that we must overcome in order to persuade two molecules of interest to react?
+    \item How stable is this compound? How much energy would it take to pull it apart?
+\end{itemize}
+An example of a very simple approximate solution to such questions is the Lennard-Jones potential,
+\begin{equation}
+V_{LJ} = \varepsilon \left[  \left( \frac {r_{m}} {r} \right)^{12} - 2\left( \frac {r_{m}} {r} \right)^6 \right] 
+\end{equation}
+which approximates the dependence of the interaction potential on the distance $r$ between two atoms, where $\epsilon$ is the depth of the potential well at $r=r_m$, the equilibrium bond length of the molecule. 
+Lennard-Jones gives a simple and computationally frugal estimate of the interaction energy, but its approximation breaks down for a broad variety of chemical systems. For larger, more complex molecules, quantum chemists depend on more sophisticated models, or \emph{ans\"atze}.
+
+\subsection{Ans\"atze}
+The first task in solving problems of the form of (\ref{eqn:electronic-schrodinger-equation}) is to choose a representation, parametrization or \emph{ansatz} for the electronic wavefunction $\Psi_e$. 
+The \emph{molecular orbital approximation} gives a simple ansatz for the molecular electronic structure, in which the full electronic wavefunction $\Psi$ is written as a separable product of single-electron molecular wavefunctions $\psi_i$: 
+\begin{equation}
+    \Psi(\vec{r_1}, \vec{r_2}, \ldots \vec{r_n}) = \prod_{i=1}^N\psi_i(\vec{r}_i).
+    \label{eqn:hartree-product}
+\end{equation}
+known as a Hartree product. Any single-electron molecular wavefunction can  be expressed as a linear combination over a basis set of $n_{\mathrm{basis}}$ atomic orbitals (single-electron, single-atom wavefunctions) $\phi_j$,
+\begin{equation}
+    \psi_i(\vec{r}) = \sum_{j=1}^{n_{basis}} c_{ij} \phi_j (\vec{r}).
+    \label{eqn:atomic-orbitals}
+\end{equation}
+In general, the Hartree product (\ref{eqn:hartree-product}) violates Pauli exclusion, since it is not antisymmetric: the expressions $\psi(\vec{r_1}, \vec{r_2}) = \psi(\vec{r}_1) \times \psi(\vec{r}_1)$ and $\psi(\vec{r_2}, \vec{r_1}) = \psi(\vec{r}_2) \times \psi(\vec{r}_1)$ are not the same, and 
+\begin{equation}
+   \psi(\vec{r_1}, \vec{r_2}) \ne -\psi(\vec{r_2}, \vec{r_1}),
+\end{equation} 
+i.e. the electronic wavefunction does not change sign upon exchange of two electrons.
+The solution is to antisymmetrize the wavefunction, writing it as a linear combination of Hartree products 
+\begin{equation}
+    \psi(\vec{r}_1 \vec{r_2}) = \frac{1}{\sqrt{2}} \left(\psi_1(\vec{r}_1)\psi_2(\vec{r}_2) - \psi_2(\vec{r}_2)\psi_1(\vec{r}_1)\right).
+\end{equation}
+Using a method due to Slater \cite{Slater1929}, we can generalize this ansatz to the $n$-electron case, including the electron spin, by writing the full electron wavefunction as an antisymmetrised ($\mathcal{A}$) product of spin orbitals $\chi_i(\vec{r}_i, \omega) \in \left[ \psi_i(\vec{r}_i)\alpha(\uparrow), \psi_i(\vec{r}_i)\beta(\downarrow)  \right]$, 
+\begin{equation}
+    \Psi(\vec{r}, \omega) \equiv \Psi(x) = \mathcal{A} \{ \prod_{i=1}^n \chi_i(x_i) \}, 
+\end{equation}
+which can be neatly written as a \emph{Slater determinant}
+\begin{equation}
+    \Psi(x_1, x_2 \ldots x_n) = 
+    \ket{\chi_1 \chi_2 \ldots \chi_n} =
+    \frac{1}{\sqrt{n!}}
+\begin{vmatrix}
+    \chi_1(x_1) & \chi_2(x_1) & \ldots & \chi_1(x_n)  \\
+    \chi_1(x_2) & \chi_2(x_2) & \ldots & \chi_2(x_n)  \\
+    \vdots      & \vdots      & \ddots & \vdots       \\
+    \chi_1(x_n) & \chi_2(x_n) & \ldots & \chi_n(x_n)
+\end{vmatrix}.
+\label{eqn:slater-determinant}
+\end{equation}
+The Slater determinant provides an elegant ansatz for separable molecular spin orbitals, which is physical by construction. Note that this is the fermionic equivalent of the method described in section \ref{sec:permanents} to compute bosonic states and statistics using the permanent $\perm(M)$.
+Owing to the fact that states described in this way do not include any entanglement, \emph{every state in the ansatz can be parametrized with a polynomial number of parameters}, the single-electron atomic orbital coefficients $c_{ij}$ in (\ref{eqn:atomic-orbitals}). We will herein label the real parameters used to address such a subspace of states as $\vec{\phi} \equiv c_{ij}$.
+%TOOD: mean field, interactions
+
+\subsubsection{Hartree-Fock}
+\label{sec:hartree-fock}
+Having chosen an ansatz for the state, the task is then to find the parameter values $\vec{\phi}$ which best satisfy the Schr\"odinger equation. The \emph{variational principle} states that any trial wavefunction (a ``guess'' at $\vec{\phi}$)  will not have an energy less than the ground state energy $E_0$ of the Hamiltonian. Therefore we can find a good, approximate solution to the Schr\"odinger equation --- the ground state itself --- simply by varying these parameters so as to minimize the energy, in what is known as the \emph{variational method}. This technique lends itself to a numerical approach, in which an iterative nonlinear optimization algorithm is used to minimize the energy of a trial wavefunction, 
+\begin{equation}
+    E_0 = \min_{\vec{\phi}} \bra{\Psi(\vec{\phi})} \hat{H} \ket{\Psi(\vec{\phi})}.
+    \label{eqn:variational-method}
+\end{equation}
+From $\vec{\phi}$, we can then reconstruct full (approximate) information of the electronic configuration, as well as the ground state energy $E_0$.
+
+The \emph{Hartree-Fock-Roothan (HF) method} is an iterative, polynomial-time algorithm which computes an approximate solution to (\ref{eqn:variational-method}), yielding the HF ground state $\ket{\Phi_0}$.  Key to the efficiency of this technique are two related assumptions: (i) that $\Psi$ is separable, allowing it to be expressed as a single Slater determinant,  and (ii) that the Coulomb interaction term in $\hamiltonian_e$ is well-described by a \emph{mean-field approximation} in which all two-electron contributions are approximated ``as well as possible'' by single-electron terms in the same Slater determinant.  
+
+HF provides a polynomial ansatz which has been very successful in describing a broad range of chemical systems, but does not account for electron correlations or nonseparability. As such this method fails for many physical systems of interest, including those described in the introduction to this chapter. In an attempt to remedy this situation, correlated electronic behaviour has been re-introduced to the ansatz by a number of ``post-Hartree-Fock'' methods. 
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=.9\textwidth]{chapter6/fig/configuration_interaction.pdf}
+\caption[Configuration interaction ansatz]{
+Schematic of the configuration interaction ansatz --- a linear combination of possible molecular spin orbital configurations. When the series is not truncated, we obtain the \emph{full configuration interaction} ansatz, which is exact up to the choice of atomic orbital basis set but is classically intractable for systems of more than $\gtrsim 3$ atoms.
+}
+\label{fig:configuration-interaction}
+\end{figure}
+
+\subsubsection{Post Hartree-Fock}
+\label{sec:post-hartree-fock}
+In the Hartree-Fock method, the electronic configuration wavefunction is  approximately parametrized in terms of a single Slater determinant. A numerically exact, unscalable, completely general ansatz is given by the \gls{fci} method, illustrated in figure \ref{fig:configuration-interaction}, in which the entire space of physical electronic wavefunctions is fully and exactly parametrized using a linear combination of exponentially many Slater determinants, accounting for all possible (entangled, correlated) electronic configurations 
+\begin{eqnarray}
+    \Phi_0 &=& \ket{\chi_1 \chi_2 \chi_3 \ldots \chi_n}   \\
+    \Psi_{CI} &=& g_0 \Phi^0 + \sum_{a, i}g_a^i \Phi_a^i + \sum_{a,b,i,j} g_{ab}^{st} \Phi_{ab}^{ij} \ldots
+    \label{eqn:configuration-interaction}
+\end{eqnarray}
+where the spin-orbital subscripts $(a,b\ldots)$ and superscripts $(i,j\ldots)$ mark differences with respect to the Hartree-Fock ground state.  \gls{fci} calculations give numerically exact, optimal solutions, but the number of Slater determinants, and thus the number of parameters required to describe the state, scales factorially with the number of electrons. As such, \gls{fci} calculations are currently limited to diatomic or triatomic molecules.
+
+Strongly related to CI methods is the \emph{coupled-cluster} (CC) ansatz \cite{Shavitt2009}.  Configuration-interaction methods can be made tractable by truncation of the series (\ref{eqn:configuration-interaction}). CC  methods provide an improved approach to this truncation, grouping electronic excitations together in the exponential ansatz,  
+\begin{equation}
+    \ket{\Psi} = e^{\hat{T}} \ket{\Phi_{0}}.
+\end{equation}
+Here, $\ket{\Phi_0}$ is the Hartree-Fock ground state, which can be efficiently computed as we have already seen, and $\hat{T}$ is the so-called \emph{cluster operator}. The basic technique is to group $k$-fold electronic excitations, choosing a cut-off at $k=k_{max}$:
+\begin{equation}
+    T=T_1+T_2+T_3 \ldots T_{n_{max}}
+\end{equation}
+where $T_1$ is the single-excitation term, a linear combination of all possible excitations which raise or lower a single electron from spin orbital $a$ to $i$,
+\begin{equation}
+    T_1 = \sum_i \sum_a  g_a^i \annihilation^a \creation_i.
+\end{equation}
+ The pair excitation term is more complex, simultaneously raising two electrons from spin orbitals $(a, b)$ to $(i, j)$
+\begin{equation}
+    T_2 = \frac{1}{4} \sum_{ij} \sum_{ab}  g_{ab}^{ij} \annihilation^a \annihilation^b \creation_i \creation_j
+\end{equation}
+and so on. In practice, this series is usually truncated at the level of two-particle or three-particle excitations. By this approximation, the number of parameters used to describe the state remains polynomial in the system size.  Even so, the CC ansatz is currently classically intractable for $k_{max}\gtrsim3$. 
+
+We will skip discussion of \emph{density functional theory} (DFT), an alternative mean-field theory for quantum chemistry (see \cite{Koch2001}). Suffice to say that despite the success of DFT, as with the HF, CC and truncated CI methods, the approximation that it uses to achieve scalability leads to incorrect results for a large class of chemical systems.
+
+\section{Quantum simulators} 
+We have arrived a situation in which all known exact methods for the simulation of quantum chemistry are intractable for molecules with more than $\sim$3 atoms. Moreover, the approximate methods that do scale are only precise for certain classes of molecule. Hartree-Fock, coupled-cluster, DFT and truncated CI models all break down at some point. There are examples of surprisingly simple molecules for which all known approximate methods fail, including the lowly nitrogen $\mathrm{N}_2$ molecule, whose triple bond gives rise to strongly correlated electronic behaviour at high bond separations, ozone, and many others. How should we go about simulating these systems and their larger, more interesting cousins?
+
+%say that you can get more done with less
+If we are serious about efficient simulation of quantum mechanical phenomena in the lab, then the computer or machine that we use must also be quantum mechanical --- this was Feynman's insight. Throughout his work, Feynman acknowledged the possibility that the device might not necessarily constitute a universal full-scale quantum computer.  We can imagine a broad variety of special purpose devices, which perhaps do not even depend on digital quantum logic or gate operations, but nonetheless emulate or mimic the physics of a classically intractable system of interest in a scalable way. The potential for dramatic relaxation of hardware requirements (in terms of coherence time, gate fidelity etc.) in this regime, while maintaining a quantum advantage, has led many to predict that non-universal quantum simulation may constitute the first practical application of large-scale artificial quantum entanglement. 
+
+In this chapter we will only discuss schemes for quantum chemistry which \emph{do} make use of a full-scale universal digital quantum computer, and we do not address special-purpose, non-universal devices. See the discussion of \bosonsampling in section \ref{sec:bosonsampling} of this thesis for an experimental and theoretical examination of special-purpose quantum simulators, as well as recent experimental progress in \cite{Britton2012} and \cite{Fukuhara2013}.
+
+\subsection{Quantum simulation on a digital quantum computer}
+We will now give a picture of the standard approach to quantum simulation on a universal digital quantum computer. An enormous diversity of methods exist, and this description will necessarily be approximate and incomplete. We will later compare and contrast this standard method with the technique used in our experiment, which is quite distinct.
+
+In any computer simulation, we must choose a mapping between the degrees of freedom of the physical system of interest and the computational hardware. We have already seen the approach taken in classical quantum chemistry, in which an ansatz for the electronic wavefunction is expressed in terms of atomic spin orbitals, the coefficients of which are stored as floating-point numbers in a digital register. In a quantum computer, quantum information is written into registers of qubits --- distinguishable spin-$1/2$ systems. Onto this register we wish to encode the state of a system of $n$ electrons --- indistinguishable, antisymmetric fermions, with half-integer spin. In his original discussion of universal quantum simulators, Feynman expressed concern over the discrepancy between the fundamental physical properties of these two systems \cite{Feynman1982d}. How should we reconcile the two?
+
+\subsubsection{The Jordan-Wigner transform}
+\label{sec:jordan-wigner}
+Suppose that we have register of $N$ qubits, onto which we would like to map the state of $n$ electrons. We can dream up many possible encodings, but most of them will allow us to create or destroy simulated electrons in unphysical ways. For example, we should not be able create two electrons occupying the same spin orbital, and annihilation on the vacuum should produce no effect.  The essential rules for the fermionic creation and annihilation operators acting on a mode $j$ are completely captured  by the (fermionic) \emph{canonical anticommutation relations} (fCCRs):
+\begin{eqnarray}
+    \{ \annihilation_j, \creation_k \}  &=& \delta_{jk}I \\
+    \{ \annihilation_j, \annihilation_k \}  &=& 0
+\end{eqnarray}
+where $\{ A, B\} = AB+BA$ is the anticommutator \cite{Nielsen}. These equations, which are the fermionic counterpart to the bosonic CCRs (\ref{eqn:canonical-commutation-relations}) immediately imply that 
+$\{\creation_j, \creation_k\}=0$, and $(\creation_j)^2 = (\annihilation_j)^2 = 0$, the $\creation \annihilation$ are positive Hermitian with eigenvalues 0 and 1 and are mutually commuting 
+$\creation_j\annihilation_j\creation_k\annihilation_k = \creation_k\annihilation_k\creation_j\annihilation_j$, and annihilation on the vacuum behaves as desired ($\annihilation \ket{0} = 0$). 
+
+The \emph{Jordan-Wigner transform} \cite{Jordan1928, Ortiz2001} provides exactly such a mapping from qubits to fermions in the form of a definition for $\creation, \annihilation$ in terms of spin operators acting on qubits which always satisfies the fCCRs. The Jordan-Wigner transform allows \emph{any physical system} to be represented on a quantum computer, and thus forms the basic ingredient for the encodings used in most digital quantum simulation algorithms \cite{Somma2002, Abrams1997}. 
+
+In terms of the Pauli spin operators $\pauli_i$, the fermionic creation and annihilation operators acting on mode $j$ are defined by Jordan-Wigner as 
+\begin{eqnarray}
+    \annihilation_j &\equiv& I^{\otimes j-1} \otimes \pauli_{+} \otimes \pauli_z^{\otimes N-j}\\
+    \creation_j &\equiv& I^{\otimes j-1} \otimes \pauli_{-} \otimes \pauli_z^{\otimes N-j}
+\end{eqnarray}
+where $\sigma_+ = \ket{0}\bra{1}$ and  $\sigma_- = \ket{1}\bra{0}$. The tall stack of $z$-rotations 
+($\pauli_z^{\otimes n-j}$, sometimes referred to as Jordan-Wigner \emph{ladder}) has has the effect of keeping track of the sign of the fermionic wavefunction and thus enforcing antisymmetry:
+\begin{equation}
+    \annihilation_j \ket{\alpha_1, \alpha_2, \ldots \alpha_l} = -(-1)^{s_j^\alpha}\ket{\alpha_1, \alpha_2, \ldots \alpha_l,~ \mathrm{with}~ \alpha_j \rightarrow 0 },
+\end{equation}
+where $\ket{\alpha_1, \alpha_2 \ldots \alpha_n}$  is the occupation number representation of the fermionic state and $s_j^\alpha \equiv \sum_{k=1}^{j-1}\alpha_k$. It is interesting to note that when we make a \emph{local} change to the electronic system --- creating, annihilating or moving an electron --- the corresponding qubit operator, i.e. the necessary gate operation, is highly \emph{nonlocal}. 
+
+%Jordan-Wigner preserves the number of terms in the parametrization of the state/Hamiltonian, and for a system of $N$ qubits we can address an orthonormal basis of $2^N$ $N$-electron spin orbitals
+
+\subsubsection{Quantum phase estimation}
+Having mapped the physics of the chemical system into a digital register of qubits, the task is then to design a quantum circuit --- a sequence of gate operations --- which computes the eigenenergies of the electronic structure Hamiltonian of interest. Here we provide an approximate picture of the traditional framework, which is based on the \gls{pea} \cite{Kitaev2002a, Nielsen2004}.
+
+% BEGIN phase estimation figure
+\begin{figure}[t!]
+\centering
+\includegraphics[width=\textwidth]{chapter6/fig/phase_estimation.pdf}
+\caption[Quantum phase estimation algorithm]{
+    The \gls{pea} computes an $t$-bit approximation to the phase $\varphi_{\lambda_0}$ of the eigenvalue $\lambda_0 = e^{2\pi i \varphi_{\lambda_0}}$ of a unitary operator, $U$, assuming that the eigenstate $\ket{\lambda_0}$ is given. If arbitrary exponentiation $U^{2^j}$ up to $U^{2^t}$ is provided as a black-box oracle, then the \gls{pea} can achieve an exponential speedup over classical methods. The eigenstate is prepared in the \emph{system register}, and the \emph{control register} of $t$ qubits is prepared in the superposition state $\ket{+}^{\otimes t}$. The system evolves under repeated application of the oracle unitary, quantum-controlled by qubits in the control register. Finally, readout of $\varphi_{\lambda_0}$ is performed by means of the inverse quantum Fourier transform followed by measurement in the computational basis. 
+}
+\label{fig:phase-estimation}
+\end{figure}
+% END phase estimation figure
+
+The \gls{pea} takes as input an eigenstate $\ket{\lambda_0}$ of a unitary operator $\unitary$, and computes a $t$-bit approximation to the unknown phase $\varphi_{\lambda_0}$ of the eigenvalue $\lambda_0 = e^{2\pi i \varphi_{\lambda_0}}$. \gls{pea} is an oracle-based algorithm, and starts from the assumption that the controlled-$\unitary^{2^j}$ operation can be implemented by a black-box, for arbitrary $j$, at a \emph{constant} cost. The controlled-unitary gates act as 
+\begin{equation}
+    C(\unitary^{2^k}) \, \ket{+}\otimes \ket{\lambda_0} = \frac{1}{\sqrt{2}} \left(\ket{0}+e^{2\pi i \cdot 2^k \varphi} \, \ket{1}\right) \otimes \ket{\lambda_0}. 
+\end{equation}
+
+The system register is first initialized in the eigenstate $\ket{\lambda_0}$, which is provided as input to the algorithm. A secondary control register of $t$ qubits is prepared in the separable equal superposition state $\ket{+}^{\otimes t}$. We then apply the circuit of controlled-$\unitary^{2^t}$ operations shown in figure \ref{fig:phase-estimation}. The system register stays in the state $\ket{\lambda_0}$ throughout the computation, with the full system evolving as
+\begin{align}
+\begin{split}
+    \ket{+}^{\otimes t} \otimes \ket{\lambda_0} \xrightarrow{\mathrm{PEA_1}} \frac{1}{\sqrt{2^0}} 
+    &\left( \ket{0} + e^{2\pi i \cdot 2^{t-1} \varphi} \ket{1}\right) \\
+    \otimes &\left( \ket{0} + e^{2\pi i \cdot 2^{t-2} \varphi} \ket{1}\right)\\
+    \ldots &\\
+    \otimes &\left( \ket{0} + e^{2\pi i \cdot 2^{0} \varphi} \ket{1}\right) \otimes \ket{\lambda_0}.
+\end{split}
+    \label{eqn:PEA-binary-1}
+\end{align}
+The final state of the control register can then be written independently of the system, 
+\begin{gather}
+    \frac{1}{\sqrt{2^t}} \left[
+    \ket{00\ldots0} +
+    e^{2\pi i \varphi \cdot 1 } \ket{00\ldots1} +
+    \ldots
+    e^{2\pi i \varphi \cdot 2^{t-1} } \ket{11\ldots1} 
+    \right]\\
+    =
+    \frac{1}{\sqrt{2^t}} \sum_{k=0}^{2^{t-1}} e ^ {2\pi i \cdot \varphi k } \ket{k} 
+    \label{eqn:PEA-binary-2}
+\end{gather}
+where $\ket{k}$ is the state corresponding to the binary representation of $k$.  In the event that the phase can be exactly written as a binary fraction of $t$ bits $\varphi = 0.\varphi_1 \varphi_2 \ldots \varphi_t \equiv \frac{\varphi_1}{2} + \frac{\varphi_2}{4} + \frac{\varphi_3}{8} \ldots \frac{\varphi_t}{2^t}$, the output state of the first stage of \gls{pea} (\ref{eqn:PEA-binary-1}) can be rewritten as
+\begin{equation}
+    \frac{1}{\sqrt{2^t}} 
+    \left( \ket{0} + e^{2\pi i \, 0.\varphi_t} \ket{1}\right) 
+    \otimes \left( \ket{0} + e^{2\pi i \, 0.\varphi_{t-1}} \ket{1}\right)
+    \ldots 
+    \otimes \left( \ket{0} + e^{2\pi i \, 0.\varphi_{1}\varphi_{2}\ldots \varphi_t} \ket{1}\right) 
+    \label{eqn:chemistry-digital-phase}
+\end{equation}
+It is then straightforward to show that the quantum Fourier transform of (\ref{eqn:chemistry-digital-phase}) is a logical basis state corresponding to the digits of $\varphi$, $\ket{\varphi_1\varphi_2 \ldots \varphi_t}$. The final stage of the \gls{pea} implements this quantum Fourier transform on the control register, followed by measurement in the logical basis. From these measurement outcomes the experimentalist reads out the exact digits of $\varphi$, thereby obtaining the eigenvalue $\lambda_0$ of $\unitary$ in a single shot. Even when $\varphi$ cannot be exactly expressed as a $t$-bit binary fraction, the \gls{pea} returns the phase to a good approximation, with a success probability $1-\epsilon$.  The choice of $t$ determines the output precision as well as the probability of success of the \gls{pea}.
+
+
+\subsubsection{Quantum chemistry using the \acrshort{pea}}
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=.8\textwidth]{chapter6/fig/universal_quantum_simulators.pdf}
+\caption[Ballistic quantum chemistry on a quantum computer]{
+Ballistic quantum chemistry on a quantum computer. A fiducial state $\ket{0^{\otimes N}}$ is adiabatically time-evolved to an eigenstate $\ket{\lambda_0}$ of the Hamiltonian of interest. The energy is then read out by means of the quantum phase estimation algorithm.  A significant property of this approach is that although the necessary number of qubits can be relatively low, the number of fundamental gate operations which must be consecutively and coherently performed is typically very large due to the heavy dependence on Trotterization for time-evolution of the state.}
+\label{fig:chemistry-standard-approach}
+\end{figure}
+
+We will now describe a polynomial-time algorithm which makes use of the \gls{pea} to compute exact ground-state energies under the full configuration-interaction ansatz, following \cite{Whitfield2011, Wecker2013}.
+Starting from the \gls{fci} electronic structure Hamiltonian $\hamiltonian$ (\ref{eqn:electronic-structure-hamiltonian}) for our molecule of interest, we generate the unitary time evolution operator $\unitary = e^{i \hamiltonian \tau}$, where the energy $E=2\pi \varphi / \tau$ of an eigenstate $\ket{\lambda_0}$ is mapped to the phase of its eigenvalue $\lambda_0 = e^{2\pi i \varphi}$ 
+\begin{equation}
+    \unitary \ket{\psi} = e^{i \hamiltonian \tau} \ket{\psi} = e^{2\pi i \varphi} \ket{\psi}.
+\end{equation}
+% Trotterization
+The task is then to estimate $\varphi$, and thus $E$, by means of the \gls{pea}. We must first be able to implement the controlled-$\unitary(\tau)$ operations at the heart of the \gls{pea} as gate sequences in a digital quantum computer. The Trotter decomposition provides a general prescription for approximate time evolution of arbitrary unitary operators in the gate model. The technique bears a strong resemblance to stop-frame animation \cite{Johnston1981}. For a Hamiltonian $\hamiltonian = \sum_k h_k$, the full time-evolution $exp(i\hamiltonian \tau)$ is divided into $M$ short, time-independent unitary slices of length $\Delta_\tau = \tau/M$,
+\begin{equation}
+    \unitary=e^{i \tau \sum_k h_k } = \prod_k \left[ e^{i\Delta_\tau h_k}   \right] + O(\Delta_\tau),
+\end{equation}
+a process known as \emph{Trotterization}.
+The number of gate operations is at least linear in $t$, and the procedure introduces a discretization error polynomial in $t$. Larger values of $M$ and higher-order decompositions both give rise to a smoother ``animation'' and less error, at the cost of further gate operations. This error must be within chemical accuracy (roughly one part in a million) for the computation to be useful. Even for small molecules, Trotterization to chemical accuracy demands very large numbers of gates. A conservative implementation of \gls{fci}-\gls{pea} for the water molecule using $\sim 30$ qubits in the system register requires $O(10^4)$ gate operations per Trotter step, and $M = O(10^6)$ steps in the full time evolution, leading to a total of $O(10^{10})$ serial gate operations \cite{Wecker2013} --- a formidable challenge.
+
+% State preparation
+The \gls{pea} provides an efficient method to compute the eigenvalue of a \emph{given} eigenstate of $\unitary$. However, in the context of quantum chemistry we do not initially know the eigenstate --- in fact, $\ket{\lambda_0}$ should be regarded as encoding the \emph{answer} to our problem. Efficient classical methods provide an approximate ground state, but the error in this approximation is the entire motivation to seek a quantum algorithm in the first place!  What happens if we use the approximate Hartree-Fock ground state $\ket{\psi_{HF}}$ instead of the exact eigenstate?  Using $\ket{\psi_{HF}} = \sum_i \lambda_i \ket{\lambda_i} \approx \ket{\lambda_0}$ as input to the system register, we find \cite{Nielsen2004} that the \gls{pea} outputs the exact phase $\varphi$ of $\ket{\lambda_0}$ with probability proportional to $|\overlap{\lambda_0}{\psi_{HF}}|^2$. Thus in some cases, an approximate eigenstate can be used to find the \emph{exact} energy of the ground state, at the cost of a lower probability of success. 
+
+This method has been used for ground state estimation in numerical simulations of $\mathrm{H_2O}$ \cite{Aspuru-Guzik2005, Wecker2013} and  LiH \cite{Aspuru-Guzik2005}, as well as a recent experimental demonstration for $\mathrm{H}_2$ using photonic qubits \cite{Lanyon2010}. Unfortunately, for many chemical systems of interest, the Hartree-Fock approximation performs so badly that the probability of success vanishes.  As a result, the state preparation problem in quantum simulation of quantum chemistry can become very involved.  Methods to overcome this issue largely depend on adiabatic eigenstate preparation algorithms \cite{Lloyd1996, Aspuru-Guzik2005} in which the Hamiltonian is slowly transformed from an ``easy'' Hartree-Fock Hamiltonian $\hamiltonian^{HF}$ to the exact, full-configuration interaction Hamiltonian $\hamiltonian^{FCI}$. These methods again depend on Trotterization for the implementation of time-evolution under a time-dependent Hamiltonian, incurring a similar or greater cost in the number of required gate operations.
+
+We thus arrive at a \emph{ballistic} picture of quantum algorithms for quantum chemistry resembling that shown in figure \ref{fig:chemistry-standard-approach}, in which the process is broadly subdivided into (i) preparation of qubits in a simple fiducial state $\ket{0}^{\otimes N}$ (ii) adiabatic or iterative \gls{pea} state preparation and (iii) \gls{pea} readout of the energy. A key property of this approach is that while the number of qubits $N$ can be relatively small --- \gls{pea} is amenable to a recursive modification which allows chemically relevant calculations to be performed using $\sim$ 10 control qubits and $\sim$ 30 system qubits --- the number of basic gate operations required is typically enormous. 
+
+%, with a typical scaling of $O(N^5)$, to which Trotterization adds a large constant prefactor. This places a considerable demand on the quantum hardware, in particular with respect to decoherence times, as well as the physical size of the device in the case of integrated quantum photonics.
+
+\subsection{Limitations of quantum simulators}
+Arguably the most important task for in any scalable algorithm for quantum chemistry is the choice of ansatz. The most general ansatz, which captures the full space of possible states of the system and maps to the full \emph{Hilbert space} $\hilspace$ upon which the quantum state is defined has dimension $O(2^n)$ and can only be parametrized by an exponential number of real parameters.  Efficient classical algorithms must therefore \emph{throw away} an exponentially large subspace of $\hilspace$. The most successful ans\"atze do this in a targeted way, discarding highly entangled or extremely strongly correlated states --- which do not often appear in nature --- while preserving the most chemically relevant regions of $\hilspace$.  
+
+The Hilbert space dimension of $n$ qubits and that of $n$ electrons occupying a system of spin orbitals are both exponential in $n$ and are of the same order.  We have seen from the Jordan-Wigner transform that the physics of these two systems can be made isomorphic, and from this it might be natural to infer that a quantum computer should be able to implement a \emph{complete} ansatz, addressing the entirety of $\hilspace$. The counter-argument to this reasoning is simple: we need to be able to \emph{drive} the quantum computer. That is, any machine which allows us to prepare or represent states  throughout the entirety of $\hilspace$ must by definition have a number of classical control parameters --- knobs --- exponential in $n$, and is therefore not scalable. Quantum computers must have a polynomial number of knobs on top, and as such can only access a polynomially small subset of \emph{efficiently preparable} Hilbert space. \emph{Arbitrary $n$-qubit state preparation does not scale}. 
+
+Ground-state quantum chemistry problems are a subset of the $k$-local Hamiltonian problem, i.e. the problem of finding the ground state of a Hamiltonian on $n$ qubits, $\hamiltonian = \sum{i=1}^{r} \hat{h}_i$ where $r=\mathrm{poly}(n)$ and each $\hat{h}_i$ acts on at most $k$ qubits. The general $k$-local Hamiltonian problem has been proven \cite{Kempe2004} by Kempe, Kitaev and Regev to be $\QMA$-complete for $k\ge 2$. $\QMA$-completeness means that problem is at least as hard as any in $\QMA$, and since $\QMA$ contains $\BQP$, the complexity class accessible in polynomial time by quantum circuits, the ($k\ge 2$)-local Hamiltonian problem is exponentially hard for quantum computers. This implies that there exist polynomial-size ground state problems in quantum chemistry that are intractable \emph{even on a quantum computer}.
+
+If all of the above is true, why should we bother to build a quantum computer for quantum chemistry?
+Despite the apparent difficulty of building a digital quantum simulator, a small fraction of which we have outlined outlined above, we nonetheless expect that such devices should provide an exponential speedup over classical machines for large classes of interesting physical and chemical systems, enabling \gls{fci} quantum chemistry in polynomial time. That said, it would be nice if we could do it without the need for \emph{quite} so many gate operations. The next section presents our work in this direction.
+
+\section{Quantum simulation without quantum evolution} 
+
+We will now describe an alternative approach by which quantum chemistry calculations can be performed on a hybrid quantum-classical processor without time evolution or quantum phase estimation. This approach introduces a number of new unknowns, but significantly reduces the number of required gate operations by means of a variational approach with a strong resemblance to certain classical methods in quantum chemistry.
+
+\subsection{Scheme}
+Any Hamiltonian can be written as a sum of tensor products of Pauli matrices
+\begin{equation}
+    \hamiltonian = 
+    \sum_{i\alpha} h_a ^ i \pauli_a ^ i +
+    \sum_{i j a b} h_{a b} ^ {ij} \pauli_a^i \otimes \pauli_b^j + 
+    \ldots
+\end{equation}
+for real $h$, where $(a, b \ldots)$ index the three Pauli operators $\{ \pauli_x, \pauli_y, \pauli_z \}$ and $(i, j \ldots)$ index the subspace of qubits upon which they act. In general this expansion has exponentially many terms, but for all physical Hamiltonians (including electronic structure Hamiltonians (\ref{eqn:electronic-structure-hamiltonian}), the Ising model, Heisenberg model etc.)  it can be truncated to a number of terms which is polynomial in the size of the system. The basic intuition for this fact is that arbitrarily strong, arbitrarily long-range interactions do not appear in nature.  
+
+Calculations in quantum chemistry are generally concerned with the energy $E = \langle \hamiltonian \rangle = \bra{\psi} \hamiltonian \ket{\psi}$ of a state $\ket{\psi}$ under the Hamiltonian $\hamiltonian$. By linearity, this is given by
+\begin{equation}
+    E=
+    \langle \psi | \hamiltonian | \psi \rangle= 
+    \sum_{i\alpha} h_a ^ i \langle \psi | \pauli_a ^ i | \psi \rangle +
+    \sum_{i j a b} h_{a b} ^ {ij} \langle \psi | \pauli_a^i \otimes \pauli_b^j| \psi  \rangle + 
+    \ldots
+    \label{eqn:chemistry-energy-evaluation}
+\end{equation}
+Thus the energy reduces to a weighted sum over a polynomial number of expectation values of local Pauli observables, and can be precisely estimated by means of repeated local single-qubit measurements together with classical floating-point addition. For an $N$-qubit state, we can thus efficiently evaluate the expectation value of a $2^N \times 2^N$ Hamiltonian.
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=\textwidth]{chapter6/fig/classical_vs_quantum.pdf}
+\caption[Quantum simulation without time-evolution]{
+Quantum simulation without time-evolution. (a) Classical approaches to quantum chemistry often make use of the variational method. An approximate ansatz is chosen for $\ket{\psi}$, allowing a subspace of $\hilspace$ to be represented in the CPU. The ansatz parameters $\vec{\phi}$ are initialized according to some approximate method, and a nonlinear optimization algorithm then iteratively minimizes the energy of the state under the chemical Hamiltonian.  We propose a hybrid quantum-classical analog to this approach, in which a small quantum processor (QPU), likely constructed from a universal gate set, is used in place of the CPU to implement the ansatz and compute energies (red box) while the optimization algorithm still runs on a classical processor (blue box). (b, c) Various classical ans\"atze exist to efficiently parametrize small subspaces of the electronic configuration Hilbert space. A QPU cannot scalably address the full Hilbert space, but should nonetheless give access classically intractable ans\"atze. }
+\label{fig:classical-vs-quantum}
+\end{figure}
+
+In classical methods for quantum chemistry, as we have already seen, the ground state energy of the chemical Hamiltonian is generally found by an iterative variational method, in which a nonlinear optimization algorithm is used to minimize the energy with respect to the parameters $\ket{\phi}$ of a scalable ansatz for the state.  The electronic configuration of the molecule is approximately represented in the digital logic of the central processing unit (CPU) by means of an approximate, scalable ansatz $f(\vec{\phi}) = \ket{\psi(\vec{\phi})}$. This restricts the CPU to a small subspace of $\hilspace$. The ansatz parameters $\vec{\phi}$ are initialized according to a guess or approximate method, and the energy $\bra{\psi(\vec{\phi})}\hamiltonian\ket{\psi(\vec{\phi})}$ is evaluated by a numerical method.  The optimization algorithm then attempts to iteratively drive towards the ground state.
+
+We propose a hybrid quantum-classical analogue to this approach, illustrated schematically in figure \ref{fig:classical-vs-quantum}. Rather than a CPU, we make use of a small quantum processor (QPU), constructed from the universal gate set, to implement the ansatz and evaluate the energy of candidate ground states.  The QPU takes as input some real parameters $\vec{\phi}$, and prepares a state $\ket{\vec{\phi}}$ in a qubit register of the device.  Copies of this state are then measured in a number of local Pauli bases  --- corresponding  to terms in (\ref{eqn:chemistry-energy-evaluation}) --- from which the energy is recovered by classical floating-point addition. The optimization process, which updates the ansatz parameters $\vec{\phi}$ based on the current energy, is then performed classically on the CPU.
+
+We have already seen that existing efficient classical ans\"atze are limited to describing certain classes of chemical systems. By representing the trial wavefunction on a quantum device, although we can still only parametrize a polynomial subspace of $\hilspace$, the expectation is that we should nonetheless be able to efficiently implement \emph{different class} of ans\"atze for which no efficient classical algorithm exists. In particular, there is reason to believe that efficient parametrization of highly correlated, entangled electronic configurations should be more efficient using a QPU than a CPU.  A simplistic argument for the existence of such ans\"atze is as follows: Consider a quantum circuit, parametrized by a number of classical control phases and constructed somehow at random from a universal gate set. It is then reasonable to believe that the chance of finding an efficient classical parametrization of the output state $\ket{\psi(\vec{\phi})}$ should be vanishingly small. Hence it is likely that there exist a large number of classically intractable ans\"atze which can be implemented using exponentially fewer resources on a QPU. The development of such ans\"atze remains an open problem in quantum simulation.
+
+\subsection{Advantages}
+Quantum chemistry using the \gls{pea} promises full-configuration-interaction calculations using relatively few qubits but requires an imposing number of gate operations, due in part to the Trotterization overhead required for time evolution. Our approach, although limited to an approximate ansatz, provides variationally optimal solutions without dependence on Trotterization, time-evolution, or the \gls{pea}. The number of gate operations, and hence the necessary qubit coherence time or the physical size of the device, is thus dramatically reduced with respect to \gls{pea}. Note that in our algorithm, the QPU repeatedly prepares a state under the ansatz and immediately measures it in a local basis, destroying all quantum coherence --- this is the entirety of the ``quantum'' stage of computation. In contrast, the \gls{pea} must remain coherent throughout. A recent numerical investigation \cite{Wecker2013} into \gls{fci}-\gls{pea} computation of the ground state energy of iron sulfide $\mathrm{Fe_2S_2}$ estimated the required calculation time --- which, for a ballistic computation, is equivalent to the required coherence time --- to be 1.5 \emph{years}.
+
+By implementing a large fraction of the total computation on a classical processor, we ensure that the use of quantum resources is limited to the operations where they give the greatest advantage, i.e. in the representation of quantum states. The trade-off with respect to the \gls{pea} is that we no longer have ballistic, single-shot computation, since the classical optimization algorithm must make a large number of calls to the QPU before convergence to the ground state is achieved. 
+
+\subsection{Scaling}
+A single call to an $n$-qubit QPU prepares $\ket{\psi(\vec{\phi})}$ and returns the expectation value of a tensor product of Pauli operators.  The gate cost of the state preparation stage is dictated by our choice of ansatz, which is not predetermined --- we \emph{assume} that we will always choose an ansatz with a known decomposition into a polynomial number of gate operations, without explicitly defining this choice. 
+
+The measurement stage can be parallelized, giving an estimate of a single term in (\ref{eqn:chemistry-energy-evaluation}) with precision $p$ in after $O(|h|^2/p^2)$ repeated measurements of copies of the state. This leads to a total readout cost $O(|h_{max}|^2M/p^2)$ to evaluate the energy of a trial state $\ket{\psi}$ under the full Hamiltonian, where $M$ is the number of terms in the expansion (\ref{eqn:chemistry-energy-evaluation}).  
+
+\subsection{Open questions}
+In an ideal world, having chosen a classically intractable class of chemical systems of interest, we would then design a QPU which addresses the subspace of $\hilspace$ in which they live.  While \gls{pea}-based methods provide an explicit prescription for the necessary gate-model circuit, much less is known when it comes to the deterministic design of circuits which efficiently parametrize the approximate ans\"atze required for our algorithm. This currently limits the scope of our method, and restricts our ability to assess its asymptotic performance. 
+
+Further uncertainty arises as a result of the use of nonlinear numerical optimization.  
+How many calls to the QPU will it take for the classical minimization to traverse the quantum energy landscape and converge to the ground state? How will the choice of optimization algorithm affect the precision in $E$? These questions depend in turn on the choice of ansatz and the nature of the chemical Hamiltonian.  
+In our experimental demonstration (section \ref{sec:chemistry-experiment}) we use a general-purpose optimization algorithm (Nelder-Mead simplex, \texttt{fminsearch} in Matlab / \texttt{scipy.fmin} in Python). Despite experimental imperfections this algorithm performed well on a realistic chemical Hamiltonian, converging to the ground state to acceptable accuracy after a few hundred iterations. There is scope for considerable optimization in the choice of this optimization algorithm, and we expect that existing techniques from ``classical'' quantum chemistry should be directly applicable to our scheme.  This is not to say that the optimization will \emph{always} run in polynomial time, and thus the scalability of our approach remains an open question.
+
+An interesting problem for all quantum simulation algorithms is raised by the intractability of full quantum state tomography. Although our algorithm and \gls{pea}-based methods both prepare the approximate ground state, from which the ground-state energy can be efficiently obtained, we cannot recover full information on the eigenstate vector --- in order to do so we would need an efficient classical parametrization of the state, which presumably does not exist for those chemical problems which demand quantum simulation. Similarly, we cannot obtain the full spectrum of the Hamiltonian, since in general it has exponentially many eigenvalues. Therefore, through quantum simulation we can at best hope to obtain partial information on the eigenstates of classically intractable Hamiltonians, for instance measuring expectation values of some operator of interest other than the Hamiltonian, or partial information on the spatial configuration of a molecule. The design and optimization of such readout methods will be an important problem for future implementations of our algorithm.
+
+\section{Experiment} 
+\label{sec:chemistry-experiment}
+We have performed a proof-of principle experimental demonstration of this method, using the \acrshort{cnotmz} device previously described. Since the \acrshort{cnotmz} permits arbitrary 2-qubit state preparation as well as arbitrary measurement in a local Pauli basis, it is an ideal test-bed for our algorithm. The fact that the chip is fully computer-controlled allows the optimization feedback loop to be performed without human intervention, which is important when a single run of the experiment can involve thousands of unique measurement settings.
+
+\begin{figure}[t!]
+\centering
+\includegraphics[width=\textwidth]{chapter6/fig/dissociation_curve.pdf}
+\caption[Bond dissociation curve of \hehplus, simulated using the \acrshort{cnotmz}]{ 
+    (a) A single optimization run, finding the ground state energy of \hehplus for a specific molecular separation, $R$=90pm. Coloured points show the experimentally computed energy as a function of the optimization step, where the colour corresponds to the tangle of the 2-qubit state, estimated directly from $\ket{\phi}$. Red lines show the four eigenenergies of the \gls{fci} Hamiltonian of \hehplus in a minimal basis. Crosses correspond to a theoretical ideal value of the energy, computed at each optimization step.
+(b) Experimentally measured bond dissociation curve of \hehplus, analogous to the approximate Lennard-Jones potential. Each point corresponds to the ground state energy of the Hamiltonian $\hamiltonian(R)$ for a particular value of the atomic separation $R$, and is obtained from a single optimization run as shown in (a). The red line shows the theoretical curve, and grey points show experimental data prior to correction for a small systematic error. (c) is a magnified region of (b), demonstrating that our experimental setup can resolve the dip in the curve, corresponding to the equilibrium bond length of the molecule.
+}
+\label{fig:chemistry-bond-dissociation}
+\end{figure}
+
+The ability to prepare two-qubit states (section \ref{sec:arbitrary-two-qubit}) allows us to investigate $4\times4$ Hamiltonians. It is interesting to draw comparison with the recent experimental demonstration by Lanyon et al. \cite{Lanyon2010}, in which two photonic qubits were implemented in a bulk optical setup. In this work the authors make use of a more orthodox \gls{pea}-based algorithm and as such are forced to use one qubit as the control register which leaves room for a $2\times2$ Hamiltonian only. 
+
+We chose the helium hydride ion \hehplus as the chemical system of interest for this demonstration. Helium hydride is the strongest known acid, and was likely the first molecule to form in the universe after the big bang. The second-quantized Hamiltonian for the two-electron system of $\mathrm{He-H^+}$ can be expressed as a $4\times4$ matrix using a minimal atomic basis set (STO-3G). The coefficients $h_\alpha^i \ldots$ in the expansion of the Hamiltonian were calculated by means of an \gls{fci} method in the PSI3 ab-initio computational chemistry package \cite{Psi4}. Note that this approach is not scalable in general, and is used here for convenience only. The mapping from qubits to fermions is performed using the Jordan-Wigner transform, as described in section \ref{sec:jordan-wigner}.
+
+In our experimental implementation, owing to the small size of the circuit used, we choose as an ansatz the full-two qubit Hilbert space, which has 6 free parameters. This provides a robust test for the performance of the optimization algorithm, but is not at all scalable. Future demonstrations will need to implement a scalable ansatz, the design of which remains an open problem. 
+
+Figure \ref{fig:chemistry-bond-dissociation}(a) shows experimental data from a typical optimization run, with the energy converging to the ground state after $\sim100$ iterations of the algorithm. We studied the degree of entanglement of the two-qubit state as a function of time during the optimization run, using as a metric the \emph{tangle} $T=\mathcal{C}^2$, where $\mathcal{C}$ is concurrence (\ref{eqn:concurrence}). For the case of \hehplus we found that while the algorithm does pass through regions of strongly entangled Hilbert space during the optimization run, the qubit representation of the final electronic ground state was generally only very weakly entangled. The nature of the Jordan-Wigner transform is such that there is not necessarily a correspondence between the degree of entanglement of the fermionic state and that of its qubit representation.
+
+Writing the \hehplus Hamiltonian as a function of the atomic separation $R$, 
+\begin{equation}
+    \hamiltonian = 
+    \sum_{i\alpha} h_a ^ i (R) \, \pauli_a ^ i +
+    \sum_{i j a b} h_{a b} ^ {ij} (R) \, \pauli_a^i \otimes \pauli_b^j + 
+    \ldots
+\end{equation}
+we repeated the optimization process for several values of $R$, thus obtaining the bond dissociation curve shown in figure \ref{fig:chemistry-bond-dissociation}(b, c). This curve is analogous to the Lennard-Jones potential previously described. The equilibrium bond length --- the atomic separation of the molecule in its relaxed state --- was measured to be $R = 92.3 \pm 0.1$ pm, with a corresponding ground-state electronic energy of $E = -2.865\pm0.008$ MJ/mol. Here the error bar is due only to Poissonian finite statistics, and does not take into account error introduced by other experimental imperfections or the convergence of the optimization algorithm. The experimental data in figure \ref{fig:chemistry-bond-dissociation} correspond to tens of thousands of unique measurements on two-photon states generated by the \acrshort{cnotmz}, and as such represent the most demanding application of the device to date.
+
+\section{Discussion} 
+In this work we have simulated the \hehplus molecule using a single two-qubit gate together with a handful of single-qubit rotations. By comparison, the \gls{pea}-based \gls{fci} method for an equivalent Hamiltonian, without adiabatic state preparation, would require at least 12 \acrshort{cnot} operations. By dispensing with the need for \gls{pea}, Trotterization and time evolution, our algorithm enables much more chemistry to be done with much less quantum hardware, and dramatically reduces the necessary coherence time. In doing so, however, we introduce new unknowns. 
+In particular, it is not clear whether the optimization algorithm will necessarily converge in polynomial time. Furthermore, we have not provided a deterministic technique by which a given polynomially-sized ansatz may be parametrized in terms of a quantum circuit --- a fundamental requirement for both theoretical analysis and practical implementation of our algorithm.
+
+
+\section*{Statement of work}
+My main contribution in this section was in the optimization and maintenance of the \gls{cnotmz} chip, together with theoretical analysis of the work. Figure \ref{fig:chemistry-bond-dissociation} is due to Alberto Peruzzo, who also measured the data.
+
+\bibliographystyle{unsrt}
+\bibliography{main.bib}
