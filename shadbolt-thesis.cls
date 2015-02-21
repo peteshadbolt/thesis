@@ -109,8 +109,6 @@
     Department of Physics
 	\vspace{32pt}
 
-    \textcolor{red}{\large This version is not corrected. It contains known mistakes. \\ Proceed with caution!}
-    \vspace{5mm}
 
     A thesis submitted to the University of Bristol in accordance with the requirements for the degree of Doctor of Philosophy in the Faculty~of~Science, Department~of~Physics\\
     \vspace{22pt}

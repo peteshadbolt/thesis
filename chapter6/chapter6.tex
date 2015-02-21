@@ -127,8 +127,8 @@ which can be neatly written as a \emph{Slater determinant}
     \ket{\chi_1 \chi_2 \ldots \chi_n} =
     \frac{1}{\sqrt{n!}}
 \begin{vmatrix}
-    \chi_1(x_1) & \chi_2(x_1) & \ldots & \chi_1(x_n)  \\
-    \chi_1(x_2) & \chi_2(x_2) & \ldots & \chi_2(x_n)  \\
+    \chi_1(x_1) & \chi_2(x_1) & \ldots & \chi_n(x_1)  \\
+    \chi_1(x_2) & \chi_2(x_2) & \ldots & \chi_n(x_2)  \\
     \vdots      & \vdots      & \ddots & \vdots       \\
     \chi_1(x_n) & \chi_2(x_n) & \ldots & \chi_n(x_n)
 \end{vmatrix}.
@@ -155,8 +155,7 @@ HF provides a polynomial ansatz which has been very successful in describing a b
 \centering
 \includegraphics[width=.9\textwidth]{chapter6/fig/configuration_interaction.pdf}
 \caption[Configuration interaction ansatz]{
-Schematic of the configuration interaction ansatz --- a linear combination of possible molecular spin orbital configurations. When the series is not truncated, we obtain the \emph{full configuration interaction} ansatz, which is exact up to the choice of atomic orbital basis set but is classically intractable for systems of more than $\gtrsim 3$ atoms.
-}
+Schematic of the configuration interaction ansatz --- a linear combination of possible molecular spin orbital configurations. When the series is not truncated, we obtain the \emph{full configuration interaction} ansatz, which is exact up to the choice of atomic orbital basis set. However, given the number of orbitals and electrons in a typical molecule of interest, and the number of permutations thereof, this encoding is classically intractable for systems of more than $\gtrsim 3$ atoms. }
 \label{fig:configuration-interaction}
 \end{figure}
 
@@ -300,7 +299,7 @@ Starting from the \gls{fci} electronic structure Hamiltonian $\hamiltonian$ (\re
     \unitary \ket{\psi} = e^{i \hamiltonian \tau} \ket{\psi} = e^{2\pi i \varphi} \ket{\psi}.
 \end{equation}
 % Trotterization
-The task is then to estimate $\varphi$, and thus $E$, by means of the \gls{pea}. We must first be able to implement the controlled-$\unitary(\tau)$ operations at the heart of the \gls{pea} as gate sequences in a digital quantum computer. The Trotter decomposition provides a general prescription for approximate time evolution of arbitrary unitary operators in the gate model. The technique bears a strong resemblance to stop-frame animation \cite{Johnston1981}. For a Hamiltonian $\hamiltonian = \sum_k h_k$, the full time-evolution $exp(i\hamiltonian \tau)$ is divided into $M$ short, time-independent unitary slices of length $\Delta_\tau = \tau/M$,
+The task is then to estimate $\varphi$, and thus $E$, by means of the \gls{pea}. We must first be able to implement the controlled-$\unitary(\tau)$ operations at the heart of the \gls{pea} as gate sequences in a digital quantum computer. The Trotter decomposition provides a general prescription for approximate time evolution of arbitrary unitary operators in the gate model. The technique bears a strong resemblance to stop-frame animation \cite{Johnston1981}. For a Hamiltonian $\hamiltonian = \sum_k h_k$, the full time-evolution $\exp(i\hamiltonian \tau)$ is divided into $M$ short, time-independent unitary slices of length $\Delta_\tau = \tau/M$,
 \begin{equation}
     \unitary=e^{i \tau \sum_k h_k } = \prod_k \left[ e^{i\Delta_\tau h_k}   \right] + O(\Delta_\tau),
 \end{equation}

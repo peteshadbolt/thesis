@@ -10,7 +10,7 @@ Machines take me by surprise with great frequency.
 \label{sec:cnot-mz-intro}
 The discovery and development of universal computing machines is one of the greatest scientific accomplishments of the 20$^{\text{th}}$ century. The Church-Turing thesis --- that all calculable functions can be computed by a particularly simple type of machine --- is generally expressed as a statement about mathematical functions, and the evaluation of numbers. However, the influence of universal computing machines has stretched much further than the academic mathematical context in which they were first conceived, having profound effects on social, economic and artistic life.
 
-The prospective benefits of quantum computing enjoy a similar promise of universality. Specifically, we believe \cite{Deutsch1985} that a large enough machine satisfying the DiVincenzo criteria (section \ref{sec:divincenzo-criteria}) would be universal for quantum computing, and could run any quantum algorithm, prepare any quantum state or operator\footnote{Note that this does not imply any particular scaling: arbitrary $N$-qubit state preparation is exponentially hard even for quantum computers. See chapter \ref{chap:quantum-chemistry} for further discussion.}, and would also be universal for classical computation. This promise allows us to progress with the development of the basic building blocks of quantum information technologies, without complete information on the potential applications of quantum computing: although we have a small number of specific examples of quantum algorithms which provide an exponential speedup over classical machines, it is reasonable to think that, as with classical computation, the scope of useful applications will ultimately prove to be much broader.
+The prospective benefits of quantum computing enjoy a similar promise of universality. Specifically, we believe \cite{Deutsch1985} that a scalable machine satisfying the DiVincenzo criteria (section \ref{sec:divincenzo-criteria}) would be universal for quantum computing, and could run any quantum algorithm, prepare any quantum state or operator\footnote{Note that this does not imply any particular scaling: arbitrary $N$-qubit state preparation is exponentially hard even for quantum computers. See chapter \ref{chap:quantum-chemistry} for further discussion.}, and would also be universal for classical computation. This promise allows us to progress with the development of the basic building blocks of quantum information technologies, without complete information on the potential applications of quantum computing: although we have a small number of specific examples of quantum algorithms which provide an exponential speedup over classical machines, it is reasonable to think that, as with classical computation, the scope of useful applications will ultimately prove to be much broader.
 
 The results of \acrshort{klm} (section \ref{sec:klm}), together with more recent developments in cluster-state theories \cite{Raussendorf2001, Raussendorf2003, Briegel2001, Browne2005}, show that in principle \acrshort{loqc} can provide a scalable route to universal quantum computation. More recently, integrated quantum photonics (section \ref{sec:integrated-quantum-photonics}) has been shown to offer an \emph{experimentally} scalable approach to the construction of \acrshort{loqc} machines, potentially allowing millions  \cite{Sun2013} of components to be lithographically fabricated on a single monolithic chip. Early results in the field include the demonstration of quantum interference in passive linear optical interferometers \cite{Politi2009, Laing2010, Marshall2009, Peruzzo2011a}, as well as active devices with reconfigurable phase shifters\cite{Matthews2009, Matthews2011a, Bonneau2012b}. Notably, most of these reconfigurable devices used a single phase shifter, giving the device a single classical control parameter. This was sufficient for novel demonstrations of quantum metrology \cite{Matthews2009} and switching of entangled photonic states \cite{Bonneau2012b}. However, much of the utility and interest of a universal quantum computer arises from the fact that a single machine can be arbitrarily reconfigured to perform a broad variety of tasks. This degree of reconfigurability requires a large (polynomial) number of classical control parameters, and is the main focus of work described in this section.
 
@@ -112,7 +112,7 @@ The quality of fabrication of directional couplers is critical to the performanc
 The general-purpose flexibility of the \gls{cnotmz} is achieved through the inclusion of eight reconfigurable phase shifters, as shown in figure \ref{fig:cnot-mz-chip}. 
 In silica-on-silicon, reconfigurable phase shifts are most easily implemented using the \emph{thermo-optic effect}. Here, a metallic (titanium/platinum) resistive heater of length $L$ is lithographically patterned on the top surface of the upper waveguide cladding, directly above the waveguide core, as shown in figure \ref{fig:silica-on-silicon}. This heater is connected via Ti/Pt/Au electrodes to a current source, allowing the temperature of a local region of the waveguide to be precisely controlled via Ohmic heating. This gives rise to a to a change in the refractive index of the local core and cladding, with $dn/dT \sim 10^{-5} / \text{K}$, increasing the effective path length and leading to a phase shift $\varphi$ with respect to the unperturbed waveguide. 
 
-The maximum temperature difference supported by the silica-on-silicon material system is \SI{\sim 30}{\degree}, and in order to achieve a range in phase of 2$\pi$ the resistive heater must therefore have a length on the order of \SI{4}{\milli \metre}. 
+The maximum temperature difference supported by the silica-on-silicon material system is \SI{\sim 30}{\degree}C, and in order to achieve a range in phase of 2$\pi$ the resistive heater must therefore have a length on the order of \SI{4}{\milli \metre}. 
 The heaters are rated for a maximum voltage of \SI{5}{\volt}, however in order to achieve a full $2\pi$ phaseshift in all \glspl{mzi} we had to exceed this limit, running most phaseshifters between \SI{0}{\volt} and \SI{7}{\volt}, leading to a total of  \SI{\sim 1}{\watt} per heater at maximum voltage. I-V curves for each resistive heater on the \gls{cnotmz} are shown in figure \ref{fig:calibration}(d), showing a typical resistance of $R$ \SI{\sim 60}{\ohm}. Further details of phaseshifter calibration are given in section \ref{sec:cnot-mz-calibration}.
 
 %Drawbacks
@@ -358,7 +358,7 @@ By a similar argument to that used in section \ref{sec:cnotmz-state-preparation}
 
 \subsection{\acrshort{cnotmz} is universal}
 \label{sec:arbitrary-two-qubit}
-The \gls{cnotmz} can prepare any entangled or separable two-qubit state, up to a global phase.
+The \gls{cnotmz} can prepare any entangled or separable pure two-qubit state, up to a global phase.
 To see this, first note that by the Schmidt decomposition \cite{Nielsen2004}, any pure two-qubit state can be expressed as an arbitrary superposition of two orthogonal separable states
 \begin{align}
   \ket{\Psi_{CT}} &= \alpha\ket{0_C0_T} + \beta \ket{0_C1_T} +\gamma \ket{1_C0_T} + \delta\ket{1_C1_T} \\
@@ -425,7 +425,7 @@ This capability is used to the fullest extent in chapter \ref{chap:quantum-chemi
 \centering
 \includegraphics[width=\linewidth]{chapter3/fig/source_etc.pdf}
 \caption[Experimental setup]
-{ \gls{cnotmz} experimental setup.  A Toptica \emph{iBeam} \SI{404}{\nano \metre} \gls{cw} laser pumps a \gls{bibo} nonlinear crystal, cut and phase-matched to generate degenerate \SI{808}{\nano \metre} photon pairs by type-I \gls{spdc}. Spectral indistinguishability is optimized using tilted Semrock \emph{Maxline} \SI{3}{\nano \metre} notch interference filters (\acrshort{if}). The pump is absorbed by a beam dump (\acrshort{bd}). Photon pairs are coupled in and out of the \gls{cnotmz} through V-groove fiber arrays (\acrshort{vg}). A current source connects to resistive heaters onboard the chip via a custom \gls{pcb}. Four Si-\gls{apd} single-photon detectors, together with an \gls{fpga}, are used to count coincidences at the output of the chip.
+{ \gls{cnotmz} experimental setup.  A Toptica \emph{iBeam} \SI{404}{\nano \metre} \gls{cw} laser pumps a \gls{bibo} nonlinear crystal, cut and phase-matched to generate degenerate \SI{808}{\nano \metre} photon pairs by type-I \gls{spdc}. Spectral indistinguishability is optimized using tilted Semrock \emph{Maxline} \SI{3}{\nano \metre} notch interference filters (\acrshort{if}). The pump is absorbed by a beam dump (\acrshort{bd}). Photon pairs are coupled in and out of the \gls{cnotmz} through optical fibre and V-groove fiber arrays (\acrshort{vg}). \gls{pmf} is used at the input, as \gls{hom} interference is sensitive to the polarization of incoming photons, while \gls{smf} can be used at the output, as the detectors are not strongly polarization-sensitive. A current source connects to resistive heaters onboard the chip via a custom \gls{pcb}. Four Si-\gls{apd} single-photon detectors, together with an \gls{fpga}, are used to count coincidences at the output of the chip.
 }
 \label{fig:cnotmz-experimental-setup}
 \end{figure}
@@ -569,7 +569,7 @@ $\vec{\phi_{j}}$.
 Having calibrated each phaseshifter and observed high-visibility quantum interference in the \gls{cnotmz}, we then used a randomized benchmarking technique to to characterise the operational real-world performance of the device, across the full parameter space.
 We cannot expect to test every possible configuration of all eight phase shifters. Instead, we checked performance for a large number of configurations sampled uniformly at random from the full 8-dimensional parameter space of the chip. A somewhat similar randomized approach to global characterization of quantum gate operations has been proposed by Knill \cite{Knill2008}.
 
-We first chose $995$ random vectors $\vec{\phi_{j}}$ representing possible configurations of the device
+We first chose $1000$ random vectors $\vec{\phi_{j}}$ representing possible configurations of the device
 \begin{equation}
 \vec{\phi_{j}} = \left [ \phi_{1, j}, \phi_{2, j},...,\phi_{8, j}\right]
 ~; \quad 
@@ -581,7 +581,7 @@ Injecting indistinguishable photon pairs into waveguides $w_2$ and $w_4$, we enc
    \approx \left(\sum_i{C_{ij}}\right) \vec{P}_{j}.
 \end{equation}
 Using an idealized numerical model of the device, assuming unit visibility of quantum interference and perfect fabrication, we then calculated the ideal probability distribution 
-$\vec{P}_{j}'$ for each configuration of phases. The experimental setup would ideally exactly reproduce the theoretical prediction, $\vec{P}_{j}' = \vec{P}_{j}$. We characterised the discrepancy between the performance of the \gls{cnotmz} and theoretical predictions using the \emph{statistical fidelity} $F(P, P')=\sum_{i}\sqrt{P_{i}\cdot P_{i}'}$.  The measured statistical distribution of these fidelities over all 995 random configurations is shown in Fig. \ref{fig:histogram}. 
+$\vec{P}_{j}'$ for each configuration of phases. The experimental setup would ideally exactly reproduce the theoretical prediction, $\vec{P}_{j}' = \vec{P}_{j}$. We characterised the discrepancy between the performance of the \gls{cnotmz} and theoretical predictions using the \emph{statistical fidelity} $F(P, P')=\sum_{i}\sqrt{P_{i}\cdot P_{i}'}$.  The measured statistical distribution of these fidelities over 995 random configurations \footnote{Five measurement outcomes were deemed to be spurious due to detectable experimental error.} is shown in Fig. \ref{fig:histogram}. 
 The average fidelity across all configurations was measured to be 0.990$\pm$0.009 with 96\% of configurations producing photon statistics with $F >$ 0.97. 
 
 This result depends on simultaneous high fidelity quantum and classical interference, as well as accurate joint control of all eight phase controllers. Poor performance of any of these component parts would result in lower fidelity output for some subset of 
@@ -636,15 +636,16 @@ Having obtained $\vec{T}$, the experimental density matrix is typically reconstr
 \subsection{Linear reconstruction}
 Consider the choice of quorum 
 \begin{equation}
-\tmeas_i = \hat{\sigma}_{i_1} \otimes \hat{\sigma}_{i_2} \otimes \ldots \otimes \hat{\sigma}_{i_n}.
+\tmeas_i = \hat{\sigma}_{i_1} \otimes \hat{\sigma}_{i_2} \otimes \ldots \otimes \hat{\sigma}_{i_n},
 \label{eqn:pauli_quorum}
 \end{equation}
+where $\sigma_i$ are the usual Pauli matrices.
 It is easy to see 
 from (\ref{eqn:general_mixed_state}) that for this quorum, under ideal experimental conditions, $\vec{T} = \vec{S}$ --- in which case $\dema$ can be simply reconstructed by evaluation of the sum in (\ref{eqn:general_mixed_state}). The simplicity of this reconstruction motivates (\ref{eqn:pauli_quorum}) as the quorum of choice in many experimental implementations of \gls{qst}. However, it is not necessary to choose (\ref{eqn:pauli_quorum}) and there are sometimes experimental reasons\footnote{See for example ref. \cite{LangfordThesis}, where this problem is addressed for polarization-encoded qubits.}
 to make a different choice. In particular it is not necessary for the eigenstates of $\tmeas_i$ to be orthogonal. In order to accommodate more general quora in this analysis, we can write the system of simultaneous equations relating $\vec{T}$ and $\vec{S}$ as $\vec{T} = Q \vec{S}$
 where $Q$ is a change-of-basis matrix with entries
 \begin{equation}
-    Q_{i,j}=\frac{1}{2^n} \mathrm{Tr} \left[ \tmeas_i \hat{\sigma}_j \right]
+    Q_{i,j}=\frac{1}{2^n} \mathrm{Tr} \left[ \tmeas_i \hat{\sigma}_j \right].
 \end{equation}
 %FUTURE: BIG indexing problem. Need to discriminate between 
 This allows $\vec{T}$ --- the experimental data --- to be converted to $\vec{S}$ by linear inversion of $Q$, which is guaranteed to be possible because $\tmeas_i$ and $\hat{\sigma}_j$ are both linearly independent. Once this is done, reconstruction of $\dema$ is a simple matter of evaluating (\ref{eqn:general_mixed_state}).
@@ -660,7 +661,7 @@ When $\dema_r$ is not physical, we cannot confidently apply standard measures to
 %to find the density matrix most likely to have given rise to the experimental data while still guaranteeing physicality. 
 This is accomplished by use of numerical optimization to maximize, over the space of all physical density matrices, a likelihood function describing the probability that a particular $\dema_r$ gave rise to the experimental data. The parametrization of this space can be achieved using the following form, which is positive-semidefinite Hermitian and normalized by construction:
 \begin{equation}
-\dema_{p}\left( \vec{t} \right) = \frac{\hat{g}(\vec{t}) \hat{g}(\vec{t})^{\dagger}} {Tr \left[ \hat{g}(\vec{t}) \hat{g}(\vec{t})^{\dagger} \right]}.
+\dema_{p}\left( \vec{t} \right) = \frac{\hat{g}(\vec{t}) \hat{g}(\vec{t})^{\dagger}} {\trace \left[ \hat{g}(\vec{t}) \hat{g}(\vec{t})^{\dagger} \right]}.
 \label{eqn:physical-mixed-state}
 \end{equation}
 where $\vec{t}$ is a vector of 
@@ -812,7 +813,7 @@ For each $\rho^j_\lin$, the output state of the \acrshort{cnotp} gate was measur
 The process matrix $\chi$ was then reconstructed according to the maximum likelihood technique previously described.
 The experimentally measured process matrix is shown together with the theoretical ideal matrix $\chi_\mathrm{ideal}$ in figures \ref{fig:qpt}(b-d). For clarity, the experimental matrix has been rotated through a local two-qubit unitary which maps \gls{cnotp} to \gls{cnot} (see section \ref{sec:ralph-cnot}). The \emph{process fidelity} \cite{Nielsen2004}
 \begin{equation}
-F_{P} = Tr(\chi_{ideal}\chi_{exp})
+F_{P} = \trace(\chi_\text{ideal}\chi_\text{exp})
 \end{equation}
 between the reconstructed process and the ideal \gls{cnot} operation was found to be 
 0.841$\pm$ 0.002. 

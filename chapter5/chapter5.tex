@@ -19,7 +19,7 @@ As quantum technologies become increasingly complex, these issues will not disap
 
 In all such scenarios, unknown rotations decouple Alice's reference frame from Bob, effectively \emph{breaking} most tomographic protocols, entanglement witnesses, Bell tests, and QKD. Sometimes we can use active stabilization or further classical communication to establish a shared frame, but it is interesting to ask --- how well can we perform these QI tasks in the absence of any shared reference frame?
 
-In this chapter we show how detection of Bell nonlocality can be guaranteed --- preserving device independence --- without a shared frame, even in the absence of well-calibrated devices. We experimentally demonstrate that by dithering voltages on the \acrshort{cnotmz}, we can violate a Bell inequality with high probability.  Finally, we describe a practical method to accurately measure the degree of entanglement of a two-qubit state despite time-dependent unitary noise on the local channel between source and observer. This method makes direct use of Haar-random noise to improve performance,  and allows an experimentalist to detect entanglement by simply shaking, bending and twisting non-polarization maintaining optical fiber. We discuss possible applications of this scheme to measurement and secure communication.
+In this chapter we show how detection of Bell nonlocality can be guaranteed --- preserving device independence --- without a shared frame, even in the absence of well-calibrated devices. We experimentally demonstrate that by randomizing voltages on the \acrshort{cnotmz}, we can violate a Bell inequality with high probability.  Finally, we describe a practical method to accurately measure the degree of entanglement of a two-qubit state despite time-dependent unitary noise on the local channel between source and observer. This method makes direct use of Haar-random noise to improve performance,  and allows an experimentalist to detect entanglement by simply shaking, bending and twisting non-polarization maintaining optical fiber. We discuss possible applications of this scheme to measurement and secure communication.
 
 \section{Bell tests without a shared frame} 
 \label{sec:random-chsh-calibrated}
@@ -38,7 +38,7 @@ A source generates entangled pairs, and photons are sent to Alice and Bob respec
 In sections \ref{sec:nonlocality}, \ref{sec:qkd}, and \ref{sec:cnot-mz-chsh} of this thesis we have seen the significance of nonlocality as a fundamental quantum mechanical phenomenon, as well the utility of nonlocal correlations as a tool for device-independent quantum communication and state characterization.
 Bell tests such as Bell-\acrshort{chsh}, described in detail in section \ref{sec:nonlocality}, provide an experimental prescription for rigorous certification of nonlocal statistics. 
 
-It will be convenient to first re-write the Bell-CHSH inequality (\ref{eqn:chsh-abstract}) using a slightly different notation.  We assume that Alice and Bob measure a two-qubit state $\ket{\psi}$ using $m$ local measurement settings per party, $\hat{A}_i, \hat{B}_j$, $i, j \in \left[0, m -1 \right]$ respectively.  For $m=2$, all local hidden variable (LHV) models must satisfy the Bell-CHSH inequality
+It will be convenient to first re-write the Bell-CHSH inequality (\ref{eqn:chsh-abstract}) using a slightly different notation.  We assume that Alice and Bob measure a two-qubit state $\ket{\psi}$ using $m$ local measurement settings per party, $\hat{A}_j, \hat{B}_j$, $i, j \in \left[0, m -1 \right]$ respectively.  For $m=2$, all local hidden variable (LHV) models must satisfy the Bell-CHSH inequality
 \begin{equation}
         |S| = |\expect{\hat{A}_0 \hat{B}_0} + 
         \expect{\hat{A}_0 \hat{B}_1} + 
@@ -98,7 +98,7 @@ It is straightforward to show that these expectation values are given by the sca
 The columns of $\mathcal{E}$ are therefore equivalent to the coordinates $b_k'$ of the Bloch vectors $\vec{b}_j$ in the basis $\vec{a}_i\}$.  
 By re-labelling measurement settings and outcomes we are free to permute rows and/or columns of this matrix as well as possibly change their sign. 
 We can therefore assume, without loss of generality, that $E_{00, 11, 22} > 0$, and that $E_{22}$ is the largest element by absolute value in $\mathcal{E}$. 
-$\vec{b}_i$ are orthonormal, giving 
+$\vec{b}_j$ are orthonormal, giving 
 $\vec{b}_2 = \pm \vec{b}_0 \times \vec{b}_1$ and therefore 
 $|E_{22}| = |E_{00}E_{11} - E_{01}E_{10}|$.
 Now, 
@@ -266,13 +266,13 @@ Charlie has a source, which generates qubit pairs in the state $\astate$. He cla
 \begin{equation}
     \fullchannel(t) = \unitary_A(t) \otimes \unitary_B(t),
 \end{equation}
-where $\unitary_A(t)$, $\unitary_B(t)$ are chosen independently and at random from the Haar measure on $SU(2)$. After some interval $\Delta t$, instability in the channel leads to new instances of $\unitary_A$, $\unitary_B$, drawn again from the Haar measure. During a single timestep $t_i = t_0 + i \Delta t$, Alice and Bob receive $n$ copies of the state
+where $\unitary_A(t)$, $\unitary_B(t)$ are chosen independently and at random from the Haar measure on $SU(2)$. After some interval $\Delta t$, instability in the channel leads to new instances of $\unitary_A$, $\unitary_B$, drawn again from the Haar measure. During a single timestep $t_j = t_0 + j \Delta t$, Alice and Bob receive $n$ copies of the state
 \begin{equation}
-   \bstate^i = \fullchannel(t_i) ~ \astate ~ \fullchannel(t_i)^\dagger = \fullchannel_i ~ \astate ~ \fullchannel_i^\dagger 
+   \bstate^i = \fullchannel(t_j) ~ \astate ~ \fullchannel(t_j)^\dagger = \fullchannel_j ~ \astate ~ \fullchannel_j^\dagger 
 \end{equation}
 where $n$ is sufficiently large to give a good estimate of the expectation value
 \begin{equation}
-  E_i = \expect{\ameas_i \otimes \bmeas_i } = \text{Tr}\, ( \bstate^i ~ \ameas_i \otimes \bmeas_i ),
+  E_j = \expect{\ameas_j \otimes \bmeas_j } = \text{Tr}\, ( \bstate^j ~ \ameas_j \otimes \bmeas_j ),
 \end{equation}
 where $\ameas$, $\bmeas$ are Alice and Bob's single-qubit measurement operators  respectively.
 
@@ -290,12 +290,12 @@ What happens if Alice and Bob attempt to perform quantum state tomography (secti
 
 Assuming that $\unitary_A$, $\unitary_B$ are Haar-random, Alice and Bob know that no particular choice of local measurement basis can give more information than any other. Without loss of generality, we can therefore assume that they \emph{always} measure the $\hat{\sigma}_z$ basis, obtaining expectation values
 \begin{equation}
-    E_i = \langle \hat{\sigma}_z \otimes \hat{\sigma}_z \rangle = \text{Tr}\, \left( (\hat{\sigma}_z \otimes \hat{\sigma}_z ) (\fullchannel_i \astate \fullchannel_i^\dagger ) \right).
+    E_j = \langle \hat{\sigma}_z \otimes \hat{\sigma}_z \rangle = \text{Tr}\, \left( (\hat{\sigma}_z \otimes \hat{\sigma}_z ) (\fullchannel_j \astate \fullchannel_j^\dagger ) \right).
     \label{eqn:harsh-expectation-value}
 \end{equation}
-It can easily be shown that the average value of $E_i$ over all $\fullchannel_i$ is always 0, regardless of $\astate$. However, if we take the absolute value of $E_i$ before averaging, we will show that the quantity
+It can easily be shown that the average value of $E_j$ over all $\fullchannel_j$ is always 0, regardless of $\astate$. However, if we take the absolute value of $E_j$ before averaging, we will show that the quantity
 \begin{equation}
-    T \equiv \langle |E| \rangle = \sum_{i=0}^N \frac{|E_i|}{N},
+    T \equiv \langle |E| \rangle = \sum_{i=0}^N \frac{|E_j|}{N},
     \label{eqn:define-t}
 \end{equation}
 distinguishes entangled states from separable states, and can be used to infer the degree of entanglement of $\astate$.  Figure \ref{fig:harsh-noise-setup}(c) is result of a numerical simulation, showing the distribution of $T$ for a separable state $\ket{00}$ and a maximally entangled state $\ket{\Psi^-}$, averaging over $N$ measurements. 
@@ -303,12 +303,12 @@ All separable pure states give a mean value $T=1/4$, while all maximally entangl
 
 \vspace{3mm}
 \noindent\textbf{Proof:}
-Given that $\fullchannel = \unitary_A \otimes \unitary_B$ where $\unitary_{A,B}$ are chosen by the Haar measure on $SU(2)$, we can assume without loss of generality that, after the channel, any separable state is equivalent to the state $\ket{00}$ and any maximally entangled state is equivalent to the singlet $\ket{\Psi^-}$. Unitary rotation of a qubit followed by measurement in the $\hat{\sigma}_z$ basis is equivalent to measurement in the \emph{effective} basis $\hat{M}^{eff} = \unitary^\dagger \hat{\sigma}_z \unitary$. Rather than integrating $\unitary_{A,B}$ over the Haar measure on $SU(2)$, it is simpler to consider the Bloch vectors $\vec{a}_i, \vec{b}_i \in \mathbb{R}^{(3)}$, which depend on $\unitary_{A,B}$ and map to Alice and Bob's effective measurement operators 
+Given that $\fullchannel = \unitary_A \otimes \unitary_B$ where $\unitary_{A,B}$ are chosen by the Haar measure on $SU(2)$, we can assume without loss of generality that, after the channel, any separable state is equivalent to the state $\ket{00}$ and any maximally entangled state is equivalent to the singlet $\ket{\Psi^-}$. Unitary rotation of a qubit followed by measurement in the $\hat{\sigma}_z$ basis is equivalent to measurement in the \emph{effective} basis $\hat{M}^{eff} = \unitary^\dagger \hat{\sigma}_z \unitary$. Rather than integrating $\unitary_{A,B}$ over the Haar measure on $SU(2)$, it is simpler to consider the Bloch vectors $\vec{a}_j, \vec{b}_j \in \mathbb{R}^{(3)}$, which depend on $\unitary_{A,B}$ and map to Alice and Bob's effective measurement operators 
 \begin{align}
-\hat{A}_j^{eff} = \vec{a}_j \cdot \vec{\sigma} = a_j^x \hat{\sigma}_x + a_j^y \hat{\sigma}_y + a_j^z \hat{\sigma}_z\\
-\hat{B}_j^{eff} = \vec{b}_j \cdot \vec{\sigma} = b_j^x \hat{\sigma}_x + b_j^y \hat{\sigma}_y + b_j^z \hat{\sigma}_z,
+\hat{A}_j^\text{eff} = \vec{a}_j \cdot \vec{\sigma} = a_j^x \hat{\sigma}_x + a_j^y \hat{\sigma}_y + a_j^z \hat{\sigma}_z\\
+\hat{B}_j^\text{eff} = \vec{b}_j \cdot \vec{\sigma} = b_j^x \hat{\sigma}_x + b_j^y \hat{\sigma}_y + b_j^z \hat{\sigma}_z,
 \end{align}
-which correspond to points on the 2-sphere $\mathbb{S}^{(2)}$. For the singlet, the expectation value (\ref{eqn:harsh-expectation-value}) is simply given by the dot product, $E_i=-\vec{a}_i \cdot \vec{b}_i$. For $\ket{00}$, the expectation value is $E_i = a_i^z\, a_i^z$.
+which correspond to points on the 2-sphere $\mathbb{S}^{(2)}$. For the singlet, the expectation value (\ref{eqn:harsh-expectation-value}) is simply given by the dot product, $E_j=-\vec{a}_j \cdot \vec{b}_j$. For $\ket{00}$, the expectation value is $E_j = a_j^z\, a_j^z$.
 
 
 
@@ -361,7 +361,7 @@ $\ket{\phi(\mu)} = \sqrt{\mu}\ket{\Psi^-} + \sqrt{1-\mu}\ket{00}$,  which can be
 %%%%%%%%%%%%% FIGURE 2 %%%%%%%%%%%%%
 \begin{figure}[t!]
 \includegraphics[width=.99\linewidth]{chapter5/fig/harsh/data.pdf}
-\caption[Detecting entanglement by bending single-mode fiber]{Experimental data. (a) Expectation values $E_i = (C_{00}-C_{01}-C_{10})/\mathcal{C}$, measured as a function of time for a Bell state (blue lines) and a separable state (red lines), with optical fiber subject to constant bending and twisting. (b) Values of $T$ computed from the data shown in (a), with $N \in \left[1, 20\right]$. The entangled distributions (red lines) are clearly distinguishable from the separable state data (blue lines). By encoding bits of information in the choice of entangled/separable state, an image can be sent through the noisy polarization channel. Inset (i) source image sent by Charlie, (ii) image recovered by Alice and Bob. (c) Twisting optical fiber does not sample uniformly from $SU(2)$. This data was measured using waveplates to experimentally implement $\sim100$ unitaries sampled numerically from $SU(2)\times SU(2)$. Blue and red dots show the quantum and classical experimental distributions of $T$ respectively, for $N=4$. Solid lines show the theoretical prediction. Inset: real and imaginary parts of $\ket{\Psi^-}$ as generated by the source, characterized by quantum state tomography.
+\caption[Detecting entanglement by bending single-mode fiber]{Experimental data. (a) Expectation values $E_j = (C_{00}-C_{01}-C_{10})/\mathcal{C}$, measured as a function of time for a Bell state (blue lines) and a separable state (red lines), with optical fiber subject to constant bending and twisting. (b) Values of $T$ computed from the data shown in (a), with $N \in \left[1, 20\right]$. The entangled distributions (red lines) are clearly distinguishable from the separable state data (blue lines). By encoding bits of information in the choice of entangled/separable state, an image can be sent through the noisy polarization channel. Inset (i) source image sent by Charlie, (ii) image recovered by Alice and Bob. (c) Twisting optical fiber does not sample uniformly from $SU(2)$. This data was measured using waveplates to experimentally implement $\sim100$ unitaries sampled numerically from $SU(2)\times SU(2)$. Blue and red dots show the quantum and classical experimental distributions of $T$ respectively, for $N=4$. Solid lines show the theoretical prediction. Inset: real and imaginary parts of $\ket{\Psi^-}$ as generated by the source, characterized by quantum state tomography.
 }
 \label{fig:harsh-noise-data}
 \end{figure}
@@ -389,9 +389,9 @@ As already discussed, the polarization of light is not maintained by \acrshort{s
 
 In our first experiment, we investigated the performance of our technique using random unitary rotations generated in this way. Removing both polarizers, we connected each arm of the source to a fibre-coupled \gls{pbs} which, together with two detectors, projects onto the $\ket{H}$, $\ket{V}$ states --- i.e. measurement in the $\pauli_z$ basis. We then recorded coincidence count-rates $c_{HH}, c_{HV}, c_{VH}, c_{VV}$, corresponding to the $\ket{HH}, \ket{HV}, \ket{VH}, \ket{VV}$ basis states respectively, while manually straining, bending and shaking both optical fibers. We accumulated $\sim 250$ expectation values
 \begin{equation}
-    E_i = \frac{c_{HH} - c_{HV} - c_{VH} + c_{VV}}{c_{HH} + c_{HV} + c_{VH} + c_{VV}}.
+    E_j = \frac{c_{HH} - c_{HV} - c_{VH} + c_{VV}}{c_{HH} + c_{HV} + c_{VH} + c_{VV}}.
 \end{equation}
-Inserting a linear polarizer at \SI{0}{\degree} into one arm of the source, we then filtered out the $\ket{HV}$ term of (\ref{eqn:spdc-bell}) --- rendering Charlie's state separable --- and took a second set of data, manipulating the fibers as before. Raw data for both states is shown in figure \ref{fig:harsh-noise-data}. Although the average expectation value $\expect{E_i}$ is equal to zero for both states, the entangled state is clearly more likely to yield strongly correlated or anticorrelated statistics. Figure \ref{fig:harsh-noise-data} shows the distribution of the absolute expectation value, when averaging over $N$ measurements, for $N \in \left[ 1, 20 \right]$. As predicted, we see a clear distinction between distributions generated by the entangled and separable states, becoming increasingly pronounced with larger values of $N$. When Charlie prepares $\ket{\Psi^+}$, the average value of $T$ (\ref{eqn:define-t}) was found to be $\expect{T}\sim 0.399$. For the separable state $\ket{VH}$, we found $\expect{T}\sim0.163$. 
+Inserting a linear polarizer at \SI{0}{\degree} into one arm of the source, we then filtered out the $\ket{HV}$ term of (\ref{eqn:spdc-bell}) --- rendering Charlie's state separable --- and took a second set of data, manipulating the fibers as before. Raw data for both states is shown in figure \ref{fig:harsh-noise-data}. Although the average expectation value $\expect{E_j}$ is equal to zero for both states, the entangled state is clearly more likely to yield strongly correlated or anticorrelated statistics. Figure \ref{fig:harsh-noise-data} shows the distribution of the absolute expectation value, when averaging over $N$ measurements, for $N \in \left[ 1, 20 \right]$. As predicted, we see a clear distinction between distributions generated by the entangled and separable states, becoming increasingly pronounced with larger values of $N$. When Charlie prepares $\ket{\Psi^+}$, the average value of $T$ (\ref{eqn:define-t}) was found to be $\expect{T}\sim 0.399$. For the separable state $\ket{VH}$, we found $\expect{T}\sim0.163$. 
 
 The distribution of random unitaries generated by manual manipulation of \acrshort{smf} is not perfectly uniform. Moreover, it is inevitable that the fiber will move somewhat during each measurement step, in which case the measured expectation value is averaged over a continuum of states. This leads to an overall reduction in the absolute expectation value, and explains why measured values of $\expect{T}$ were not closer to 1/2 and 1/4 respectively. Experimentally, it will often be the case that the channel unitary will change by a significant amount during the measurement of a single expectation value. A numerical analysis of the performance of this scheme under such conditions is shown in figure \ref{fig:harsh-noisy-states}(b). Although $\expect{T}$ does indeed reduce as the maximum rate of change of the channel is increased, we note a consistent separation between entangled and separable states, suggesting that they might still be distinguished even when the channel fluctuates much faster than a measurement can be made.
 
