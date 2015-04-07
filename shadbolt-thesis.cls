@@ -40,7 +40,7 @@
 \RequirePackage{listings}
 \RequirePackage[]{siunitx}
 \RequirePackage{chapterbib}
-\RequirePackage[xindy]{glossaries}
+\RequirePackage[xindy, nonumberlist]{glossaries}
 %\renewcommand{\glsdisplayfirst}[4]{\textit{#1 #4}}
 
 

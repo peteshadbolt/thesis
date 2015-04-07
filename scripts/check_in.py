@@ -57,7 +57,8 @@ plt.hist(hours, bins=23, color='black', ec='black', histtype='step')
 plt.xlim(0, 23)
 plt.xticks(range(24))
 plt.yticks([0, 45])
-plt.xlabel('Time')
+plt.xlabel('Time of day')
+plt.xlabel('Number of commits')
 
 plt.savefig('progress.pdf', bbox_inches='tight')
 
